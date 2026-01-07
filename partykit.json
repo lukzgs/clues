@@ -1,6 +1,7 @@
 {
   "name": "clues-party",
   "$schema": "https://www.partykit.io/schema.json",
-  "main": "src/party/server.ts",
-  "compatibilityDate": "2024-01-01"
+  "main": "party/server.ts",
+  "compatibilityDate": "2024-01-01",
+  "port": 1999
 }

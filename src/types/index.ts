@@ -15,10 +15,11 @@ export interface Player {
   color: string;
   isConnected: boolean;
   isHost: boolean;
+  isBot?: boolean; // [BOT] Flag para identificar bots
 }
 
 export interface TableCard {
-  oderId: number;  // Ordem para embaralhar na votação
+  orderId: number;  // Ordem para embaralhar na votação
   playerId: string;
   card: Card;
 }
@@ -39,7 +40,7 @@ export interface GameState {
   narratorIndex: number;
   currentClue: string;
   tableCards: TableCard[];
-  votes: Record<string, number>; // oderId do cardId votado
+  votes: Record<string, number>; // orderId do cardId votado
   winner: string | null;
   deckCount: number; // Não enviamos o deck inteiro para o cliente
 }
@@ -77,6 +78,9 @@ export enum ClientMessageType {
   VOTE = 'VOTE',
   NEXT_ROUND = 'NEXT_ROUND',
   RESTART_GAME = 'RESTART_GAME',
+  // [BOT] Mensagens para controle de bots
+  ADD_BOT = 'ADD_BOT',
+  REMOVE_BOT = 'REMOVE_BOT',
 }
 
 export interface JoinRoomMessage {
@@ -105,7 +109,7 @@ export interface PlayCardMessage {
 
 export interface VoteMessage {
   type: ClientMessageType.VOTE;
-  oderId: number;
+  orderId: number;
 }
 
 export interface NextRoundMessage {
@@ -116,6 +120,16 @@ export interface RestartGameMessage {
   type: ClientMessageType.RESTART_GAME;
 }
 
+// [BOT] Mensagens de bot
+export interface AddBotMessage {
+  type: ClientMessageType.ADD_BOT;
+}
+
+export interface RemoveBotMessage {
+  type: ClientMessageType.REMOVE_BOT;
+  botId: string;
+}
+
 export type ClientMessage =
   | JoinRoomMessage
   | LeaveRoomMessage
@@ -124,7 +138,9 @@ export type ClientMessage =
   | PlayCardMessage
   | VoteMessage
   | NextRoundMessage
-  | RestartGameMessage;
+  | RestartGameMessage
+  | AddBotMessage
+  | RemoveBotMessage;
 
 // ============================================
 // MENSAGENS SERVIDOR -> CLIENTE

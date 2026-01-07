@@ -30,6 +30,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*",
+    "party/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

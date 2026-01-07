@@ -1,16 +1,8 @@
 import { Card } from '../types';
+import { GAME_CONFIG } from '../config';
 
-// ============================================
-// CONFIGURAÇÕES DO JOGO
-// ============================================
-
-export const GAME_CONFIG = {
-  MIN_PLAYERS: 3,
-  MAX_PLAYERS: 8,
-  HAND_SIZE: 6,
-  WINNING_SCORE: 30,
-  DECK_SIZE: 84,
-} as const;
+// Re-export para manter compatibilidade
+export { GAME_CONFIG };
 
 // ============================================
 // DECK DE CARTAS
@@ -18,7 +10,7 @@ export const GAME_CONFIG = {
 
 // Usando picsum.photos com seeds para imagens consistentes
 export const INITIAL_DECK: Card[] = Array.from(
-  { length: GAME_CONFIG.DECK_SIZE }, 
+  { length: GAME_CONFIG.DECK_SIZE },
   (_, i) => ({
     id: i + 1,
     imageUrl: `https://picsum.photos/seed/clues-${i + 1}/400/600`,
@@ -29,5 +21,5 @@ export const INITIAL_DECK: Card[] = Array.from(
 // PARTYKIT
 // ============================================
 
-export const PARTYKIT_HOST = 
+export const PARTYKIT_HOST =
   import.meta.env.VITE_PARTYKIT_HOST || 'localhost:1999';
