@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PartySocket from 'partysocket';
-import { 
-  GameState, 
-  ClientMessageType, 
+import {
+  GameState,
+  ClientMessageType,
   ServerMessageType,
   ServerMessage,
 } from '../types';
 import { PARTYKIT_HOST } from '../constants';
+import {
+  JoinRoomSchema,
+  SubmitClueSchema,
+  PlayCardSchema,
+  VoteSchema,
+  RemoveBotSchema,
+} from '../schemas';
 
 // ============================================
 // TIPOS DO HOOK
@@ -23,30 +30,33 @@ interface UseGameRoomReturn {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
-  
+
   // Ações
   startGame: () => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
-  vote: (oderId: number) => void;
+  vote: (orderId: number) => void;
   nextRound: () => void;
   restartGame: () => void;
   leaveRoom: () => void;
+  // [BOT] Ações de bots
+  addBot: () => void;
+  removeBot: (botId: string) => void;
 }
 
 // ============================================
 // HOOK PRINCIPAL
 // ============================================
 
-export function useGameRoom({ 
-  roomCode, 
-  playerName 
+export function useGameRoom({
+  roomCode,
+  playerName
 }: UseGameRoomOptions): UseGameRoomReturn {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
 
@@ -64,14 +74,17 @@ export function useGameRoom({
     socket.addEventListener('open', () => {
       setIsConnected(true);
       setError(null);
-      
-      // Entra na sala
+
+      // Entra na sala (com validação)
       if (!hasJoinedRef.current) {
-        socket.send(JSON.stringify({
-          type: ClientMessageType.JOIN_ROOM,
+        const result = JoinRoomSchema.safeParse({
+          type: 'JOIN_ROOM',
           playerName,
-        }));
-        hasJoinedRef.current = true;
+        });
+        if (result.success) {
+          socket.send(JSON.stringify(result.data));
+          hasJoinedRef.current = true;
+        }
       }
     });
 
@@ -137,25 +150,33 @@ export function useGameRoom({
   }, [send]);
 
   const submitClue = useCallback((cardId: number, clue: string) => {
-    send({ 
-      type: ClientMessageType.SUBMIT_CLUE, 
-      cardId, 
-      clue 
+    const result = SubmitClueSchema.safeParse({
+      type: 'SUBMIT_CLUE',
+      cardId,
+      clue
     });
+    if (result.success) {
+      send(result.data);
+    } else {
+      setError(result.error.issues[0]?.message || 'Dados inválidos');
+    }
   }, [send]);
 
   const playCard = useCallback((cardId: number) => {
-    send({ 
-      type: ClientMessageType.PLAY_CARD, 
-      cardId 
+    send({
+      type: ClientMessageType.PLAY_CARD,
+      cardId
     });
   }, [send]);
 
-  const vote = useCallback((oderId: number) => {
-    send({ 
-      type: ClientMessageType.VOTE, 
-      oderId 
+  const vote = useCallback((orderId: number) => {
+    const result = VoteSchema.safeParse({
+      type: 'VOTE',
+      orderId
     });
+    if (result.success) {
+      send(result.data);
+    }
   }, [send]);
 
   const nextRound = useCallback(() => {
@@ -171,6 +192,21 @@ export function useGameRoom({
     socketRef.current?.close();
   }, [send]);
 
+  // [BOT] Ações de bots
+  const addBot = useCallback(() => {
+    send({ type: ClientMessageType.ADD_BOT });
+  }, [send]);
+
+  const removeBot = useCallback((botId: string) => {
+    const result = RemoveBotSchema.safeParse({
+      type: 'REMOVE_BOT',
+      botId
+    });
+    if (result.success) {
+      send(result.data);
+    }
+  }, [send]);
+
   return {
     gameState,
     playerId,
@@ -183,5 +219,7 @@ export function useGameRoom({
     nextRound,
     restartGame,
     leaveRoom,
+    addBot,
+    removeBot,
   };
 }

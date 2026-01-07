@@ -6,12 +6,12 @@ import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 // Gera código de sala aleatório
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 5 }, () => 
+  return Array.from({ length: 5 }, () =>
     chars[Math.floor(Math.random() * chars.length)]
   ).join('');
 }
 
-type AppState = 
+type AppState =
   | { screen: 'join' }
   | { screen: 'connecting'; roomCode: string; playerName: string }
   | { screen: 'game'; roomCode: string; playerName: string };
@@ -32,6 +32,8 @@ const App: React.FC = () => {
     nextRound,
     restartGame,
     leaveRoom,
+    addBot,
+    removeBot,
   } = useGameRoom({
     roomCode: appState.screen !== 'join' ? appState.roomCode : '',
     playerName: appState.screen !== 'join' ? appState.playerName : '',
@@ -55,8 +57,8 @@ const App: React.FC = () => {
   // Transição de connecting para game quando conectado
   React.useEffect(() => {
     if (appState.screen === 'connecting' && isConnected && gameState) {
-      setAppState(prev => 
-        prev.screen === 'connecting' 
+      setAppState(prev =>
+        prev.screen === 'connecting'
           ? { screen: 'game', roomCode: prev.roomCode, playerName: prev.playerName }
           : prev
       );
@@ -66,7 +68,7 @@ const App: React.FC = () => {
   // Tela de join
   if (appState.screen === 'join') {
     return (
-      <JoinScreen 
+      <JoinScreen
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
       />
@@ -75,8 +77,8 @@ const App: React.FC = () => {
 
   // Tela de conexão
   if (appState.screen === 'connecting' || !gameState || !playerId) {
-    const roomCode = appState.screen === 'connecting' ? appState.roomCode : 
-                     appState.screen === 'game' ? appState.roomCode : '';
+    const roomCode = appState.screen === 'connecting' ? appState.roomCode :
+      appState.screen === 'game' ? appState.roomCode : '';
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center">
@@ -87,7 +89,7 @@ const App: React.FC = () => {
           {error && (
             <div className="mt-4">
               <p className="text-red-400 mb-2">{error}</p>
-              <button 
+              <button
                 onClick={() => setAppState({ screen: 'join' })}
                 className="text-slate-500 hover:text-white"
               >
@@ -108,6 +110,8 @@ const App: React.FC = () => {
         currentPlayer={gameState.players.find(p => p.id === playerId)}
         onStartGame={startGame}
         onLeaveRoom={handleLeaveRoom}
+        onAddBot={addBot}
+        onRemoveBot={removeBot}
       />
     );
   }
