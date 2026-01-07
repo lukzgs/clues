@@ -1,15 +1,17 @@
 // ============================================
 // CONFIGURAÇÕES DO JOGO
-// Arquivo compartilhado entre cliente e servidor
+// Importado de game.config.json (compartilhado com servidor)
 // ============================================
 
-export const GAME_CONFIG = {
-    MIN_PLAYERS: 3,
-    MAX_PLAYERS: 8,
-    HAND_SIZE: 6,
-    WINNING_SCORE: 30,
-    DECK_SIZE: 84,
-} as const;
+import gameConfig from '../game.config.json';
+
+export const GAME_CONFIG = gameConfig as {
+    readonly MIN_PLAYERS: number;
+    readonly MAX_PLAYERS: number;
+    readonly HAND_SIZE: number;
+    readonly WINNING_SCORE: number;
+    readonly DECK_SIZE: number;
+};
 
 // ============================================
 // CORES DOS JOGADORES

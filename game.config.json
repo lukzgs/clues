@@ -1,0 +1,7 @@
+{
+    "MIN_PLAYERS": 3,
+    "MAX_PLAYERS": 8,
+    "HAND_SIZE": 6,
+    "WINNING_SCORE": 30,
+    "DECK_SIZE": 84
+}
