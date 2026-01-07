@@ -3,12 +3,12 @@ import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 
-// Gera código de sala aleatório
+// Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 5 }, () =>
-    chars[Math.floor(Math.random() * chars.length)]
-  ).join('');
+  const array = new Uint8Array(5);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => chars[byte % chars.length]).join('');
 }
 
 type AppState =
