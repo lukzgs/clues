@@ -11,17 +11,21 @@
     "party:deploy": "partykit deploy"
   },
   "dependencies": {
-    "partysocket": "^1.0.2",
+    "partysocket": "^1.1.10",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
+    "@types/node": "^25.0.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "partykit": "^0.0.111",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^5.1.2",
+    "partykit": "^0.0.115",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "ws": "^8.19.0"
   }
 }
