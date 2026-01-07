@@ -23,16 +23,10 @@ try {
 }
 
 // ============================================
-// CONFIGURAÇÕES (duplicadas aqui pois server não usa vite)
+// CONFIGURAÇÕES (importado de game.config.json)
 // ============================================
 
-const GAME_CONFIG = {
-  MIN_PLAYERS: 3,
-  MAX_PLAYERS: 8,
-  HAND_SIZE: 6,
-  WINNING_SCORE: 30,
-  DECK_SIZE: 84,
-};
+import GAME_CONFIG from '../game.config.json';
 
 // ============================================
 // FUNÇÕES UTILITÁRIAS
@@ -71,6 +65,10 @@ export default class GameServer implements Party.Server {
 
   // [BOT] Gerenciador de bots (opcional)
   private botManager: any = null;
+
+  // Rate limiting: connectionId -> count
+  private messageCount: Map<string, number> = new Map();
+  private rateLimitReset: number = Date.now();
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
@@ -139,10 +137,40 @@ export default class GameServer implements Party.Server {
   }
 
   // ============================================
+  // RATE LIMITING
+  // ============================================
+
+  private checkRateLimit(connId: string): boolean {
+    const now = Date.now();
+    const WINDOW_MS = 5000; // 5 segundos
+    const MAX_MESSAGES = 5; // máximo por janela
+
+    // Reset contador a cada janela
+    if (now - this.rateLimitReset > WINDOW_MS) {
+      this.messageCount.clear();
+      this.rateLimitReset = now;
+    }
+
+    const count = this.messageCount.get(connId) || 0;
+    if (count >= MAX_MESSAGES) {
+      return false;
+    }
+
+    this.messageCount.set(connId, count + 1);
+    return true;
+  }
+
+  // ============================================
   // PROCESSAMENTO DE MENSAGENS
   // ============================================
 
   onMessage(message: string, sender: Party.Connection) {
+    // Rate limiting
+    if (!this.checkRateLimit(sender.id)) {
+      console.warn('Rate limit excedido:', sender.id);
+      return;
+    }
+
     try {
       // Validação com Zod
       const parsed = ClientMessageSchema.safeParse(JSON.parse(message));
@@ -364,7 +392,6 @@ export default class GameServer implements Party.Server {
     });
 
     // Verifica se todos jogaram
-    const playersWhoShouldPlay = this.state.players.length - 1; // -1 narrador
     if (this.state.tableCards.length === this.state.players.length) {
       // Embaralha as cartas na mesa
       this.state.tableCards = shuffle(this.state.tableCards).map((tc, i) => ({
