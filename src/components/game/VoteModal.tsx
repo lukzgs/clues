@@ -56,7 +56,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           const isMine = tableCard.playerId === playerId;
           
           return (
-            <div key={tableCard.oderId} className="flex flex-col items-center gap-2">
+            <div key={tableCard.orderId} className="flex flex-col items-center gap-2">
               <GameCard
                 card={tableCard.card}
                 size="md"

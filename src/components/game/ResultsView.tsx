@@ -40,11 +40,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           
           // Conta votos nesta carta
           const votesOnThis = Object.entries(gameState.votes)
-            .filter(([_, oderId]) => oderId === tableCard.oderId)
+            .filter(([_, orderId]) => orderId === tableCard.orderId)
             .map(([voterId]) => gameState.players.find(p => p.id === voterId));
 
           return (
-            <div key={tableCard.oderId} className="flex flex-col items-center gap-3">
+            <div key={tableCard.orderId} className="flex flex-col items-center gap-3">
               <GameCard
                 card={tableCard.card}
                 size="md"

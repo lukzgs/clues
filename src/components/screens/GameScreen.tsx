@@ -15,7 +15,7 @@ interface GameScreenProps {
   playerId: string;
   onSubmitClue: (cardId: number, clue: string) => void;
   onPlayCard: (cardId: number) => void;
-  onVote: (oderId: number) => void;
+  onVote: (orderId: number) => void;
   onNextRound: () => void;
   onRestartGame: () => void;
   onLeaveRoom: () => void;
@@ -62,7 +62,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   // Handler para votar
   const handleVote = (tableCard: TableCard) => {
     if (tableCard.playerId !== playerId) {
-      onVote(tableCard.oderId);
+      onVote(tableCard.orderId);
     }
   };
 
