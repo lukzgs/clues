@@ -1,0 +1,162 @@
+# Documentação do Cliente
+
+## Visão Geral
+
+O frontend é uma aplicação React 19 usando TypeScript. Conecta-se ao servidor PartyKit via WebSocket e gerencia a UI do jogo.
+
+## Ponto de Entrada
+
+### `src/App.tsx`
+
+Componente principal da aplicação gerenciando estado do app:
+
+```typescript
+type AppState =
+  | { screen: 'join' }
+  | { screen: 'connecting'; roomCode: string; playerName: string }
+  | { screen: 'game'; roomCode: string; playerName: string };
+```
+
+**Funções Principais:**
+- `generateRoomCode()` - Cria códigos de sala de 5 caracteres criptograficamente seguros
+- `handleCreateRoom()` - Cria nova sala e conecta
+- `handleJoinRoom()` - Entra em sala existente
+- `handleLeaveRoom()` - Desconecta e retorna para tela de entrada
+
+---
+
+## Hooks
+
+### `useGameRoom` (`src/hooks/useGameRoom.ts`)
+
+Hook principal para conexão WebSocket e ações do jogo.
+
+**Parâmetros:**
+```typescript
+interface UseGameRoomOptions {
+  roomCode: string;
+  playerName: string;
+}
+```
+
+**Retorna:**
+```typescript
+{
+  gameState: GameState | null;
+  playerId: string | null;
+  isConnected: boolean;
+  error: string | null;
+  
+  // Ações
+  startGame: () => void;
+  submitClue: (cardId: number, clue: string) => void;
+  playCard: (cardId: number) => void;
+  vote: (orderId: number) => void;
+  nextRound: () => void;
+  restartGame: () => void;
+  leaveRoom: () => void;
+  addBot: () => void;
+  removeBot: (botId: string) => void;
+}
+```
+
+---
+
+## Telas
+
+Localizadas em `src/components/screens/`:
+
+### `JoinScreen.tsx`
+
+Tela inicial para criar ou entrar em salas.
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `onCreateRoom` | `(playerName: string) => void` | Cria nova sala |
+| `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Entra em sala existente |
+
+### `LobbyScreen.tsx`
+
+Sala de espera antes do jogo começar.
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `gameState` | `GameState` | Estado atual do jogo |
+| `currentPlayer` | `Player \| undefined` | Dados do jogador atual |
+| `onStartGame` | `() => void` | Inicia o jogo (host) |
+| `onLeaveRoom` | `() => void` | Sai da sala |
+| `onAddBot` | `() => void` | Adiciona jogador bot (host) |
+| `onRemoveBot` | `(botId: string) => void` | Remove bot (host) |
+
+### `GameScreen.tsx`
+
+Interface principal do jogo com renderização baseada em fase.
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `gameState` | `GameState` | Estado atual do jogo |
+| `playerId` | `string` | ID do jogador atual |
+| `onSubmitClue` | `(cardId, clue) => void` | Enviar dica do narrador |
+| `onPlayCard` | `(cardId) => void` | Jogar carta |
+| `onVote` | `(orderId) => void` | Votar em carta |
+| `onNextRound` | `() => void` | Avançar rodada |
+| `onRestartGame` | `() => void` | Reiniciar jogo |
+| `onLeaveRoom` | `() => void` | Sair da sala |
+
+---
+
+## Componentes do Jogo
+
+Localizados em `src/components/game/`:
+
+| Componente | Descrição |
+|------------|-----------|
+| `GameCard.tsx` | Exibição de carta individual com estado de seleção |
+| `PlayerHand.tsx` | Mão de cartas do jogador |
+| `GameHeader.tsx` | Barra de informações (fase, dica, narrador) |
+| `ClueModal.tsx` | Modal para narrador inserir dica |
+| `VoteModal.tsx` | Modal para fase de votação |
+| `CardPreviewModal.tsx` | Visualização ampliada da carta |
+| `ResultsView.tsx` | Resultados da rodada com pontuações |
+| `GameOverView.tsx` | Pontuações finais e vencedor |
+
+---
+
+## Validação
+
+### Schemas Zod (`src/schemas/messages.ts`)
+
+Validação de mensagens do lado do cliente antes de enviar ao servidor:
+
+```typescript
+import { 
+  JoinRoomMessageSchema,
+  SubmitClueMessageSchema,
+  PlayCardMessageSchema,
+  VoteMessageSchema 
+} from './schemas';
+```
+
+---
+
+## Tipos
+
+### `src/types/index.ts`
+
+Definições de tipos compartilhados:
+
+- `Card` - Carta com id e imageUrl
+- `Player` - Dados do jogador incluindo mão
+- `TableCard` - Carta jogada na mesa
+- `GamePhase` - Enum das fases do jogo
+- `GameState` - Estado público completo do jogo
+- `ClientMessage` - União de tipos de mensagens do cliente
+- `ServerMessage` - União de tipos de mensagens do servidor
+
+---
+
+## Documentação Relacionada
+
+- [Documentação do Servidor](./SERVER.md)
+- [Tipos de Mensagens](./MESSAGES.md)
+- [Máquina de Estados](./STATE_MACHINE.md)
