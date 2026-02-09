@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* ===== DESIGN TOKENS ===== */
+
+/* Cores customizadas */
+@theme {
+  --color-background: #020617;
+  --color-card: #0f172a;
+  --color-card-border: #1e293b;
+  --color-accent: #f59e0b;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #6366f1;
+}
+
+/* ===== FONTES ===== */
+
+/* Importar Inter do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ===== BASE STYLES ===== */
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+/* Títulos elegantes */
+h1, h2, h3, .font-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoom-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-in-from-bottom {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 300ms ease-out both;
+}
+
+.animate-zoom-in {
+  animation: zoom-in 300ms ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-in-from-bottom 300ms ease-out both;
+}
+
+/* ===== UTILITIES ===== */
+
+/* Card flip animation */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.card-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card-flipped {
+  transform: rotateY(180deg);
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* ===== SCROLLBAR ===== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
