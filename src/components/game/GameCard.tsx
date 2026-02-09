@@ -24,10 +24,11 @@ export const GameCard: React.FC<GameCardProps> = ({
   onClick,
   className = '',
 }) => {
+  // Tamanhos responsivos
   const sizeClasses = {
-    sm: 'w-20 h-28',
-    md: 'w-28 h-40',
-    lg: 'w-40 h-56',
+    sm: 'w-16 h-24 md:w-20 md:h-28',
+    md: 'w-24 h-36 md:w-32 md:h-44 lg:w-36 lg:h-52',
+    lg: 'w-32 h-48 md:w-40 md:h-56 lg:w-44 lg:h-64',
   };
 
   const isClickable = onClick && !disabled;
@@ -36,26 +37,38 @@ export const GameCard: React.FC<GameCardProps> = ({
     <div
       onClick={isClickable ? onClick : undefined}
       className={`
-        relative rounded-xl overflow-hidden transition-all duration-200
+        relative rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300
         ${sizeClasses[size]}
-        ${isClickable ? 'cursor-pointer hover:scale-105 hover:-translate-y-1' : ''}
-        ${isSelected ? 'ring-4 ring-amber-400 scale-105' : ''}
-        ${isHighlighted ? 'ring-4 scale-105' : ''}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+        ${isClickable
+          ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20'
+          : ''
+        }
+        ${isSelected
+          ? 'ring-4 ring-amber-400 scale-105 -translate-y-2 shadow-xl shadow-amber-500/30'
+          : ''
+        }
+        ${isHighlighted
+          ? 'ring-4 scale-105 shadow-xl'
+          : ''
+        }
+        ${disabled
+          ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
+          : ''
+        }
         ${className}
-        shadow-xl
+        shadow-lg
       `}
-      style={isHighlighted && highlightColor ? { '--tw-ring-color': highlightColor } as any : undefined}
+      style={isHighlighted && highlightColor ? { '--tw-ring-color': highlightColor } as React.CSSProperties : undefined}
     >
       {isHidden || card.id === -1 ? (
-        // Carta virada
-        <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border-2 border-slate-700">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
-            <span className="text-slate-500 text-lg">?</span>
+        // Carta virada (verso)
+        <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-850 to-slate-900 flex items-center justify-center border-2 border-slate-700">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-700/80 flex items-center justify-center border border-slate-600">
+            <span className="text-slate-500 text-lg md:text-xl">?</span>
           </div>
         </div>
       ) : (
-        // Carta visível
+        // Carta visível (frente)
         <>
           <img
             src={card.imageUrl}
@@ -63,7 +76,8 @@ export const GameCard: React.FC<GameCardProps> = ({
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+          {/* Overlay sutil no topo e base */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
         </>
       )}
     </div>
