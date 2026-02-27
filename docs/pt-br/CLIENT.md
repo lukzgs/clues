@@ -83,7 +83,7 @@ Sala de espera antes do jogo começar.
 |------|------|-----------|
 | `gameState` | `GameState` | Estado atual do jogo |
 | `currentPlayer` | `Player \| undefined` | Dados do jogador atual |
-| `onStartGame` | `() => void` | Inicia o jogo (host) |
+| `onStartGame` | `(victoryCondition: VictoryCondition) => void` | Inicia o jogo com condição de vitória escolhida (host) |
 | `onLeaveRoom` | `() => void` | Sai da sala |
 | `onAddBot` | `() => void` | Adiciona jogador bot (host) |
 | `onRemoveBot` | `(botId: string) => void` | Remove bot (host) |

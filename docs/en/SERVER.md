@@ -111,6 +111,8 @@ interface ServerGameState {
   votes: Record<string, number>;
   winner: string | null;
   deck: Card[];  // Server-only, not sent to clients
+  victoryCondition: VictoryCondition; // Configured by host at game start
+  currentRound: number; // 0-based round counter
 }
 ```
 

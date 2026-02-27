@@ -110,7 +110,9 @@ interface ServerGameState {
   tableCards: TableCard[];
   votes: Record<string, number>;
   winner: string | null;
-  deck: Card[];  // Apenas servidor, não enviado aos clientes
+  deck: Card[]; // Somente servidor, não enviado aos clientes
+  victoryCondition: VictoryCondition; // Configurado pelo host ao iniciar
+  currentRound: number; // Contador de rodadas (base 0)
 }
 ```
 

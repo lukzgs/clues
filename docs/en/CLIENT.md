@@ -83,7 +83,7 @@ Waiting room before game starts.
 |------|------|-------------|
 | `gameState` | `GameState` | Current game state |
 | `currentPlayer` | `Player \| undefined` | Current player data |
-| `onStartGame` | `() => void` | Starts the game (host) |
+| `onStartGame` | `(victoryCondition: VictoryCondition) => void` | Starts the game with chosen victory condition (host) |
 | `onLeaveRoom` | `() => void` | Leaves the room |
 | `onAddBot` | `() => void` | Adds bot player (host) |
 | `onRemoveBot` | `(botId: string) => void` | Removes bot (host) |

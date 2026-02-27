@@ -31,7 +31,7 @@ enum ClientMessageType {
 |----------|---------|-------------|
 | `JOIN_ROOM` | `playerName: string` | Qualquer |
 | `LEAVE_ROOM` | (nenhum) | Qualquer |
-| `START_GAME` | (nenhum) | LOBBY (apenas host) |
+| `START_GAME` | `victoryCondition: VictoryCondition` | LOBBY (apenas host) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (apenas narrador) |
 | `PLAY_CARD` | `cardId: number` | OTHERS_CHOOSING (não-narradores) |
 | `VOTE` | `orderId: number` | VOTING (não-narradores) |
