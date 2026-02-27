@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { GAME_CONFIG } from '../../constants';
 
 interface JoinScreenProps {
   onCreateRoom: (playerName: string) => void;
@@ -44,12 +43,12 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
           <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl md:rounded-3xl p-8 md:p-10 shadow-2xl animate-fade-in">
 
             {/* Logo e título */}
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <h1 className="text-5xl md:text-6xl text-amber-500 font-display mb-3">
                 Clues
               </h1>
               <p className="text-slate-400 italic text-lg">
-                Imaginação e dedução
+                It's like Dixit, but much better!
               </p>
             </div>
 
@@ -69,16 +68,6 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                 Entrar em Sala
               </button>
             </div>
-
-            {/* Footer */}
-            <div className="mt-10 pt-6 border-t border-slate-800 text-center">
-              <p className="text-slate-500 text-sm">
-                Jogo inspirado em Dixit
-              </p>
-              <p className="text-slate-600 text-xs mt-1">
-                {GAME_CONFIG.MIN_PLAYERS}-{GAME_CONFIG.MAX_PLAYERS} jogadores
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -97,7 +86,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               onClick={() => { setMode('menu'); setError(''); }}
               className="text-slate-500 hover:text-white mb-6 flex items-center gap-2 transition-colors"
             >
-              ← Voltar
+              Voltar
             </button>
 
             {/* Título */}
@@ -152,7 +141,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
             onClick={() => { setMode('menu'); setError(''); }}
             className="text-slate-500 hover:text-white mb-6 flex items-center gap-2 transition-colors"
           >
-            ← Voltar
+            Voltar
           </button>
 
           {/* Título */}

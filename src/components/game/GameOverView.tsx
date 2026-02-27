@@ -29,7 +29,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
           <span style={{ color: winner?.color }} className="font-bold">
             {gameState.winner}
           </span>
-          {' '}venceu! 🎉
+          {' '}venceu!
         </p>
       </div>
 
@@ -51,7 +51,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
                     index === 1 ? 'text-slate-400' :
                       index === 2 ? 'text-orange-700' : 'text-slate-600'
                   }`}>
-                  {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
+                  {`${index + 1}.`}
                 </span>
                 <div
                   className="w-8 h-8 rounded-full shadow-lg shrink-0"
@@ -78,14 +78,14 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
             onClick={onRestartGame}
             className="flex-1 bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-xl font-bold font-display transition-all duration-200 shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98]"
           >
-            🎮 Jogar Novamente
+            Jogar Novamente
           </button>
         )}
         <button
           onClick={onLeaveRoom}
           className={`${isHost ? '' : 'flex-1'} bg-slate-800/80 hover:bg-slate-700 px-8 py-4 rounded-xl text-slate-300 hover:text-white transition-all duration-200 border border-slate-700/50`}
         >
-          ← Sair
+          Sair
         </button>
       </div>
 

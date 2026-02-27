@@ -122,7 +122,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {phaseLabels[gameState.phase]}
           </h1>
           <div className="flex items-center gap-2 text-slate-400 text-sm">
-            <span className="text-slate-500">⏱</span>
+
             <span className="font-mono">00:45</span>
           </div>
         </div>
@@ -130,14 +130,14 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         {/* Right: Room Code & Settings */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-slate-500 text-xs">
-            <span>📋</span>
+
             <span className="font-mono">ROOM CODE: <span className="text-white">{gameState.roomCode}</span></span>
           </div>
           <button
             onClick={onLeaveRoom}
             className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
           >
-            ⚙️
+            Sair
           </button>
         </div>
       </header>

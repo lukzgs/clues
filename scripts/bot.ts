@@ -318,7 +318,7 @@ Exemplos:
     const baseName = args[1];
     const count = parseInt(args[2] || '1', 10);
 
-    console.log(`\n🤖 Iniciando ${count} bot(s) para sala ${roomCode}...\n`);
+    console.log(`\nIniciando ${count} bot(s) para sala ${roomCode}...\n`);
 
     const bots: CluesBot[] = [];
 
@@ -336,7 +336,7 @@ Exemplos:
         }
     }
 
-    console.log(`\n✅ ${bots.length} bot(s) conectado(s). Pressione Ctrl+C para encerrar.\n`);
+    console.log(`\n${bots.length} bot(s) conectado(s). Pressione Ctrl+C para encerrar.\n`);
 
     // Graceful shutdown
     process.on('SIGINT', () => {
