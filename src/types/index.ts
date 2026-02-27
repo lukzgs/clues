@@ -33,6 +33,17 @@ export enum GamePhase {
   GAME_OVER = 'GAME_OVER'
 }
 
+// ============================================
+// CONDIÇÕES DE VITÓRIA
+// ============================================
+
+export interface VictoryCondition {
+  scoreEnabled: boolean;       // Enable score-based victory
+  targetScore: number;         // First to reach X points wins
+  narratorRoundsEnabled: boolean; // Enable narrator-rounds-based victory
+  narratorRounds: number;      // Each player narrates X times
+}
+
 export interface GameState {
   roomCode: string;
   phase: GamePhase;
@@ -43,6 +54,8 @@ export interface GameState {
   votes: Record<string, number>; // orderId do cardId votado
   winner: string | null;
   deckCount: number; // Não enviamos o deck inteiro para o cliente
+  victoryCondition: VictoryCondition;
+  currentRound: number; // Current round number (0-based)
 }
 
 // Estado completo do servidor (não exposto ao cliente)
@@ -94,6 +107,7 @@ export interface LeaveRoomMessage {
 
 export interface StartGameMessage {
   type: ClientMessageType.START_GAME;
+  victoryCondition: VictoryCondition;
 }
 
 export interface SubmitClueMessage {

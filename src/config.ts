@@ -11,6 +11,7 @@ export const GAME_CONFIG = gameConfig as {
     readonly HAND_SIZE: number;
     readonly WINNING_SCORE: number;
     readonly DECK_SIZE: number;
+    readonly DEFAULT_NARRATOR_ROUNDS: number;
 };
 
 // ============================================

@@ -32,8 +32,16 @@ export const LeaveRoomSchema = z.object({
     type: z.literal('LEAVE_ROOM'),
 });
 
+export const VictoryConditionSchema = z.object({
+    scoreEnabled: z.boolean(),
+    targetScore: z.number().int().min(10).max(100),
+    narratorRoundsEnabled: z.boolean(),
+    narratorRounds: z.number().int().min(1).max(5),
+});
+
 export const StartGameSchema = z.object({
     type: z.literal('START_GAME'),
+    victoryCondition: VictoryConditionSchema,
 });
 
 export const SubmitClueSchema = z.object({

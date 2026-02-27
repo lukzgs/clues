@@ -5,6 +5,7 @@ import {
   ClientMessageType,
   ServerMessageType,
   ServerMessage,
+  VictoryCondition,
 } from '../types';
 import { PARTYKIT_HOST } from '../constants';
 import {
@@ -13,6 +14,7 @@ import {
   PlayCardSchema,
   VoteSchema,
   RemoveBotSchema,
+  StartGameSchema,
 } from '../schemas';
 
 // ============================================
@@ -31,8 +33,8 @@ interface UseGameRoomReturn {
   isConnected: boolean;
   error: string | null;
 
-  // Ações
-  startGame: () => void;
+  // Acoes
+  startGame: (victoryCondition: VictoryCondition) => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
   vote: (orderId: number) => void;
@@ -145,8 +147,14 @@ export function useGameRoom({
   // AÇÕES DO JOGO
   // ============================================
 
-  const startGame = useCallback(() => {
-    send({ type: ClientMessageType.START_GAME });
+  const startGame = useCallback((victoryCondition: VictoryCondition) => {
+    const result = StartGameSchema.safeParse({
+      type: ClientMessageType.START_GAME,
+      victoryCondition,
+    });
+    if (result.success) {
+      send(result.data);
+    }
   }, [send]);
 
   const submitClue = useCallback((cardId: number, clue: string) => {
