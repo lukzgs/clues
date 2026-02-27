@@ -35,7 +35,7 @@ import GAME_CONFIG from '../game.config.json';
 function createDeck(): Card[] {
   return Array.from({ length: GAME_CONFIG.DECK_SIZE }, (_, i) => ({
     id: i + 1,
-    imageUrl: `https://picsum.photos/seed/clues-${i + 1}/400/600`,
+    imageUrl: `/cards/card_${String(i + 1).padStart(4, '0')}.avif`,
   }));
 }
 
@@ -89,6 +89,13 @@ export default class GameServer implements Party.Server {
       votes: {},
       winner: null,
       deck: shuffle(createDeck()),
+      victoryCondition: {
+        scoreEnabled: true,
+        targetScore: GAME_CONFIG.WINNING_SCORE,
+        narratorRoundsEnabled: false,
+        narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
+      },
+      currentRound: 0,
     };
   }
 
@@ -143,7 +150,7 @@ export default class GameServer implements Party.Server {
   private checkRateLimit(connId: string): boolean {
     const now = Date.now();
     const WINDOW_MS = 5000; // 5 segundos
-    const MAX_MESSAGES = 5; // máximo por janela
+    const MAX_MESSAGES = 15; // máximo por janela
 
     // Reset contador a cada janela
     if (now - this.rateLimitReset > WINDOW_MS) {
@@ -191,7 +198,7 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'START_GAME':
-          if (playerId) this.handleStartGame(playerId);
+          if (playerId) this.handleStartGame(playerId, msg.victoryCondition);
           break;
 
         case 'SUBMIT_CLUE':
@@ -303,7 +310,7 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleStartGame(playerId: string) {
+  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }) {
     const player = this.state.players.find(p => p.id === playerId);
 
     // Apenas host pode iniciar
@@ -311,10 +318,23 @@ export default class GameServer implements Party.Server {
       return;
     }
 
-    // Verifica mínimo de jogadores
+    // Verifica minimo de jogadores
     if (this.state.players.length < GAME_CONFIG.MIN_PLAYERS) {
       return;
     }
+
+    // At least one condition must be enabled
+    if (!victoryCondition.scoreEnabled && !victoryCondition.narratorRoundsEnabled) {
+      return;
+    }
+
+    // Apply victory condition from host
+    this.state.victoryCondition = {
+      scoreEnabled: victoryCondition.scoreEnabled,
+      targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
+      narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
+      narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
+    };
 
     // Embaralha deck e distribui cartas
     this.state.deck = shuffle(createDeck());
@@ -331,6 +351,7 @@ export default class GameServer implements Party.Server {
     this.state.tableCards = [];
     this.state.votes = {};
     this.state.winner = null;
+    this.state.currentRound = 0;
 
     this.broadcastState();
 
@@ -478,12 +499,34 @@ export default class GameServer implements Party.Server {
       }
     });
 
-    // Verifica vencedor
-    const winner = this.state.players.find(p => p.score >= GAME_CONFIG.WINNING_SCORE);
-    if (winner) {
-      this.state.phase = GamePhase.GAME_OVER;
-      this.state.winner = winner.name;
-    } else {
+    // Check victory conditions (first condition reached wins)
+    const vc = this.state.victoryCondition;
+    let gameOver = false;
+
+    // Check score-based victory
+    if (vc.scoreEnabled) {
+      const winner = this.state.players.find(p => p.score >= vc.targetScore);
+      if (winner) {
+        this.state.phase = GamePhase.GAME_OVER;
+        this.state.winner = winner.name;
+        gameOver = true;
+      }
+    }
+
+    // Check narrator-rounds-based victory (only if score didn't already end it)
+    if (!gameOver && vc.narratorRoundsEnabled) {
+      const totalRounds = this.state.players.length * vc.narratorRounds;
+      const completedRounds = this.state.currentRound + 1;
+
+      if (completedRounds >= totalRounds) {
+        const sorted = [...this.state.players].sort((a, b) => b.score - a.score);
+        this.state.phase = GamePhase.GAME_OVER;
+        this.state.winner = sorted[0].name;
+        gameOver = true;
+      }
+    }
+
+    if (!gameOver) {
       this.state.phase = GamePhase.RESULTS;
     }
   }
@@ -494,7 +537,10 @@ export default class GameServer implements Party.Server {
     const player = this.state.players.find(p => p.id === playerId);
     if (!player?.isHost) return;
 
-    // Distribui uma nova carta para cada jogador
+    // Increment round counter
+    this.state.currentRound++;
+
+    // Distribute a new card to each player
     this.state.players.forEach(p => {
       if (this.state.deck.length > 0) {
         p.hand.push(this.state.deck.shift()!);
@@ -541,7 +587,7 @@ export default class GameServer implements Party.Server {
   }
 
   // ============================================
-  // [BOT] HANDLERS DE BOTS - Removíveis
+  // [BOT] HANDLERS DE BOTS - Removiveis
   // ============================================
 
   private handleAddBot(playerId: string) {
@@ -619,6 +665,8 @@ export default class GameServer implements Party.Server {
       votes: this.state.votes,
       winner: this.state.winner,
       deckCount: this.state.deck.length,
+      victoryCondition: this.state.victoryCondition,
+      currentRound: this.state.currentRound,
     };
   }
 

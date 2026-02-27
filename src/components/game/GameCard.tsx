@@ -62,11 +62,11 @@ export const GameCard: React.FC<GameCardProps> = ({
     >
       {isHidden || card.id === -1 ? (
         // Carta virada (verso)
-        <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-850 to-slate-900 flex items-center justify-center border-2 border-slate-700">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-700/80 flex items-center justify-center border border-slate-600">
-            <span className="text-slate-500 text-lg md:text-xl">?</span>
-          </div>
-        </div>
+        <img
+          src="/cards/back_001.avif"
+          alt="Card back"
+          className="w-full h-full object-cover"
+        />
       ) : (
         // Carta visível (frente)
         <>

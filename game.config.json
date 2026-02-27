@@ -3,5 +3,6 @@
     "MAX_PLAYERS": 8,
     "HAND_SIZE": 6,
     "WINNING_SCORE": 30,
-    "DECK_SIZE": 84
+    "DECK_SIZE": 341,
+    "DEFAULT_NARRATOR_ROUNDS": 2
 }
