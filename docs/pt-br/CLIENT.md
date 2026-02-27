@@ -111,7 +111,7 @@ Localizados em `src/components/game/`:
 
 | Componente | Descrição |
 |------------|-----------|
-| `GameCard.tsx` | Exibição de carta individual com estado de seleção |
+| `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `PlayerHand.tsx` | Mão de cartas do jogador |
 | `GameHeader.tsx` | Barra de informações (fase, dica, narrador) |
 | `ClueModal.tsx` | Modal para narrador inserir dica |

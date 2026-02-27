@@ -111,7 +111,7 @@ Located in `src/components/game/`:
 
 | Component | Description |
 |-----------|-------------|
-| `GameCard.tsx` | Individual card display with selection state |
+| `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `PlayerHand.tsx` | Player's hand of cards |
 | `GameHeader.tsx` | Game info bar (phase, clue, narrator) |
 | `ClueModal.tsx` | Modal for narrator to enter clue |

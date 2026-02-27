@@ -16,7 +16,7 @@
 | Zod validation | ✅ Complete |
 | Rate limiting | ✅ Complete |
 | Internationalization | 🚧 Partial |
-| Custom card decks | ❌ Not started |
+| Static card deck (341 cards) | ✅ Complete |
 | In-game chat | ❌ Not started |
 
 ## Project Structure

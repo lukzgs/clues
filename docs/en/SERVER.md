@@ -51,7 +51,7 @@ class GameServer implements Party.Server {
 
 | Function | Description |
 |----------|-------------|
-| `createDeck()` | Generates 100 card deck |
+| `createDeck()` | Generates 341-card deck from local static assets (`/cards/card_XXXX.avif`) |
 | `shuffle(array)` | Fisher-Yates shuffle |
 | `generatePlayerId()` | Creates unique player ID |
 | `createInitialState()` | Returns fresh game state |

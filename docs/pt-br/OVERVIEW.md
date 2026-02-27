@@ -16,7 +16,7 @@
 | Validação com Zod | ✅ Completo |
 | Rate limiting | ✅ Completo |
 | Internacionalização | 🚧 Parcial |
-| Baralhos personalizados | ❌ Não iniciado |
+| Baralho de cartas estático (341 cartas) | ✅ Completo |
 | Chat no jogo | ❌ Não iniciado |
 
 ## Estrutura do Projeto
