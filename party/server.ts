@@ -651,6 +651,28 @@ export default class GameServer implements Party.Server {
   // ============================================
 
   private getPublicState(forPlayerId: string | null): GameState {
+    const narrator = this.state.players[this.state.narratorIndex];
+    const isNarrator = forPlayerId === narrator?.id;
+    const isRevealed = this.state.phase === GamePhase.RESULTS || this.state.phase === GamePhase.GAME_OVER;
+
+    // Filter tableCards: hide playerId unless narrator or in RESULTS/GAME_OVER
+    const tableCards = this.state.tableCards.map(tc => ({
+      ...tc,
+      playerId: (isNarrator || isRevealed) ? tc.playerId : '',
+      isMine: tc.playerId === forPlayerId,
+    }));
+
+    // Filter votes: hide until RESULTS/GAME_OVER; during VOTING show only own vote
+    let votes: Record<string, number> = {};
+    if (isRevealed) {
+      votes = this.state.votes;
+    } else if (forPlayerId && this.state.votes[forPlayerId] !== undefined) {
+      votes = { [forPlayerId]: this.state.votes[forPlayerId] };
+    }
+
+    // playersWhoPlayed: safe list of IDs who already placed a card (no card association)
+    const playersWhoPlayed = this.state.tableCards.map(tc => tc.playerId);
+
     return {
       roomCode: this.state.roomCode,
       phase: this.state.phase,
@@ -661,10 +683,11 @@ export default class GameServer implements Party.Server {
       })),
       narratorIndex: this.state.narratorIndex,
       currentClue: this.state.currentClue,
-      tableCards: this.state.tableCards,
-      votes: this.state.votes,
+      tableCards,
+      votes,
       winner: this.state.winner,
       deckCount: this.state.deck.length,
+      playersWhoPlayed,
       victoryCondition: this.state.victoryCondition,
       currentRound: this.state.currentRound,
     };

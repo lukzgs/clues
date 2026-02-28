@@ -22,6 +22,7 @@ export interface TableCard {
   orderId: number;  // Ordem para embaralhar na votação
   playerId: string;
   card: Card;
+  isMine?: boolean; // Set by server in getPublicState — true only for the player's own card
 }
 
 export enum GamePhase {
@@ -54,6 +55,7 @@ export interface GameState {
   votes: Record<string, number>; // orderId do cardId votado
   winner: string | null;
   deckCount: number; // Não enviamos o deck inteiro para o cliente
+  playersWhoPlayed: string[]; // IDs of players who already placed a card on the table
   victoryCondition: VictoryCondition;
   currentRound: number; // Current round number (0-based)
 }

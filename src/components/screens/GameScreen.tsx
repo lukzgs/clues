@@ -36,7 +36,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
   const isNarrator = narrator?.id === playerId;
-  const hasPlayed = gameState.tableCards.some(tc => tc.playerId === playerId);
+  const hasPlayed = gameState.tableCards.some(tc => tc.isMine);
   const hasVoted = gameState.votes[playerId] !== undefined;
 
   const phaseLabels: Record<GamePhase, string> = {
@@ -69,7 +69,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   // Handler para votar
   const handleVote = (tableCard: TableCard) => {
-    if (tableCard.playerId !== playerId) {
+    if (!tableCard.isMine) {
       onVote(tableCard.orderId);
     }
   };
@@ -81,7 +81,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       return gameState.votes[player.id] !== undefined ? 'voted' : 'waiting';
     }
     if (gameState.phase === GamePhase.OTHERS_CHOOSING) {
-      return gameState.tableCards.some(tc => tc.playerId === player.id) ? 'played' : 'waiting';
+      return (gameState.playersWhoPlayed ?? []).includes(player.id) ? 'played' : 'waiting';
     }
     return 'waiting';
   };
@@ -287,7 +287,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 {/* Table Cards */}
                 <div className="flex flex-wrap justify-center gap-4 md:gap-6">
                   {gameState.tableCards.map((tableCard) => {
-                    const isMine = tableCard.playerId === playerId;
+                    const isMine = tableCard.isMine === true;
                     const votesOnThis = Object.entries(gameState.votes)
                       .filter(([_, orderId]) => orderId === tableCard.orderId).length;
 
