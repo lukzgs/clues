@@ -527,7 +527,7 @@ export default class GameServer implements Party.Server {
       const winner = this.state.players.find(p => p.score >= vc.targetScore);
       if (winner) {
         this.state.phase = GamePhase.GAME_OVER;
-        this.state.winner = winner.name;
+        this.state.winner = winner.id;
         gameOver = true;
       }
     }
@@ -540,7 +540,7 @@ export default class GameServer implements Party.Server {
       if (completedRounds >= totalRounds) {
         const sorted = [...this.state.players].sort((a, b) => b.score - a.score);
         this.state.phase = GamePhase.GAME_OVER;
-        this.state.winner = sorted[0].name;
+        this.state.winner = sorted[0].id;
         gameOver = true;
       }
     }

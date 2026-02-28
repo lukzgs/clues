@@ -1,4 +1,3 @@
-import React from 'react';
 import { GameState } from '../../types';
 
 interface GameOverViewProps {
@@ -16,7 +15,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
 }) => {
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const isHost = currentPlayer?.isHost ?? false;
-  const winner = gameState.players.find(p => p.name === gameState.winner);
+  const winner = gameState.players.find(p => p.id === gameState.winner);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 py-8 animate-fade-in">
@@ -27,7 +26,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
         </h1>
         <p className="text-xl md:text-2xl text-white">
           <span style={{ color: winner?.color }} className="font-bold">
-            {gameState.winner}
+            {winner?.name ?? gameState.winner}
           </span>
           {' '}venceu!
         </p>
