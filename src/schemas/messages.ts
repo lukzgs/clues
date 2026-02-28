@@ -48,7 +48,7 @@ export const StartGameSchema = z.object({
 export const SubmitClueSchema = z.object({
     type: z.literal('SUBMIT_CLUE'),
     cardId: PositiveInt,
-    clue: SafeString.min(1, 'Pista obrigatória').max(200, 'Pista muito longa'),
+    clue: SafeString.min(1, 'Pista obrigatória').max(100, 'Pista muito longa'),
 });
 
 export const PlayCardSchema = z.object({
