@@ -66,9 +66,8 @@ export default class GameServer implements Party.Server {
   // [BOT] Gerenciador de bots (opcional)
   private botManager: any = null;
 
-  // Rate limiting: connectionId -> count
-  private messageCount: Map<string, number> = new Map();
-  private rateLimitReset: number = Date.now();
+  // Rate limiting: connectionId -> { count, windowStart }
+  private rateLimitData: Map<string, { count: number; windowStart: number }> = new Map();
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
@@ -141,29 +140,30 @@ export default class GameServer implements Party.Server {
     }
 
     this.connections.delete(conn.id);
-  }
-
-  // ============================================
+    this.rateLimitData.delete(conn.id);
+  }  // ============================================
   // RATE LIMITING
   // ============================================
 
   private checkRateLimit(connId: string): boolean {
     const now = Date.now();
-    const WINDOW_MS = 5000; // 5 segundos
-    const MAX_MESSAGES = 15; // máximo por janela
+    const WINDOW_MS = 5000; // 5 seconds
+    const MAX_MESSAGES = 15; // max per window per connection
 
-    // Reset contador a cada janela
-    if (now - this.rateLimitReset > WINDOW_MS) {
-      this.messageCount.clear();
-      this.rateLimitReset = now;
+    let data = this.rateLimitData.get(connId);
+
+    if (!data || now - data.windowStart > WINDOW_MS) {
+      // New window for this connection
+      data = { count: 1, windowStart: now };
+      this.rateLimitData.set(connId, data);
+      return true;
     }
 
-    const count = this.messageCount.get(connId) || 0;
-    if (count >= MAX_MESSAGES) {
+    if (data.count >= MAX_MESSAGES) {
       return false;
     }
 
-    this.messageCount.set(connId, count + 1);
+    data.count++;
     return true;
   }
 
