@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card } from '../../types';
 
 interface GameCardProps {
@@ -75,6 +74,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             alt={`Card ${card.id}`}
             className="w-full h-full object-cover"
             loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/cards/back_001.avif'; }}
           />
           {/* Overlay sutil no topo e base */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />

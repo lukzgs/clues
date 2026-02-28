@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { GameState, GamePhase, Card, TableCard } from '../../types';
 import {
   GameCard,
-  PlayerHand,
   ClueModal,
-  VoteModal,
   ResultsView,
   GameOverView
 } from '../game';
@@ -121,10 +119,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           <h1 className="text-white font-bold tracking-wide text-sm md:text-base">
             {phaseLabels[gameState.phase]}
           </h1>
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
-
-            <span className="font-mono">00:45</span>
-          </div>
         </div>
 
         {/* Right: Room Code & Settings */}
@@ -135,6 +129,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
           <button
             onClick={onLeaveRoom}
+            aria-label="Sair da sala"
             className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
           >
             Sair

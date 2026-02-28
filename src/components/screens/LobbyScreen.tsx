@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { GameState, Player, VictoryCondition } from '../../types';
 import { GAME_CONFIG } from '../../constants';
 
@@ -112,6 +112,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       onClick={() => onRemoveBot(player.id)}
                       className="text-red-400 hover:text-red-300 text-sm w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-900/30 transition-colors"
                       title="Remover bot"
+                      aria-label={`Remover bot ${player.name}`}
                     >
                       x
                     </button>
