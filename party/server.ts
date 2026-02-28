@@ -8,8 +8,8 @@ import {
   GameState,
   ClientMessageType,
   ServerMessageType,
-  PLAYER_COLORS,
 } from "../src/types";
+import { PLAYER_COLORS } from "../src/config";
 import { ClientMessageSchema } from "../src/schemas";
 
 // [BOT] Import dinâmico - não falha se bots não existir
