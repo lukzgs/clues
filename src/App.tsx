@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
@@ -6,7 +6,7 @@ import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 // Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const array = new Uint8Array(5);
+  const array = new Uint8Array(6);
   crypto.getRandomValues(array);
   return Array.from(array, byte => chars[byte % chars.length]).join('');
 }

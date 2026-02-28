@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface JoinScreenProps {
   onCreateRoom: (playerName: string) => void;
@@ -27,8 +27,8 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
       setError('Digite seu nome');
       return;
     }
-    if (!roomCode.trim() || roomCode.length < 4) {
-      setError('Código da sala inválido');
+    if (!roomCode.trim() || roomCode.length !== 6) {
+      setError('Código da sala deve ter 6 caracteres');
       return;
     }
     onJoinRoom(roomCode.toUpperCase(), playerName.trim());
