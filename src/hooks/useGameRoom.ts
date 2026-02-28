@@ -62,6 +62,9 @@ export function useGameRoom({
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
 
+  // sessionStorage key for reconnection
+  const storageKey = `clues:playerId:${roomCode}`;
+
   // Conecta ao servidor
   useEffect(() => {
     if (!roomCode || !playerName) return;
@@ -79,9 +82,11 @@ export function useGameRoom({
 
       // Entra na sala (com validação)
       if (!hasJoinedRef.current) {
+        const savedPlayerId = sessionStorage.getItem(storageKey) || undefined;
         const result = JoinRoomSchema.safeParse({
           type: 'JOIN_ROOM',
           playerName,
+          reconnectId: savedPlayerId,
         });
         if (result.success) {
           socket.send(JSON.stringify(result.data));
@@ -99,6 +104,8 @@ export function useGameRoom({
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
+              // Persist playerId for reconnection
+              sessionStorage.setItem(storageKey, msg.yourPlayerId);
             }
             break;
 

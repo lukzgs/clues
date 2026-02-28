@@ -190,7 +190,7 @@ export default class GameServer implements Party.Server {
 
       switch (msg.type) {
         case 'JOIN_ROOM':
-          this.handleJoinRoom(msg.playerName, sender);
+          this.handleJoinRoom(msg.playerName, sender, msg.reconnectId);
           break;
 
         case 'LEAVE_ROOM':
@@ -239,11 +239,30 @@ export default class GameServer implements Party.Server {
   // HANDLERS DE AÇÕES
   // ============================================
 
-  private handleJoinRoom(playerName: string, conn: Party.Connection) {
+  private handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
     // Verifica se já está conectado
     if (this.connections.has(conn.id)) {
       this.sendError(conn, 'Você já está na sala');
       return;
+    }
+
+    // Reconnection: try to reclaim a disconnected player by ID
+    if (reconnectId && this.state.phase !== GamePhase.LOBBY) {
+      const player = this.state.players.find(p => p.id === reconnectId && !p.isConnected && !p.isBot);
+      if (player) {
+        // Reclaim: map new connection to existing player
+        player.isConnected = true;
+        this.connections.set(conn.id, player.id);
+
+        this.broadcast({
+          type: ServerMessageType.PLAYER_JOINED,
+          player: { ...player, hand: [] },
+        });
+
+        this.broadcastState();
+        return;
+      }
+      // reconnectId invalid or player already connected — fall through to normal join
     }
 
     // Verifica fase
