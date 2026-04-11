@@ -68,7 +68,7 @@ Localizadas em `src/components/screens/`:
 
 ### `JoinScreen.tsx`
 
-Tela inicial para criar ou entrar em salas.
+Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo Design System "Clues", que utiliza um visual "deep-black" com fortes elementos de "glassmorfismo", tons dourados e "Botões Míticos" com tipografia serifada.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|

@@ -68,7 +68,7 @@ Located in `src/components/screens/`:
 
 ### `JoinScreen.tsx`
 
-Initial screen for creating or joining rooms.
+Initial screen for creating or joining rooms. Recently updated to feature the new deep-black, glassmorphism-heavy "Clues" Design System with "Mythic Buttons".
 
 | Prop | Type | Description |
 |------|------|-------------|
