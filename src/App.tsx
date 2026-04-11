@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
@@ -55,7 +55,7 @@ const App: React.FC = () => {
   }, [leaveRoom]);
 
   // Transição de connecting para game quando conectado
-  React.useEffect(() => {
+  useEffect(() => {
     if (appState.screen === 'connecting' && isConnected && gameState) {
       setAppState(prev =>
         prev.screen === 'connecting'
