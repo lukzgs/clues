@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
@@ -65,12 +65,25 @@ const App: React.FC = () => {
     }
   }, [appState.screen, isConnected, gameState]);
 
+  // Extract ?room= from URL (invite link)
+  const prefillRoomCode = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room')?.toUpperCase();
+    if (room && room.length === 6) {
+      // Clean up URL without reloading
+      window.history.replaceState({}, '', window.location.pathname);
+      return room;
+    }
+    return undefined;
+  }, []);
+
   // Tela de join
   if (appState.screen === 'join') {
     return (
       <JoinScreen
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
+        prefillRoomCode={prefillRoomCode}
       />
     );
   }
@@ -80,23 +93,63 @@ const App: React.FC = () => {
     const roomCode = appState.screen === 'connecting' ? appState.roomCode :
       appState.screen === 'game' ? appState.roomCode : '';
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">
-            Conectando à sala {roomCode}...
-          </p>
-          {error && (
-            <div className="mt-4">
-              <p className="text-red-400 mb-2">{error}</p>
-              <button
-                onClick={() => setAppState({ screen: 'join' })}
-                className="text-slate-500 hover:text-white"
-              >
-                Voltar
-              </button>
+      <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
+        {/* Ambient Lighting — same as JoinScreen */}
+        <div
+          className="fixed inset-0 pointer-events-none z-[-1]"
+          style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
+        />
+        <div
+          className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+        />
+
+        <div className="w-full max-w-[420px] z-10">
+          <div
+            className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center"
+            style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+          >
+            {/* Spinner */}
+            <div className="mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-amber-500/20" />
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-400 animate-spin" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200/60 md:w-5 md:h-5">
+                <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+                <line x1="2" y1="19" x2="22" y2="19" />
+              </svg>
             </div>
-          )}
+
+            {/* Text */}
+            <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">
+              Connecting
+            </p>
+            <div className="bg-[#1A1A1A]/50 rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border border-white/10 mb-2">
+              <span className="text-lg md:text-xl font-cinzel font-bold text-amber-300 tracking-wider">
+                {roomCode}
+              </span>
+            </div>
+            <p className="text-white/15 text-[10px] font-sans tracking-wide">
+              Joining room...
+            </p>
+
+            {error && (
+              <div className="mt-5 md:mt-6 w-full text-center" style={{ animation: 'fade-in-up 0.3s ease-out both' }}>
+                <p className="text-red-400 text-xs mb-3 bg-red-500/10 py-2 px-3 rounded-lg border border-red-500/20 font-sans">{error}</p>
+                <button
+                  onClick={() => setAppState({ screen: 'join' })}
+                  className="text-white/30 hover:text-white/60 text-sm font-sans transition-colors"
+                >
+                  ← Back
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none">
+          <p className="text-white/20 text-[10px] font-sans tracking-wide">
+            &copy; 2026 Clues. Crafted for imagination.
+          </p>
         </div>
       </div>
     );

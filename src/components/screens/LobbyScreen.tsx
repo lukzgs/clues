@@ -23,6 +23,27 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const isHost = currentPlayer?.isHost ?? false;
   const canAddBot = gameState.players.length < GAME_CONFIG.MAX_PLAYERS && onAddBot;
 
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}?room=${gameState.roomCode}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   // Victory condition is fully local — only sent to server on START_GAME
   const [vc, setVC] = useState<VictoryCondition>({
     scoreEnabled: true,
@@ -45,64 +66,96 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-slate-950">
-      <div className="w-full max-w-md lg:max-w-2xl">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl animate-fade-in">
+    <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
+      {/* Ambient Lighting — same as JoinScreen */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[-1]"
+        style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
+      />
+      <div
+        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+      />
 
+      <div className="w-full max-w-[480px] z-10 my-6 md:my-0">
+        <div
+          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-10 flex flex-col items-center"
+          style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+        >
           {/* Room code */}
-          <div className="text-center mb-8">
-            <p className="text-slate-500 text-xs uppercase tracking-widest mb-3">
-              Codigo da Sala
+          <div className="text-center mb-6 md:mb-8 w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both' }}>
+            <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 font-sans font-medium">
+              Room Code
             </p>
-            <div className="bg-slate-800/80 rounded-2xl px-6 py-4 inline-block border border-slate-700">
-              <span className="text-3xl md:text-4xl font-mono font-bold text-amber-500 tracking-[0.25em] md:tracking-[0.3em]">
+            <div className="bg-[#1A1A1A]/50 rounded-xl px-5 md:px-6 py-3 md:py-4 inline-flex items-center gap-3 border border-white/10">
+              <span className="text-2xl md:text-3xl font-cinzel font-bold text-amber-300 tracking-wider">
                 {gameState.roomCode}
               </span>
+              <button
+                onClick={handleCopyLink}
+                className={`p-1.5 rounded-lg transition-all duration-200 ${
+                  copied
+                    ? 'text-green-400 bg-green-500/10'
+                    : 'text-white/30 hover:text-white/60 hover:bg-white/5'
+                }`}
+                title="Copy room link"
+                aria-label="Copy room link"
+              >
+                {copied ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                )}
+              </button>
             </div>
-            <p className="text-slate-600 text-xs mt-3">
-              Compartilhe este codigo com seus amigos
+            <p className="text-white/20 text-[10px] mt-2 md:mt-3 font-sans tracking-wide">
+              {copied ? 'Link copied!' : 'Tap to copy invite link'}
             </p>
           </div>
 
           {/* Player list */}
-          <div className="mb-8">
-            <p className="text-slate-400 text-sm mb-4 font-medium">
-              Jogadores ({gameState.players.length}/{GAME_CONFIG.MAX_PLAYERS})
+          <div className="w-full mb-5 md:mb-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+            <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 pl-1 font-sans font-medium">
+              Players ({gameState.players.length}/{GAME_CONFIG.MAX_PLAYERS})
             </p>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3">
+            <div className="space-y-2">
               {gameState.players.map((player) => (
                 <div
                   key={player.id}
-                  className="flex items-center gap-3 bg-slate-800/50 hover:bg-slate-800/70 p-3 md:p-4 rounded-xl transition-colors border border-slate-700/50"
+                  className="flex items-center gap-2.5 md:gap-3 bg-[#1A1A1A]/50 p-2.5 md:p-3 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-200"
                 >
                   <div
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base shrink-0 shadow-lg"
+                    className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-sm shrink-0 shadow-lg"
                     style={{ backgroundColor: player.color }}
                   >
                     {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <span className="text-white font-medium block truncate">
+                    <span className="text-white font-cinzel text-sm md:text-base block truncate">
                       {player.name}
                     </span>
                     <div className="flex gap-2 mt-0.5">
                       {player.id === currentPlayer?.id && (
-                        <span className="text-slate-500 text-xs">(voce)</span>
+                        <span className="text-white/30 text-[10px] font-sans">(you)</span>
                       )}
                       {player.isBot && (
-                        <span className="text-cyan-400 text-xs">(bot)</span>
+                        <span className="text-amber-400/60 text-[10px] font-sans">(bot)</span>
                       )}
                     </div>
                   </div>
 
                   {player.isHost && (
-                    <span className="text-amber-500 text-xs font-bold uppercase bg-amber-500/10 px-2 py-1 rounded-lg">
+                    <span className="text-amber-300 text-[9px] md:text-[10px] font-cinzel font-bold uppercase bg-amber-500/10 px-2 md:px-2.5 py-1 rounded-lg border border-amber-500/20 tracking-wider">
                       Host
                     </span>
                   )}
                   {!player.isConnected && !player.isBot && (
-                    <span className="text-red-400 text-xs bg-red-500/10 px-2 py-1 rounded-lg">
+                    <span className="text-red-400 text-[9px] md:text-[10px] bg-red-500/10 px-2 md:px-2.5 py-1 rounded-lg border border-red-500/20 font-sans">
                       Offline
                     </span>
                   )}
@@ -110,11 +163,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {player.isBot && isHost && onRemoveBot && (
                     <button
                       onClick={() => onRemoveBot(player.id)}
-                      className="text-red-400 hover:text-red-300 text-sm w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-900/30 transition-colors"
-                      title="Remover bot"
-                      aria-label={`Remover bot ${player.name}`}
+                      className="text-white/30 hover:text-red-400 text-sm w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-200"
+                      title="Remove bot"
+                      aria-label={`Remove bot ${player.name}`}
                     >
-                      x
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
                     </button>
                   )}
                 </div>
@@ -123,12 +179,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {Array.from({ length: Math.max(0, 3 - gameState.players.length) }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
-                  className="flex items-center gap-3 bg-slate-800/20 p-3 md:p-4 rounded-xl border border-dashed border-slate-700/30"
+                  className="flex items-center gap-2.5 md:gap-3 bg-[#1A1A1A]/20 p-2.5 md:p-3 rounded-xl border border-dashed border-white/5"
                 >
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/50 flex items-center justify-center">
-                    <span className="text-slate-600 text-lg">?</span>
+                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center">
+                    <span className="text-white/15 text-lg">?</span>
                   </div>
-                  <span className="text-slate-600 text-sm">Aguardando jogador...</span>
+                  <span className="text-white/15 text-xs md:text-sm font-sans">Waiting for player...</span>
                 </div>
               ))}
             </div>
@@ -136,39 +192,39 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
           {/* Victory conditions — host only, fully local */}
           {isHost && (
-            <div className="mb-8">
-              <p className="text-slate-400 text-sm mb-4 font-medium">
-                Condicoes de Vitoria
+            <div className="w-full mb-5 md:mb-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both' }}>
+              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 pl-1 font-sans font-medium">
+                Victory Conditions
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-2 md:space-y-3">
                 {/* Score condition */}
-                <div className={`rounded-xl border transition-all duration-200 ${
+                <div className={`rounded-xl border transition-all duration-300 ${
                   vc.scoreEnabled
-                    ? 'bg-slate-800/50 border-indigo-500/40'
-                    : 'bg-slate-800/20 border-slate-700/30 opacity-60'
+                    ? 'bg-[#1A1A1A]/50 border-amber-500/20'
+                    : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between p-4 pb-2">
-                    <span className={`text-sm font-medium ${vc.scoreEnabled ? 'text-white' : 'text-slate-500'}`}>
-                      Por Pontos
+                  <div className="flex items-center justify-between p-3 md:p-4 pb-2">
+                    <span className={`text-sm font-cinzel ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                      By Score
                     </span>
                     <button
                       onClick={() => updateVC({ scoreEnabled: !vc.scoreEnabled })}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                        vc.scoreEnabled ? 'bg-indigo-600' : 'bg-slate-700'
+                      className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                        vc.scoreEnabled ? 'bg-amber-500/80' : 'bg-white/10'
                       }`}
-                      aria-label="Ativar condicao por pontos"
+                      aria-label="Toggle score condition"
                     >
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
+                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
                         vc.scoreEnabled ? 'translate-x-5' : 'translate-x-0'
                       }`} />
                     </button>
                   </div>
 
                   {vc.scoreEnabled && (
-                    <div className="px-4 pb-4 pt-1">
+                    <div className="px-3 md:px-4 pb-3 md:pb-4 pt-1">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-slate-500 text-xs">Primeiro a atingir</span>
+                        <span className="text-white/30 text-[10px] font-sans">First to reach</span>
                         <div className="flex items-center gap-1">
                           <input
                             type="number"
@@ -181,10 +237,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                               if (!isNaN(v)) updateVC({ targetScore: v });
                             }}
                             onBlur={() => updateVC({ targetScore: Math.max(10, Math.min(100, vc.targetScore)) })}
-                            className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-amber-400 font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500 transition-colors
+                            className="w-14 bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-2 py-1 text-amber-300 font-cinzel font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500/50 transition-colors
                               [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
-                          <span className="text-slate-500 text-xs">pts</span>
+                          <span className="text-white/30 text-[10px] font-sans">pts</span>
                         </div>
                       </div>
                       <input
@@ -194,11 +250,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         step={5}
                         value={Math.max(10, Math.min(100, vc.targetScore))}
                         onChange={(e) => updateVC({ targetScore: Number(e.target.value) })}
-                        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-slate-700 accent-amber-500
-                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
-                          [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-500 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
+                          [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
                       />
-                      <div className="flex justify-between text-[10px] text-slate-600 mt-1">
+                      <div className="flex justify-between text-[9px] text-white/15 mt-1 font-sans">
                         <span>10</span>
                         <span>100</span>
                       </div>
@@ -207,32 +263,32 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 </div>
 
                 {/* Narrator rounds condition */}
-                <div className={`rounded-xl border transition-all duration-200 ${
+                <div className={`rounded-xl border transition-all duration-300 ${
                   vc.narratorRoundsEnabled
-                    ? 'bg-slate-800/50 border-indigo-500/40'
-                    : 'bg-slate-800/20 border-slate-700/30 opacity-60'
+                    ? 'bg-[#1A1A1A]/50 border-amber-500/20'
+                    : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between p-4 pb-2">
-                    <span className={`text-sm font-medium ${vc.narratorRoundsEnabled ? 'text-white' : 'text-slate-500'}`}>
-                      Por Rodadas
+                  <div className="flex items-center justify-between p-3 md:p-4 pb-2">
+                    <span className={`text-sm font-cinzel ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
+                      By Rounds
                     </span>
                     <button
                       onClick={() => updateVC({ narratorRoundsEnabled: !vc.narratorRoundsEnabled })}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-                        vc.narratorRoundsEnabled ? 'bg-indigo-600' : 'bg-slate-700'
+                      className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
+                        vc.narratorRoundsEnabled ? 'bg-amber-500/80' : 'bg-white/10'
                       }`}
-                      aria-label="Ativar condicao por rodadas"
+                      aria-label="Toggle rounds condition"
                     >
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${
+                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
                         vc.narratorRoundsEnabled ? 'translate-x-5' : 'translate-x-0'
                       }`} />
                     </button>
                   </div>
 
                   {vc.narratorRoundsEnabled && (
-                    <div className="px-4 pb-4 pt-1">
+                    <div className="px-3 md:px-4 pb-3 md:pb-4 pt-1">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-slate-500 text-xs">Cada jogador narra</span>
+                        <span className="text-white/30 text-[10px] font-sans">Each player narrates</span>
                         <div className="flex items-center gap-1">
                           <input
                             type="number"
@@ -245,10 +301,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                               if (!isNaN(v)) updateVC({ narratorRounds: v });
                             }}
                             onBlur={() => updateVC({ narratorRounds: Math.max(1, Math.min(5, vc.narratorRounds)) })}
-                            className="w-12 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-amber-400 font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500 transition-colors
+                            className="w-12 bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-2 py-1 text-amber-300 font-cinzel font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500/50 transition-colors
                               [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
-                          <span className="text-slate-500 text-xs">x</span>
+                          <span className="text-white/30 text-[10px] font-sans">x</span>
                         </div>
                       </div>
                       <input
@@ -258,11 +314,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         step={1}
                         value={Math.max(1, Math.min(5, vc.narratorRounds))}
                         onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
-                        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-slate-700 accent-amber-500
-                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
-                          [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-500 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
+                          [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
                       />
-                      <div className="flex justify-between text-[10px] text-slate-600 mt-1">
+                      <div className="flex justify-between text-[9px] text-white/15 mt-1 font-sans">
                         <span>1x</span>
                         <span>5x</span>
                       </div>
@@ -272,8 +328,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
                 {/* Info when both enabled */}
                 {vc.scoreEnabled && vc.narratorRoundsEnabled && (
-                  <p className="text-slate-500 text-xs text-center px-2">
-                    A primeira condicao alcancada encerra o jogo
+                  <p className="text-white/20 text-[10px] text-center px-2 font-sans">
+                    First condition reached ends the game
                   </p>
                 )}
               </div>
@@ -281,41 +337,56 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
           )}
 
           {/* Actions */}
-          <div className="space-y-3">
+          <div className="w-full space-y-2.5 md:space-y-3" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
             {isHost ? (
               <>
                 <button
                   onClick={handleStartGame}
                   disabled={!canStart}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed py-4 rounded-xl font-bold font-display text-lg transition-all duration-200 shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98]"
+                  className={`w-full py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-300 ${
+                    canStart
+                      ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]'
+                      : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
+                  }`}
                 >
-                  {canStart ? 'Iniciar Jogo' : `Minimo ${GAME_CONFIG.MIN_PLAYERS} jogadores`}
+                  {canStart ? 'Start Game' : `Min ${GAME_CONFIG.MIN_PLAYERS} players`}
                 </button>
 
                 {canAddBot && (
                   <button
                     onClick={onAddBot}
-                    className="w-full bg-cyan-600/80 hover:bg-cyan-500 py-3 rounded-xl text-white font-medium transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98]"
+                    className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-2.5 md:py-3 rounded-xl font-sans font-medium text-xs md:text-sm transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
                   >
-                    Adicionar Bot
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add Bot
                   </button>
                 )}
               </>
             ) : (
-              <div className="text-center py-6 text-slate-400 bg-slate-800/30 rounded-xl">
-                <span className="w-2 h-2 bg-slate-400 rounded-full inline-block animate-pulse mr-2"></span>
-                Aguardando o host iniciar o jogo...
+              <div className="text-center py-4 md:py-5 text-white/30 bg-[#1A1A1A]/30 rounded-xl border border-white/5 font-sans text-sm">
+                <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full inline-block animate-pulse mr-2" />
+                Waiting for host to start...
               </div>
             )}
 
             <button
               onClick={onLeaveRoom}
-              className="w-full bg-slate-800/50 hover:bg-slate-700 py-3 rounded-xl text-slate-400 hover:text-white border border-slate-700/50 transition-all duration-200"
+              className="w-full bg-white/5 border border-white/10 text-white/30 hover:text-white/60 py-2.5 md:py-3 rounded-xl font-sans text-xs md:text-sm transition-all duration-200"
             >
-              Sair da Sala
+              Leave Room
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
+        <p className="text-white/20 text-[10px] font-sans tracking-wide">
+          &copy; 2026 Clues. Crafted for imagination.
+        </p>
       </div>
     </div>
   );

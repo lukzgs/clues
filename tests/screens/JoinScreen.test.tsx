@@ -246,3 +246,97 @@ describe('JoinScreen — input constraints', () => {
     expect(input).toHaveFocus();
   });
 });
+
+// ============================================
+// INVITE MODE
+// ============================================
+
+function renderInviteMode(overrides = {}) {
+  return renderJoinScreen({ prefillRoomCode: 'ABC123', ...overrides });
+}
+
+describe('JoinScreen — invite mode rendering', () => {
+  it('shows the room code', () => {
+    renderInviteMode();
+    expect(screen.getByText('ABC123')).toBeInTheDocument();
+  });
+
+  it('shows "Joining Room" label', () => {
+    renderInviteMode();
+    expect(screen.getByText('Joining Room')).toBeInTheDocument();
+  });
+
+  it('shows the name input', () => {
+    renderInviteMode();
+    expect(screen.getByPlaceholderText('Enter your name')).toBeInTheDocument();
+  });
+
+  it('shows JOIN ROOM button', () => {
+    renderInviteMode();
+    expect(screen.getByText('JOIN ROOM')).toBeInTheDocument();
+  });
+
+  it('does NOT show NEW ROOM button', () => {
+    renderInviteMode();
+    expect(screen.queryByText('NEW ROOM')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show Room ID input', () => {
+    renderInviteMode();
+    expect(screen.queryByPlaceholderText('ROOM ID')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show the title "Story Weaver"', () => {
+    renderInviteMode();
+    expect(screen.queryByText('Story Weaver')).not.toBeInTheDocument();
+  });
+
+  it('does NOT show the divider "Or join existing"', () => {
+    renderInviteMode();
+    expect(screen.queryByText('Or join existing')).not.toBeInTheDocument();
+  });
+});
+
+describe('JoinScreen — invite mode join flow', () => {
+  it('calls onJoinRoom with prefilled code and trimmed name', async () => {
+    const user = userEvent.setup();
+    const { onJoinRoom } = renderInviteMode();
+
+    await user.type(screen.getByPlaceholderText('Enter your name'), '  Alice  ');
+    await user.click(screen.getByText('JOIN ROOM'));
+
+    expect(onJoinRoom).toHaveBeenCalledWith('ABC123', 'Alice');
+    expect(onJoinRoom).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onJoinRoom when pressing Enter on name input', async () => {
+    const user = userEvent.setup();
+    const { onJoinRoom } = renderInviteMode();
+
+    await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob{Enter}');
+
+    expect(onJoinRoom).toHaveBeenCalledWith('ABC123', 'Bob');
+    expect(onJoinRoom).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows error when name is empty', async () => {
+    const user = userEvent.setup();
+    const { onJoinRoom } = renderInviteMode();
+
+    await user.click(screen.getByText('JOIN ROOM'));
+
+    expect(screen.getByText('Choose your name first')).toBeInTheDocument();
+    expect(onJoinRoom).not.toHaveBeenCalled();
+  });
+
+  it('clears error when typing in name input', async () => {
+    const user = userEvent.setup();
+    renderInviteMode();
+
+    await user.click(screen.getByText('JOIN ROOM'));
+    expect(screen.getByText('Choose your name first')).toBeInTheDocument();
+
+    await user.type(screen.getByPlaceholderText('Enter your name'), 'A');
+    expect(screen.queryByText('Choose your name first')).not.toBeInTheDocument();
+  });
+});

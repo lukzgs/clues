@@ -74,6 +74,7 @@ Initial screen for creating or joining rooms. Recently updated to feature the ne
 |------|------|-------------|
 | `onCreateRoom` | `(playerName: string) => void` | Creates new room |
 | `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Joins existing room |
+| `prefillRoomCode` | `string \| undefined` | Optional room code from URL params (`?room=ABC123`). When provided, the screen renders in "Invite Mode", hiding the create room options and automatically pre-filling the code. |
 
 ### `LobbyScreen.tsx`
 

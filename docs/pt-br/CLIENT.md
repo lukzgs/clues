@@ -74,6 +74,7 @@ Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo D
 |------|------|-----------|
 | `onCreateRoom` | `(playerName: string) => void` | Cria nova sala |
 | `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Entra em sala existente |
+| `prefillRoomCode` | `string \| undefined` | Código da sala opcional proveniente dos parâmetros da URL (`?room=ABC123`). Quando fornecido, a tela é renderizada no "Modo Convite" (Invite Mode), escondendo as opções de criação e pré-preenchendo automaticamente o código. |
 
 ### `LobbyScreen.tsx`
 
