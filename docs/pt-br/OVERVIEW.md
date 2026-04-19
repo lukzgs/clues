@@ -38,6 +38,11 @@ clues/
 ├── docs/                   # Documentação
 │   ├── en/                 # Inglês
 │   └── pt-br/              # Português
+├── tests/                  # Suítes de testes
+│   ├── schemas/            # Testes de validação Zod
+│   ├── screens/            # Testes de componentes React
+│   ├── server/             # Testes de lógica do jogo
+│   └── helpers/            # Utilitários de teste
 └── .agent/                 # Contexto para agentes de IA
 ```
 
@@ -57,6 +62,7 @@ clues/
 - **Vite** - Ferramenta de build e servidor dev
 - **PartyKit** - Infraestrutura WebSocket serverless
 - **Zod** - Validação de schemas em runtime
+- **Vitest** - Framework rápido para testes unitários e de componentes
 
 ## Documentação Relacionada
 

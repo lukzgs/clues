@@ -38,6 +38,11 @@ clues/
 ├── docs/                   # Documentation
 │   ├── en/                 # English
 │   └── pt-br/              # Portuguese
+├── tests/                  # Test suites
+│   ├── schemas/            # Zod schema tests
+│   ├── screens/            # React component tests
+│   ├── server/             # Game logic tests
+│   └── helpers/            # Test utilities
 └── .agent/                 # AI agent context
 ```
 
@@ -57,6 +62,7 @@ clues/
 - **Vite** - Build tool and dev server
 - **PartyKit** - Serverless WebSocket infrastructure
 - **Zod** - Runtime schema validation
+- **Vitest** - Fast unit and component testing framework
 
 ## Related Documentation
 
