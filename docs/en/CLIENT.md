@@ -112,6 +112,7 @@ Located in `src/components/game/`:
 
 | Component | Description |
 |-----------|-------------|
+| `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `PlayerHand.tsx` | Player's hand of cards |
 | `GameHeader.tsx` | Game info bar (phase, clue, narrator) |

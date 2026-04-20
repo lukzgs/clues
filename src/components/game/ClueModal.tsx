@@ -27,14 +27,14 @@ export const ClueModal: React.FC<ClueModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-slate-900/95 backdrop-blur-sm rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-md w-full border border-slate-800 shadow-2xl animate-zoom-in"
+        className="bg-black/40 backdrop-blur-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 max-w-md w-full border border-white/20 ring-1 ring-white/10 shadow-2xl animate-zoom-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-6">
-          <h2 className="text-xl md:text-2xl text-amber-400 font-display">Criar Pista</h2>
+          <h2 className="text-xl md:text-2xl text-amber-300 font-cinzel font-bold tracking-wider">Criar Pista</h2>
           <button
             onClick={onClose}
-            className="text-slate-500 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-800 transition-colors"
+            className="text-white/40 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
           >
             ×
           </button>
@@ -52,20 +52,24 @@ export const ClueModal: React.FC<ClueModalProps> = ({
             value={clue}
             onChange={(e) => setClue(e.target.value)}
             placeholder="Digite uma pista misteriosa..."
-            className="w-full bg-slate-800/80 border-2 border-slate-700 focus:border-indigo-500 p-4 rounded-xl text-white text-center text-lg italic outline-none transition-all duration-200 placeholder:text-slate-600 placeholder:not-italic"
+            className="w-full bg-[#1A1A1A]/80 border border-white/10 focus:border-amber-500/50 p-4 rounded-xl text-white text-center text-lg italic outline-none transition-all duration-200 placeholder:text-white/30 placeholder:not-italic font-sans"
             autoFocus
             maxLength={100}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           />
 
-          <p className="text-slate-500 text-xs text-center">
+          <p className="text-white/40 text-[10px] text-center uppercase tracking-widest font-sans font-medium">
             Dica: Não seja muito óbvio, nem muito abstrato!
           </p>
 
           <button
             onClick={handleSubmit}
             disabled={!clue.trim()}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed py-4 rounded-xl font-bold font-display transition-all duration-200 shadow-lg hover:shadow-indigo-500/20 active:scale-[0.98]"
+            className={`w-full py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-300 ${
+              clue.trim()
+                ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]'
+                : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
+            }`}
           >
             Enviar Carta e Pista
           </button>

@@ -112,6 +112,7 @@ Localizados em `src/components/game/`:
 
 | Componente | Descrição |
 |------------|-----------|
+| `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `PlayerHand.tsx` | Mão de cartas do jogador |
 | `GameHeader.tsx` | Barra de informações (fase, dica, narrador) |
