@@ -51,7 +51,7 @@ class GameServer implements Party.Server {
 
 | Função | Descrição |
 |--------|-----------|
-| `createDeck()` | Gera baralho de 341 cartas a partir de assets estáticos locais (`/cards/card_XXXX.avif`) |
+| `createDeck()` | Gera baralho de 341 cartas a partir de assets estáticos locais (`/cards/new/card_XXXX.avif`) |
 | `shuffle(array)` | Embaralhamento Fisher-Yates |
 | `generatePlayerId()` | Cria ID único de jogador |
 | `createInitialState()` | Retorna estado inicial do jogo |

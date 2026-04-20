@@ -62,7 +62,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       {isHidden || card.id === -1 ? (
         // Carta virada (verso)
         <img
-          src="/cards/back_001.avif"
+          src="/cards/new/back_001.avif"
           alt="Card back"
           className="w-full h-full object-cover"
         />
@@ -74,7 +74,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             alt={`Card ${card.id}`}
             className="w-full h-full object-cover"
             loading="lazy"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/cards/back_001.avif'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/cards/new/back_001.avif'; }}
           />
           {/* Overlay sutil no topo e base */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
