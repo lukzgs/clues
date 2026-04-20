@@ -16,6 +16,7 @@ export interface Player {
   isConnected: boolean;
   isHost: boolean;
   isBot?: boolean; // [BOT] Flag para identificar bots
+  isSpectator?: boolean; // Jogador que foi kikado por AFK
 }
 
 export interface TableCard {
@@ -58,10 +59,12 @@ export interface GameState {
   playersWhoPlayed: string[]; // IDs of players who already placed a card on the table
   victoryCondition: VictoryCondition;
   currentRound: number; // Current round number (0-based)
+  phaseStartTime: number; // Timestamp de quando a fase atual começou
+  afkKickVotes: string[]; // Array de playerIds que votaram para expulsar o jogador AFK
 }
 
 // Estado completo do servidor (não exposto ao cliente)
-export interface ServerGameState extends Omit<GameState, 'deckCount'> {
+export interface ServerGameState extends Omit<GameState, 'deckCount' | 'playersWhoPlayed'> {
   deck: Card[];
 }
 
@@ -78,6 +81,7 @@ export enum ClientMessageType {
   VOTE = 'VOTE',
   NEXT_ROUND = 'NEXT_ROUND',
   RESTART_GAME = 'RESTART_GAME',
+  VOTE_KICK_AFK = 'VOTE_KICK_AFK',
   // [BOT] Mensagens para controle de bots
   ADD_BOT = 'ADD_BOT',
   REMOVE_BOT = 'REMOVE_BOT',
@@ -132,6 +136,10 @@ export interface RemoveBotMessage {
   botId: string;
 }
 
+export interface VoteKickAfkMessage {
+  type: ClientMessageType.VOTE_KICK_AFK;
+}
+
 export type ClientMessage =
   | JoinRoomMessage
   | LeaveRoomMessage
@@ -142,7 +150,8 @@ export type ClientMessage =
   | NextRoundMessage
   | RestartGameMessage
   | AddBotMessage
-  | RemoveBotMessage;
+  | RemoveBotMessage
+  | VoteKickAfkMessage;
 
 // ============================================
 // MENSAGENS SERVIDOR -> CLIENTE

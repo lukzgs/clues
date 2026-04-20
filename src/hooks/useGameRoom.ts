@@ -44,6 +44,9 @@ interface UseGameRoomReturn {
   // [BOT] Ações de bots
   addBot: () => void;
   removeBot: (botId: string) => void;
+
+  // AFK
+  voteKickAfk: () => void;
 }
 
 // ============================================
@@ -222,6 +225,10 @@ export function useGameRoom({
     }
   }, [send]);
 
+  const voteKickAfk = useCallback(() => {
+    send({ type: ClientMessageType.VOTE_KICK_AFK });
+  }, [send]);
+
   return {
     gameState,
     playerId,
@@ -236,5 +243,6 @@ export function useGameRoom({
     leaveRoom,
     addBot,
     removeBot,
+    voteKickAfk,
   };
 }

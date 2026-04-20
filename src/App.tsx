@@ -34,6 +34,7 @@ const App: React.FC = () => {
     leaveRoom,
     addBot,
     removeBot,
+    voteKickAfk,
   } = useGameRoom({
     roomCode: appState.screen !== 'join' ? appState.roomCode : '',
     playerName: appState.screen !== 'join' ? appState.playerName : '',
@@ -180,6 +181,7 @@ const App: React.FC = () => {
       onNextRound={nextRound}
       onRestartGame={restartGame}
       onLeaveRoom={handleLeaveRoom}
+      voteKickAfk={voteKickAfk}
     />
   );
 };

@@ -79,6 +79,10 @@ export const RemoveBotSchema = z.object({
     botId: z.string().regex(/^bot-/, 'ID de bot inválido'),
 });
 
+export const VoteKickAfkSchema = z.object({
+    type: z.literal('VOTE_KICK_AFK'),
+});
+
 // ============================================
 // UNION DE TODAS AS MENSAGENS
 // ============================================
@@ -94,6 +98,7 @@ export const ClientMessageSchema = z.discriminatedUnion('type', [
     RestartGameSchema,
     AddBotSchema,
     RemoveBotSchema,
+    VoteKickAfkSchema,
 ]);
 
 // ============================================

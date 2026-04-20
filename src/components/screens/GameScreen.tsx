@@ -4,7 +4,8 @@ import {
   GameCard,
   ClueModal,
   ResultsView,
-  GameOverView
+  GameOverView,
+  AfkAlertBar
 } from '../game';
 
 interface GameScreenProps {
@@ -16,6 +17,7 @@ interface GameScreenProps {
   onNextRound: () => void;
   onRestartGame: () => void;
   onLeaveRoom: () => void;
+  voteKickAfk: () => void;
 }
 
 export const GameScreen: React.FC<GameScreenProps> = ({
@@ -27,6 +29,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   onNextRound,
   onRestartGame,
   onLeaveRoom,
+  voteKickAfk,
 }) => {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showClueModal, setShowClueModal] = useState(false);
@@ -111,9 +114,29 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
+    <div className="relative min-h-screen flex flex-col overflow-hidden z-0">
+      {/* Ambient Lighting */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[-1]"
+        style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
+      />
+      <div
+        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+      />
+      <AfkAlertBar 
+        gameState={gameState} 
+        voteKickAfk={voteKickAfk} 
+        currentPlayerId={playerId} 
+      />
+
+      {currentPlayer?.isSpectator && (
+        <div className="bg-red-900/40 border-b border-red-500/30 text-red-200 text-center py-2 text-sm font-medium">
+          Você está no Modo Espectador (Inativo por tempo excedido).
+        </div>
+      )}
+
       {/* ===== HEADER ===== */}
-      <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+      <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/10 bg-[#1A1A1A]/40 backdrop-blur-md">
         {/* Left: Phase & Timer */}
         <div className="flex items-center gap-4">
           <h1 className="text-white font-bold tracking-wide text-sm md:text-base">
@@ -123,14 +146,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* Right: Room Code & Settings */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-slate-500 text-xs">
-
+          <div className="flex items-center gap-2 text-white/40 text-xs">
             <span className="font-mono">ROOM CODE: <span className="text-white">{gameState.roomCode}</span></span>
           </div>
           <button
             onClick={onLeaveRoom}
             aria-label="Sair da sala"
-            className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             Sair
           </button>
@@ -141,8 +163,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <div className="flex flex-1 overflow-hidden">
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
-        <aside className="hidden lg:flex flex-col w-64 border-r border-slate-800/50 bg-slate-900/30 p-4">
-          <h2 className="text-slate-500 text-xs uppercase tracking-widest mb-4 font-medium">
+        <aside className="hidden lg:flex flex-col w-64 border-r border-white/10 bg-[#1A1A1A]/30 p-4">
+          <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-medium">
             Players & Votes
           </h2>
           <div className="space-y-2">
@@ -153,7 +175,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               return (
                 <div
                   key={player.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isMe ? 'bg-slate-800/60 border border-slate-700/50' : 'hover:bg-slate-800/30'
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors border ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/20' : 'hover:bg-white/5 border-transparent'
                     }`}
                 >
                   {/* Avatar */}
@@ -169,11 +191,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
                   {/* Name & Score */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium text-sm truncate">
+                    <div className="text-white font-cinzel font-medium text-sm truncate flex items-center gap-2">
                       {player.name}
-                      {isMe && <span className="text-slate-500 ml-1">(YOU)</span>}
+                      {isMe && <span className="text-white/30 font-sans text-[10px] uppercase tracking-wider">(YOU)</span>}
+                      {player.isSpectator && <span className="text-red-400 text-[10px] bg-red-950/50 px-2 py-0.5 rounded-full border border-red-500/30">SPECTATOR</span>}
                     </div>
-                    <div className="text-slate-500 text-xs">
+                    <div className="text-white/40 font-sans text-xs mt-0.5">
                       {player.score} Pts
                     </div>
                   </div>
@@ -204,11 +227,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 {isNarrator ? (
                   <>
                     {/* Announcement Card */}
-                    <div className="bg-slate-800/50 border-2 border-amber-500/30 p-8 md:p-12 rounded-2xl text-center max-w-lg">
-                      <h2 className="text-3xl md:text-4xl text-white font-display mb-3">
+                    <div className="bg-[#1A1A1A]/50 border-2 border-amber-500/30 p-8 md:p-12 rounded-2xl text-center max-w-lg shadow-xl shadow-amber-500/5">
+                      <h2 className="text-3xl md:text-4xl text-amber-300 font-cinzel font-bold mb-3 tracking-wider">
                         You are the Narrator
                       </h2>
-                      <p className="text-slate-400 text-lg">
+                      <p className="text-white/60 font-sans text-sm md:text-base">
                         Choose a card and write a clue
                       </p>
                     </div>
@@ -218,18 +241,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                       <input
                         type="text"
                         placeholder="Write a creative clue..."
-                        className="w-full bg-slate-800/60 border border-slate-700 p-4 rounded-xl text-white text-center placeholder:text-slate-600 outline-none focus:border-slate-600 transition-colors"
+                        className="w-full bg-[#1A1A1A]/80 border border-white/10 p-4 rounded-xl text-white text-center placeholder:text-white/30 outline-none focus:border-amber-500/50 transition-colors font-sans"
                         disabled
                       />
                     </div>
                   </>
                 ) : (
-                  <div className="bg-slate-800/30 border border-slate-700/50 p-8 rounded-2xl text-center max-w-lg">
-                    <h2 className="text-2xl text-white mb-2">
+                  <div className="bg-[#1A1A1A]/30 border border-white/10 p-8 rounded-2xl text-center max-w-lg">
+                    <h2 className="text-xl text-white mb-2 font-cinzel font-bold tracking-widest uppercase">
                       Waiting...
                     </h2>
-                    <p className="text-slate-500">
-                      <span style={{ color: narrator?.color }} className="font-medium">{narrator?.name}</span> is choosing a card
+                    <p className="text-white/60 font-sans text-sm">
+                      <span style={{ color: narrator?.color }} className="font-bold">{narrator?.name}</span> is choosing a card
                     </p>
                   </div>
                 )}
@@ -240,9 +263,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {gameState.phase === GamePhase.OTHERS_CHOOSING && (
               <div className="flex flex-col items-center gap-8 animate-fade-in">
                 {/* Clue Card */}
-                <div className="bg-gradient-to-b from-slate-100 to-slate-200 text-slate-900 px-12 py-8 rounded-2xl shadow-2xl text-center max-w-md border-4 border-white/50">
-                  <p className="text-slate-500 text-xs uppercase tracking-widest mb-2">The clue is</p>
-                  <h2 className="text-3xl md:text-4xl font-display italic">
+                <div className="bg-[#1A1A1A]/80 text-amber-300 px-12 py-8 rounded-2xl shadow-xl shadow-amber-500/5 text-center max-w-md border border-amber-500/20">
+                  <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">The clue is</p>
+                  <h2 className="text-3xl md:text-4xl font-cinzel font-bold tracking-wider">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
@@ -250,18 +273,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 {/* Status message */}
                 <div className="text-center">
                   {!isNarrator && !hasPlayed && (
-                    <p className="text-slate-400">
+                    <p className="text-white/60 font-sans text-sm">
                       Choose a card from your hand that matches the clue
                     </p>
                   )}
                   {!isNarrator && hasPlayed && (
-                    <p className="text-green-400 flex items-center gap-2 justify-center">
-                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <p className="text-green-400 font-sans text-sm flex items-center gap-2 justify-center">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]"></span>
                       Card sent! Waiting for others...
                     </p>
                   )}
                   {isNarrator && (
-                    <p className="text-slate-500">
+                    <p className="text-white/40 font-sans text-sm">
                       Waiting for players to choose their cards...
                     </p>
                   )}
@@ -273,8 +296,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {gameState.phase === GamePhase.VOTING && (
               <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-5xl">
                 {/* Clue Card */}
-                <div className="bg-gradient-to-b from-slate-100 to-slate-200 text-slate-900 px-10 py-6 rounded-2xl shadow-2xl text-center max-w-md border-4 border-white/50">
-                  <h2 className="text-2xl md:text-3xl font-display italic">
+                <div className="bg-[#1A1A1A]/80 text-amber-300 px-10 py-6 rounded-2xl shadow-xl shadow-amber-500/5 text-center max-w-md border border-amber-500/20">
+                  <h2 className="text-2xl md:text-3xl font-cinzel font-bold tracking-wider">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
@@ -299,9 +322,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                           highlightColor="#f59e0b"
                         />
                         {/* Vote count */}
-                        <div className={`px-3 py-1 rounded-full text-xs font-bold ${votesOnThis > 0
+                        <div className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold font-sans ${votesOnThis > 0
                             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-slate-800 text-slate-500'
+                            : 'bg-[#1A1A1A]/50 text-white/30 border border-white/10'
                           }`}>
                           {votesOnThis} Vote{votesOnThis !== 1 ? 's' : ''}
                         </div>
@@ -311,15 +334,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 </div>
 
                 {/* Status */}
-                <div className="text-center">
+                <div className="text-center font-sans text-sm">
                   {isNarrator && (
-                    <p className="text-slate-500">You are the narrator, waiting for votes...</p>
+                    <p className="text-white/40">You are the narrator, waiting for votes...</p>
                   )}
                   {!isNarrator && hasVoted && (
                     <p className="text-green-400">✓ Vote registered! Waiting for others...</p>
                   )}
                   {!isNarrator && !hasVoted && (
-                    <p className="text-slate-400">Click on the card you think belongs to the narrator</p>
+                    <p className="text-white/60">Click on the card you think belongs to the narrator</p>
                   )}
                 </div>
               </div>
@@ -327,14 +350,14 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
-          {currentPlayer && (
-            <div className="border-t border-slate-800/50 bg-slate-900/80 backdrop-blur-sm">
-              <div className="p-4">
+          {currentPlayer && !currentPlayer.isSpectator && (
+            <div className="border-t border-white/10 bg-[#1A1A1A]/60 backdrop-blur-md">
+              <div className="p-4 md:p-6">
                 {/* Label for disabled hand */}
                 {(gameState.phase === GamePhase.VOTING ||
                   (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed))) && (
-                    <div className="text-center mb-2">
-                      <span className="text-slate-500 text-sm bg-slate-800/80 px-4 py-1 rounded-full">
+                    <div className="text-center mb-4">
+                      <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium bg-[#1A1A1A]/80 px-4 py-2 rounded-full border border-white/10 shadow-sm shadow-black/50">
                         Your hand is inactive during the {gameState.phase === GamePhase.VOTING ? 'voting' : 'waiting'} phase.
                       </span>
                     </div>
@@ -351,7 +374,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     <GameCard
                       key={card.id}
                       card={card}
-                      size="sm"
+                      size="md"
                       disabled={
                         (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
                         (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
