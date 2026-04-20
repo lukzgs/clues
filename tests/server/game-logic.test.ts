@@ -25,8 +25,8 @@ function createPlayer(overrides: Partial<Player> = {}): Player {
     name: 'Test Player',
     score: 0,
     hand: [
-      { id: 1, imageUrl: '/cards/card_0001.avif' },
-      { id: 2, imageUrl: '/cards/card_0002.avif' },
+      { id: 1, imageUrl: '/cards/new/card_0001.avif' },
+      { id: 2, imageUrl: '/cards/new/card_0002.avif' },
     ],
     color: '#ef4444',
     isConnected: true,
@@ -39,7 +39,7 @@ function createTableCard(playerId: string, orderId: number, cardId: number): Tab
   return {
     orderId,
     playerId,
-    card: { id: cardId, imageUrl: `/cards/card_${String(cardId).padStart(4, '0')}.avif` },
+    card: { id: cardId, imageUrl: `/cards/new/card_${String(cardId).padStart(4, '0')}.avif` },
   };
 }
 
@@ -58,9 +58,11 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
       scoreEnabled: true,
       targetScore: 30,
       narratorRoundsEnabled: false,
-      narratorRounds: 2,
+      narratorRounds: 3,
     },
     currentRound: 0,
+    phaseStartTime: Date.now(),
+    afkKickVotes: [],
     ...overrides,
   };
 }
@@ -83,14 +85,14 @@ describe('createDeck', () => {
 
   it('generates correct image URLs with zero-padded IDs', () => {
     const deck = createDeck(5);
-    expect(deck[0].imageUrl).toBe('/cards/card_0001.avif');
-    expect(deck[4].imageUrl).toBe('/cards/card_0005.avif');
+    expect(deck[0].imageUrl).toBe('/cards/new/card_0001.avif');
+    expect(deck[4].imageUrl).toBe('/cards/new/card_0005.avif');
   });
 
   it('handles single card deck', () => {
     const deck = createDeck(1);
     expect(deck).toHaveLength(1);
-    expect(deck[0]).toEqual({ id: 1, imageUrl: '/cards/card_0001.avif' });
+    expect(deck[0]).toEqual({ id: 1, imageUrl: '/cards/new/card_0001.avif' });
   });
 
   it('handles empty deck', () => {
@@ -365,23 +367,23 @@ describe('getPublicState', () => {
     id: 'p1',
     name: 'Narrator',
     hand: [
-      { id: 10, imageUrl: '/cards/card_0010.avif' },
-      { id: 11, imageUrl: '/cards/card_0011.avif' },
+      { id: 10, imageUrl: '/cards/new/card_0010.avif' },
+      { id: 11, imageUrl: '/cards/new/card_0011.avif' },
     ],
   });
   const p2 = createPlayer({
     id: 'p2',
     name: 'Player 2',
     hand: [
-      { id: 20, imageUrl: '/cards/card_0020.avif' },
-      { id: 21, imageUrl: '/cards/card_0021.avif' },
+      { id: 20, imageUrl: '/cards/new/card_0020.avif' },
+      { id: 21, imageUrl: '/cards/new/card_0021.avif' },
     ],
   });
   const p3 = createPlayer({
     id: 'p3',
     name: 'Player 3',
     hand: [
-      { id: 30, imageUrl: '/cards/card_0030.avif' },
+      { id: 30, imageUrl: '/cards/new/card_0030.avif' },
     ],
   });
 
@@ -576,8 +578,8 @@ describe('getPublicState', () => {
   describe('deckCount', () => {
     it('exposes deck size instead of full deck', () => {
       const deck = [
-        { id: 50, imageUrl: '/cards/card_0050.avif' },
-        { id: 51, imageUrl: '/cards/card_0051.avif' },
+        { id: 50, imageUrl: '/cards/new/card_0050.avif' },
+        { id: 51, imageUrl: '/cards/new/card_0051.avif' },
       ];
 
       const state = createServerState({

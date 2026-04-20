@@ -11,6 +11,14 @@ import {
 } from "../src/types";
 import { PLAYER_COLORS } from "../src/config";
 import { ClientMessageSchema } from "../src/schemas";
+import {
+  createDeck,
+  shuffle,
+  generatePlayerId,
+  calculateScores as calculateScoresPure,
+  checkVictoryCondition,
+  getPublicState,
+} from "./game-logic";
 
 // [BOT] Import dinâmico - não falha se bots não existir
 let BotManagerClass: any = null;
@@ -27,30 +35,6 @@ try {
 // ============================================
 
 import GAME_CONFIG from '../game.config.json';
-
-// ============================================
-// FUNÇÕES UTILITÁRIAS
-// ============================================
-
-function createDeck(): Card[] {
-  return Array.from({ length: GAME_CONFIG.DECK_SIZE }, (_, i) => ({
-    id: i + 1,
-    imageUrl: `/cards/card_${String(i + 1).padStart(4, '0')}.avif`,
-  }));
-}
-
-function shuffle<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function generatePlayerId(): string {
-  return `p-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-}
 
 // ============================================
 // SERVIDOR DO JOGO
@@ -87,7 +71,7 @@ export default class GameServer implements Party.Server {
       tableCards: [],
       votes: {},
       winner: null,
-      deck: shuffle(createDeck()),
+      deck: shuffle(createDeck(GAME_CONFIG.DECK_SIZE)),
       victoryCondition: {
         scoreEnabled: true,
         targetScore: GAME_CONFIG.WINNING_SCORE,
@@ -95,6 +79,8 @@ export default class GameServer implements Party.Server {
         narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
       },
       currentRound: 0,
+      phaseStartTime: Date.now(),
+      afkKickVotes: [],
     };
   }
 
@@ -229,6 +215,10 @@ export default class GameServer implements Party.Server {
         case 'REMOVE_BOT':
           if (playerId && this.botManager) this.handleRemoveBot(playerId, msg.botId);
           break;
+
+        case 'VOTE_KICK_AFK':
+          if (playerId) this.handleVoteKickAfk(playerId);
+          break;
       }
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
@@ -356,7 +346,7 @@ export default class GameServer implements Party.Server {
     };
 
     // Embaralha deck e distribui cartas
-    this.state.deck = shuffle(createDeck());
+    this.state.deck = shuffle(createDeck(GAME_CONFIG.DECK_SIZE));
 
     this.state.players.forEach(p => {
       p.hand = this.state.deck.splice(0, GAME_CONFIG.HAND_SIZE);
@@ -364,7 +354,7 @@ export default class GameServer implements Party.Server {
     });
 
     // Inicia o jogo
-    this.state.phase = GamePhase.NARRATOR_CHOOSING;
+    this.changePhase(GamePhase.NARRATOR_CHOOSING);
     this.state.narratorIndex = 0;
     this.state.currentClue = '';
     this.state.tableCards = [];
@@ -399,7 +389,7 @@ export default class GameServer implements Party.Server {
     }];
 
     this.state.currentClue = clue.trim();
-    this.state.phase = GamePhase.OTHERS_CHOOSING;
+    this.changePhase(GamePhase.OTHERS_CHOOSING);
 
     this.broadcastState();
 
@@ -432,22 +422,19 @@ export default class GameServer implements Party.Server {
     });
 
     // Verifica se todos jogaram
-    if (this.state.tableCards.length === this.state.players.length) {
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    if (this.state.tableCards.length >= activePlayers.length) {
       // Embaralha as cartas na mesa
       this.state.tableCards = shuffle(this.state.tableCards).map((tc, i) => ({
         ...tc,
         orderId: i,
       }));
 
-      this.state.phase = GamePhase.VOTING;
+      this.changePhase(GamePhase.VOTING);
+      this.triggerBotActions();
     }
 
     this.broadcastState();
-
-    // [BOT] Faz bots votarem se entrou em VOTING
-    if (this.state.phase === GamePhase.VOTING) {
-      this.triggerBotActions();
-    }
   }
 
   private handleVote(playerId: string, orderId: number) {
@@ -469,8 +456,13 @@ export default class GameServer implements Party.Server {
     this.state.votes[playerId] = orderId;
 
     // Verifica se todos votaram
-    const votersCount = this.state.players.length - 1; // -1 narrador
-    if (Object.keys(this.state.votes).length === votersCount) {
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    const votersCount = activePlayers.length - 1; // -1 narrador
+    
+    // Contar apenas votos de jogadores ativos
+    const activeVotes = Object.keys(this.state.votes).filter(vId => !this.state.players.find(p => p.id === vId)?.isSpectator);
+    
+    if (activeVotes.length >= votersCount) {
       this.calculateScores();
     }
 
@@ -478,75 +470,31 @@ export default class GameServer implements Party.Server {
   }
 
   private calculateScores() {
-    const narrator = this.state.players[this.state.narratorIndex];
-    const narratorCard = this.state.tableCards.find(tc => tc.playerId === narrator.id)!;
+    // Delegate scoring to pure function
+    const pointsEarned = calculateScoresPure(
+      this.state.players,
+      this.state.narratorIndex,
+      this.state.tableCards,
+      this.state.votes,
+    );
 
-    // Conta votos na carta do narrador
-    const votesForNarrator = Object.values(this.state.votes)
-      .filter(orderId => orderId === narratorCard.orderId).length;
+    // Apply earned points to player scores
+    for (const player of this.state.players) {
+      player.score += pointsEarned[player.id] || 0;
+    }
 
-    const totalVoters = this.state.players.length - 1;
+    // Check victory conditions
+    const winnerId = checkVictoryCondition(
+      this.state.players,
+      this.state.victoryCondition,
+      this.state.currentRound,
+    );
 
-    if (votesForNarrator === 0 || votesForNarrator === totalVoters) {
-      // Narrador errou: todos (exceto narrador) ganham 2 pontos
-      this.state.players.forEach(p => {
-        if (p.id !== narrator.id) {
-          p.score += 2;
-        }
-      });
+    if (winnerId) {
+      this.changePhase(GamePhase.GAME_OVER);
+      this.state.winner = winnerId;
     } else {
-      // Narrador acertou: narrador ganha 3 pontos
-      narrator.score += 3;
-
-      // Quem votou na carta do narrador ganha 3 pontos
-      Object.entries(this.state.votes).forEach(([voterId, orderId]) => {
-        if (orderId === narratorCard.orderId) {
-          const voter = this.state.players.find(p => p.id === voterId);
-          if (voter) voter.score += 3;
-        }
-      });
-    }
-
-    // Bônus: +1 ponto por voto recebido (exceto narrador)
-    this.state.tableCards.forEach(tc => {
-      if (tc.playerId !== narrator.id) {
-        const votesReceived = Object.values(this.state.votes)
-          .filter(orderId => orderId === tc.orderId).length;
-
-        const player = this.state.players.find(p => p.id === tc.playerId);
-        if (player) player.score += votesReceived;
-      }
-    });
-
-    // Check victory conditions (first condition reached wins)
-    const vc = this.state.victoryCondition;
-    let gameOver = false;
-
-    // Check score-based victory
-    if (vc.scoreEnabled) {
-      const winner = this.state.players.find(p => p.score >= vc.targetScore);
-      if (winner) {
-        this.state.phase = GamePhase.GAME_OVER;
-        this.state.winner = winner.id;
-        gameOver = true;
-      }
-    }
-
-    // Check narrator-rounds-based victory (only if score didn't already end it)
-    if (!gameOver && vc.narratorRoundsEnabled) {
-      const totalRounds = this.state.players.length * vc.narratorRounds;
-      const completedRounds = this.state.currentRound + 1;
-
-      if (completedRounds >= totalRounds) {
-        const sorted = [...this.state.players].sort((a, b) => b.score - a.score);
-        this.state.phase = GamePhase.GAME_OVER;
-        this.state.winner = sorted[0].id;
-        gameOver = true;
-      }
-    }
-
-    if (!gameOver) {
-      this.state.phase = GamePhase.RESULTS;
+      this.changePhase(GamePhase.RESULTS);
     }
   }
 
@@ -578,7 +526,7 @@ export default class GameServer implements Party.Server {
     this.state.currentClue = '';
     this.state.tableCards = [];
     this.state.votes = {};
-    this.state.phase = GamePhase.NARRATOR_CHOOSING;
+    this.changePhase(GamePhase.NARRATOR_CHOOSING);
 
     this.broadcastState();
 
@@ -603,6 +551,102 @@ export default class GameServer implements Party.Server {
     };
 
     this.broadcastState();
+  }
+
+  // ============================================
+  // AFK & TIMEOUT SYSTEM
+  // ============================================
+
+  private changePhase(newPhase: GamePhase) {
+    this.state.phase = newPhase;
+    this.state.phaseStartTime = Date.now();
+    this.state.afkKickVotes = [];
+  }
+
+  private getAfkPlayers(): Player[] {
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    switch (this.state.phase) {
+      case GamePhase.NARRATOR_CHOOSING:
+        const narrator = this.state.players[this.state.narratorIndex];
+        return narrator && !narrator.isSpectator ? [narrator] : [];
+      case GamePhase.OTHERS_CHOOSING:
+        return activePlayers.filter(p =>
+          p.id !== this.state.players[this.state.narratorIndex]?.id &&
+          !this.state.tableCards.some(tc => tc.playerId === p.id)
+        );
+      case GamePhase.VOTING:
+        return activePlayers.filter(p =>
+          p.id !== this.state.players[this.state.narratorIndex]?.id &&
+          this.state.votes[p.id] === undefined
+        );
+      case GamePhase.RESULTS:
+        const host = activePlayers.find(p => p.isHost);
+        return host ? [host] : [];
+      default:
+        return [];
+    }
+  }
+
+  private handleVoteKickAfk(playerId: string) {
+    const voter = this.state.players.find(p => p.id === playerId && !p.isSpectator);
+    if (!voter) return;
+
+    if (!this.state.afkKickVotes.includes(playerId)) {
+      this.state.afkKickVotes.push(playerId);
+    }
+
+    const activeVoters = this.state.players.filter(p => !p.isSpectator && !p.isBot);
+    const majority = Math.floor(activeVoters.length / 2) + 1;
+
+    if (this.state.afkKickVotes.length >= majority) {
+      const afkPlayers = this.getAfkPlayers();
+      if (afkPlayers.length === 0) return;
+
+      afkPlayers.forEach(p => {
+        p.isSpectator = true;
+        
+        // If Host is kicked, reassign host
+        if (p.isHost) {
+          p.isHost = false;
+          const newHost = this.state.players.find(np => !np.isSpectator);
+          if (newHost) newHost.isHost = true;
+        }
+      });
+
+      this.state.afkKickVotes = [];
+
+      // Anti-soft-lock: se o narrador for kickado na sua vez, pula a rodada
+      if (this.state.phase === GamePhase.NARRATOR_CHOOSING && afkPlayers.some(p => p.id === this.state.players[this.state.narratorIndex]?.id)) {
+        this.changePhase(GamePhase.RESULTS);
+        const hostId = this.state.players.find(p => p.isHost)?.id;
+        if (hostId) this.handleNextRound(hostId);
+        return;
+      }
+
+      this.checkPhaseProgression();
+      this.broadcastState();
+    }
+  }
+
+  private checkPhaseProgression() {
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    
+    if (this.state.phase === GamePhase.OTHERS_CHOOSING) {
+      if (this.state.tableCards.length >= activePlayers.length) {
+        this.state.tableCards = shuffle(this.state.tableCards).map((tc, i) => ({
+          ...tc,
+          orderId: i,
+        }));
+        this.changePhase(GamePhase.VOTING);
+        this.triggerBotActions();
+      }
+    } else if (this.state.phase === GamePhase.VOTING) {
+      const votersCount = activePlayers.length - 1; // -1 for narrator
+      const activeVotes = Object.keys(this.state.votes).filter(vId => !this.state.players.find(p => p.id === vId)?.isSpectator);
+      if (activeVotes.length >= votersCount) {
+        this.calculateScores();
+      }
+    }
   }
 
   // ============================================
@@ -670,46 +714,7 @@ export default class GameServer implements Party.Server {
   // ============================================
 
   private getPublicState(forPlayerId: string | null): GameState {
-    const narrator = this.state.players[this.state.narratorIndex];
-    const isNarrator = forPlayerId === narrator?.id;
-    const isRevealed = this.state.phase === GamePhase.RESULTS || this.state.phase === GamePhase.GAME_OVER;
-
-    // Filter tableCards: hide playerId unless narrator or in RESULTS/GAME_OVER
-    const tableCards = this.state.tableCards.map(tc => ({
-      ...tc,
-      playerId: (isNarrator || isRevealed) ? tc.playerId : '',
-      isMine: tc.playerId === forPlayerId,
-    }));
-
-    // Filter votes: hide until RESULTS/GAME_OVER; during VOTING show only own vote
-    let votes: Record<string, number> = {};
-    if (isRevealed) {
-      votes = this.state.votes;
-    } else if (forPlayerId && this.state.votes[forPlayerId] !== undefined) {
-      votes = { [forPlayerId]: this.state.votes[forPlayerId] };
-    }
-
-    // playersWhoPlayed: safe list of IDs who already placed a card (no card association)
-    const playersWhoPlayed = this.state.tableCards.map(tc => tc.playerId);
-
-    return {
-      roomCode: this.state.roomCode,
-      phase: this.state.phase,
-      players: this.state.players.map(p => ({
-        ...p,
-        // Esconde mãos dos outros jogadores
-        hand: p.id === forPlayerId ? p.hand : p.hand.map(() => ({ id: -1, imageUrl: '' })),
-      })),
-      narratorIndex: this.state.narratorIndex,
-      currentClue: this.state.currentClue,
-      tableCards,
-      votes,
-      winner: this.state.winner,
-      deckCount: this.state.deck.length,
-      playersWhoPlayed,
-      victoryCondition: this.state.victoryCondition,
-      currentRound: this.state.currentRound,
-    };
+    return getPublicState(this.state, forPlayerId);
   }
 
   private broadcastState() {
