@@ -25,7 +25,7 @@ import {
 export function createDeck(deckSize: number): Card[] {
   return Array.from({ length: deckSize }, (_, i) => ({
     id: i + 1,
-    imageUrl: `/cards/new/card_${String(i + 1).padStart(4, '0')}.avif`,
+    imageUrl: `/cards/new/${i + 1}.avif`,
   }));
 }
 

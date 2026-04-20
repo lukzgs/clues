@@ -25,8 +25,8 @@ function createPlayer(overrides: Partial<Player> = {}): Player {
     name: 'Test Player',
     score: 0,
     hand: [
-      { id: 1, imageUrl: '/cards/new/card_0001.avif' },
-      { id: 2, imageUrl: '/cards/new/card_0002.avif' },
+      { id: 1, imageUrl: '/cards/new/1.avif' },
+      { id: 2, imageUrl: '/cards/new/2.avif' },
     ],
     color: '#ef4444',
     isConnected: true,
@@ -85,14 +85,14 @@ describe('createDeck', () => {
 
   it('generates correct image URLs with zero-padded IDs', () => {
     const deck = createDeck(5);
-    expect(deck[0].imageUrl).toBe('/cards/new/card_0001.avif');
-    expect(deck[4].imageUrl).toBe('/cards/new/card_0005.avif');
+    expect(deck[0].imageUrl).toBe('/cards/new/1.avif');
+    expect(deck[4].imageUrl).toBe('/cards/new/5.avif');
   });
 
   it('handles single card deck', () => {
     const deck = createDeck(1);
     expect(deck).toHaveLength(1);
-    expect(deck[0]).toEqual({ id: 1, imageUrl: '/cards/new/card_0001.avif' });
+    expect(deck[0]).toEqual({ id: 1, imageUrl: '/cards/new/1.avif' });
   });
 
   it('handles empty deck', () => {
@@ -367,23 +367,23 @@ describe('getPublicState', () => {
     id: 'p1',
     name: 'Narrator',
     hand: [
-      { id: 10, imageUrl: '/cards/new/card_0010.avif' },
-      { id: 11, imageUrl: '/cards/new/card_0011.avif' },
+      { id: 10, imageUrl: '/cards/new/10.avif' },
+      { id: 11, imageUrl: '/cards/new/11.avif' },
     ],
   });
   const p2 = createPlayer({
     id: 'p2',
     name: 'Player 2',
     hand: [
-      { id: 20, imageUrl: '/cards/new/card_0020.avif' },
-      { id: 21, imageUrl: '/cards/new/card_0021.avif' },
+      { id: 20, imageUrl: '/cards/new/20.avif' },
+      { id: 21, imageUrl: '/cards/new/21.avif' },
     ],
   });
   const p3 = createPlayer({
     id: 'p3',
     name: 'Player 3',
     hand: [
-      { id: 30, imageUrl: '/cards/new/card_0030.avif' },
+      { id: 30, imageUrl: '/cards/new/30.avif' },
     ],
   });
 
@@ -578,8 +578,8 @@ describe('getPublicState', () => {
   describe('deckCount', () => {
     it('exposes deck size instead of full deck', () => {
       const deck = [
-        { id: 50, imageUrl: '/cards/new/card_0050.avif' },
-        { id: 51, imageUrl: '/cards/new/card_0051.avif' },
+        { id: 50, imageUrl: '/cards/new/50.avif' },
+        { id: 51, imageUrl: '/cards/new/51.avif' },
       ];
 
       const state = createServerState({
