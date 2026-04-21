@@ -114,12 +114,8 @@ Located in `src/components/game/`:
 |-----------|-------------|
 | `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
-| `PlayerHand.tsx` | Player's hand of cards |
-| `GameHeader.tsx` | Game info bar (phase, clue, narrator) |
-| `ClueModal.tsx` | Modal for narrator to enter clue |
-| `VoteModal.tsx` | Modal for voting phase |
-| `CardPreviewModal.tsx` | Enlarged card view |
-| `ResultsView.tsx` | Round results with scores |
+| `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes |
+| `ResultsView.tsx` | Round results with scores, updated to match the game's aesthetic |
 | `GameOverView.tsx` | Final scores and winner |
 
 ---

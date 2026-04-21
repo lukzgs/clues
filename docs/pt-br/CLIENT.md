@@ -114,12 +114,8 @@ Localizados em `src/components/game/`:
 |------------|-----------|
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
-| `PlayerHand.tsx` | Mão de cartas do jogador |
-| `GameHeader.tsx` | Barra de informações (fase, dica, narrador) |
-| `ClueModal.tsx` | Modal para narrador inserir dica |
-| `VoteModal.tsx` | Modal para fase de votação |
-| `CardPreviewModal.tsx` | Visualização ampliada da carta |
-| `ResultsView.tsx` | Resultados da rodada com pontuações |
+| `ClueModal.tsx` | Modal universal para o narrador inserir dica, jogadores selecionarem cartas e eleitores confirmarem votos |
+| `ResultsView.tsx` | Resultados da rodada com pontuações, usando design de vidro e destaques dourados |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
 
 ---
