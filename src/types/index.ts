@@ -2,6 +2,9 @@
 // TIPOS BASE
 // ============================================
 
+export type DeckOption = 'original' | 'new' | 'mixed';
+
+
 export interface Card {
   id: number;
   imageUrl: string;
@@ -61,6 +64,7 @@ export interface GameState {
   currentRound: number; // Current round number (0-based)
   phaseStartTime: number; // Timestamp de quando a fase atual começou
   afkKickVotes: string[]; // Array de playerIds que votaram para expulsar o jogador AFK
+  deckOption: DeckOption;
 }
 
 // Estado completo do servidor (não exposto ao cliente)
@@ -100,6 +104,7 @@ export interface LeaveRoomMessage {
 export interface StartGameMessage {
   type: ClientMessageType.START_GAME;
   victoryCondition: VictoryCondition;
+  deckOption: DeckOption;
 }
 
 export interface SubmitClueMessage {

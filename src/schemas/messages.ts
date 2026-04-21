@@ -43,6 +43,7 @@ export const VictoryConditionSchema = z.object({
 export const StartGameSchema = z.object({
     type: z.literal('START_GAME'),
     victoryCondition: VictoryConditionSchema,
+    deckOption: z.enum(['original', 'new', 'mixed']),
 });
 
 export const SubmitClueSchema = z.object({

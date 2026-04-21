@@ -148,6 +148,10 @@ interface GameState {
   votes: Record<string, number>;
   winner: string | null;
   deckCount: number;
+  victoryCondition: VictoryCondition;
+  narratorRoundsPlayed: Record<string, number>;
+  deckOption: DeckOption;
+  afkKickVotes: Record<string, string[]>;
 }
 ```
 

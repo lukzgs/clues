@@ -31,7 +31,7 @@ enum ClientMessageType {
 |---------|---------|-------------|
 | `JOIN_ROOM` | `playerName: string` | Any |
 | `LEAVE_ROOM` | (none) | Any |
-| `START_GAME` | `victoryCondition: VictoryCondition` | LOBBY (host only) |
+| `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption` | LOBBY (host only) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (narrator only) |
 | `PLAY_CARD` | `cardId: number` | OTHERS_CHOOSING (non-narrators) |
 | `VOTE` | `orderId: number` | VOTING (non-narrators) |
@@ -49,8 +49,8 @@ enum ClientMessageType {
 // Submit a clue as narrator
 { type: 'SUBMIT_CLUE', cardId: 42, clue: 'A dream within a dream' }
 
-// Start game with victory conditions
-{ type: 'START_GAME', victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 } }
+// Start game with victory conditions & deck option
+{ type: 'START_GAME', victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 }, deckOption: 'mixed' }
 
 // Vote for a card
 { type: 'VOTE', orderId: 3 }

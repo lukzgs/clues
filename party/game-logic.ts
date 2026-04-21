@@ -13,6 +13,7 @@ import {
   GameState,
   ServerGameState,
   VictoryCondition,
+  DeckOption,
 } from '../src/types';
 
 // ============================================
@@ -22,11 +23,23 @@ import {
 /**
  * Creates a deck of cards with sequential IDs and image URLs.
  */
-export function createDeck(deckSize: number): Card[] {
-  return Array.from({ length: deckSize }, (_, i) => ({
-    id: i + 1,
-    imageUrl: `/cards/new/${i + 1}.avif`,
-  }));
+export function createDeck(deckOption: DeckOption, originalSize: number, newSize: number): Card[] {
+  const cards: Card[] = [];
+  let idCounter = 1;
+
+  if (deckOption === 'original' || deckOption === 'mixed') {
+    for (let i = 1; i <= originalSize; i++) {
+      cards.push({ id: idCounter++, imageUrl: `/cards/original/${String(i).padStart(3, '0')}.avif` });
+    }
+  }
+
+  if (deckOption === 'new' || deckOption === 'mixed') {
+    for (let i = originalSize + 1; i <= originalSize + newSize; i++) {
+      cards.push({ id: idCounter++, imageUrl: `/cards/new/${i}.avif` });
+    }
+  }
+
+  return cards;
 }
 
 /**
@@ -217,5 +230,6 @@ export function getPublicState(
     currentRound: state.currentRound,
     phaseStartTime: state.phaseStartTime,
     afkKickVotes: state.afkKickVotes,
+    deckOption: state.deckOption,
   };
 }

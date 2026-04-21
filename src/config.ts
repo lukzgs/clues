@@ -10,8 +10,11 @@ export const GAME_CONFIG = gameConfig as {
     readonly MAX_PLAYERS: number;
     readonly HAND_SIZE: number;
     readonly WINNING_SCORE: number;
-    readonly DECK_SIZE: number;
+    readonly ORIGINAL_DECK_SIZE: number;
+    readonly NEW_DECK_SIZE: number;
     readonly DEFAULT_NARRATOR_ROUNDS: number;
+    readonly PHASE_TIMEOUT_MS: number;
+    readonly ENABLE_BOTS: boolean;
 };
 
 // ============================================

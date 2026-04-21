@@ -48,7 +48,7 @@ interface UseGameRoomOptions {
   error: string | null;
   
   // Ações
-  startGame: () => void;
+  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
   vote: (orderId: number) => void;

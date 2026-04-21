@@ -6,6 +6,7 @@ import {
   ServerMessageType,
   ServerMessage,
   VictoryCondition,
+  DeckOption,
 } from '../types';
 import { PARTYKIT_HOST } from '../constants';
 import {
@@ -34,7 +35,7 @@ interface UseGameRoomReturn {
   error: string | null;
 
   // Acoes
-  startGame: (victoryCondition: VictoryCondition) => void;
+  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
   vote: (orderId: number) => void;
@@ -157,10 +158,11 @@ export function useGameRoom({
   // AÇÕES DO JOGO
   // ============================================
 
-  const startGame = useCallback((victoryCondition: VictoryCondition) => {
+  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption) => {
     const result = StartGameSchema.safeParse({
       type: ClientMessageType.START_GAME,
       victoryCondition,
+      deckOption,
     });
     if (result.success) {
       send(result.data);

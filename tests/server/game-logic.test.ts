@@ -63,6 +63,7 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
     currentRound: 0,
     phaseStartTime: Date.now(),
     afkKickVotes: [],
+    deckOption: 'mixed',
     ...overrides,
   };
 }
@@ -72,32 +73,31 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
 // ============================================
 
 describe('createDeck', () => {
-  it('creates the correct number of cards', () => {
-    const deck = createDeck(341);
+  it('creates the correct number of cards for mixed deck', () => {
+    const deck = createDeck('mixed', 372, 341);
+    expect(deck).toHaveLength(713);
+  });
+
+  it('creates the correct number of cards for original deck', () => {
+    const deck = createDeck('original', 372, 341);
+    expect(deck).toHaveLength(372);
+  });
+
+  it('creates the correct number of cards for new deck', () => {
+    const deck = createDeck('new', 372, 341);
     expect(deck).toHaveLength(341);
   });
 
-  it('creates cards with sequential IDs from 1 to deckSize', () => {
-    const deck = createDeck(10);
-    const ids = deck.map(c => c.id);
-    expect(ids).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  it('generates correct image URLs for original deck', () => {
+    const deck = createDeck('original', 5, 5);
+    expect(deck[0].imageUrl).toBe('/cards/original/001.avif');
+    expect(deck[4].imageUrl).toBe('/cards/original/005.avif');
   });
 
-  it('generates correct image URLs with zero-padded IDs', () => {
-    const deck = createDeck(5);
-    expect(deck[0].imageUrl).toBe('/cards/new/1.avif');
-    expect(deck[4].imageUrl).toBe('/cards/new/5.avif');
-  });
-
-  it('handles single card deck', () => {
-    const deck = createDeck(1);
-    expect(deck).toHaveLength(1);
-    expect(deck[0]).toEqual({ id: 1, imageUrl: '/cards/new/1.avif' });
-  });
-
-  it('handles empty deck', () => {
-    const deck = createDeck(0);
-    expect(deck).toHaveLength(0);
+  it('generates correct image URLs for new deck', () => {
+    const deck = createDeck('new', 5, 5);
+    expect(deck[0].imageUrl).toBe('/cards/new/6.avif');
+    expect(deck[4].imageUrl).toBe('/cards/new/10.avif');
   });
 });
 

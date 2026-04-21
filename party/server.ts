@@ -8,6 +8,7 @@ import {
   GameState,
   ClientMessageType,
   ServerMessageType,
+  DeckOption,
 } from "../src/types";
 import { PLAYER_COLORS } from "../src/config";
 import { ClientMessageSchema } from "../src/schemas";
@@ -71,7 +72,8 @@ export default class GameServer implements Party.Server {
       tableCards: [],
       votes: {},
       winner: null,
-      deck: shuffle(createDeck(GAME_CONFIG.DECK_SIZE)),
+      deck: [], // Deck is created when game starts
+      deckOption: 'mixed',
       victoryCondition: {
         scoreEnabled: true,
         targetScore: GAME_CONFIG.WINNING_SCORE,
@@ -184,7 +186,7 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'START_GAME':
-          if (playerId) this.handleStartGame(playerId, msg.victoryCondition);
+          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption);
           break;
 
         case 'SUBMIT_CLUE':
@@ -319,7 +321,7 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }) {
+  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption) {
     const player = this.state.players.find(p => p.id === playerId);
 
     // Apenas host pode iniciar
@@ -345,8 +347,9 @@ export default class GameServer implements Party.Server {
       narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
     };
 
-    // Embaralha deck e distribui cartas
-    this.state.deck = shuffle(createDeck(GAME_CONFIG.DECK_SIZE));
+    // Create and shuffle deck based on option
+    this.state.deckOption = deckOption;
+    this.state.deck = shuffle(createDeck(deckOption, GAME_CONFIG.ORIGINAL_DECK_SIZE, GAME_CONFIG.NEW_DECK_SIZE));
 
     this.state.players.forEach(p => {
       p.hand = this.state.deck.splice(0, GAME_CONFIG.HAND_SIZE);
@@ -654,7 +657,7 @@ export default class GameServer implements Party.Server {
   // ============================================
 
   private handleAddBot(playerId: string) {
-    if (!this.botManager) return;
+    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
 
     const player = this.state.players.find(p => p.id === playerId);
     if (!player?.isHost) return;
@@ -674,7 +677,7 @@ export default class GameServer implements Party.Server {
   }
 
   private handleRemoveBot(playerId: string, botId: string) {
-    if (!this.botManager) return;
+    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
 
     const player = this.state.players.find(p => p.id === playerId);
     if (!player?.isHost) return;
@@ -694,7 +697,7 @@ export default class GameServer implements Party.Server {
   }
 
   private triggerBotActions() {
-    if (!this.botManager) return;
+    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
 
     this.botManager.executeBotActions(this.state, {
       submitClue: (botId: string, cardId: number, clue: string) => {

@@ -365,6 +365,7 @@ describe('StartGameSchema', () => {
         narratorRoundsEnabled: false,
         narratorRounds: 2,
       },
+      deckOption: 'mixed',
     });
     expect(result.success).toBe(true);
   });
