@@ -78,52 +78,52 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
         className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
       />
 
-      <div className="w-full max-w-[900px] z-10 my-6 md:my-0">
+      <div className="w-full max-w-[1000px] z-10 my-6 md:my-0">
         <div
-          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-4 md:p-8 flex flex-col"
+          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col"
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
             
             {/* Left Panel: Game Options */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-5 md:p-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
-              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-medium">
+            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+              <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-5 font-sans font-semibold">
                 Game Options
               </p>
 
-              <div className="space-y-3 flex-1">
+              <div className="space-y-4 flex-1">
                 {/* Score condition */}
-                <div className={`rounded-xl border transition-all duration-300 ${
+                <div className={`rounded-2xl border transition-all duration-300 ${
                   vc.scoreEnabled
-                    ? 'bg-[#1A1A1A]/50 border-amber-500/20'
+                    ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
                     : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between p-3 pb-2">
-                    <span className={`text-sm font-cinzel ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                  <div className="flex items-center justify-between p-4 pb-3">
+                    <span className={`text-base md:text-lg font-cinzel font-bold tracking-wide ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
                       By Score
                     </span>
                     {isHost ? (
                       <button
                         onClick={() => updateVC({ scoreEnabled: !vc.scoreEnabled })}
-                        className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
-                          vc.scoreEnabled ? 'bg-amber-500/80' : 'bg-white/10'
+                        className={`relative w-12 h-6 md:w-14 md:h-7 rounded-full transition-colors duration-300 ${
+                          vc.scoreEnabled ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-white/10'
                         }`}
                         aria-label="Toggle score condition"
                       >
-                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
-                          vc.scoreEnabled ? 'translate-x-5' : 'translate-x-0'
+                        <span className={`absolute top-0.5 left-0.5 md:top-1 md:left-1 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
+                          vc.scoreEnabled ? 'translate-x-6' : 'translate-x-0'
                         }`} />
                       </button>
                     ) : (
-                      <span className="text-white/30 text-[10px] font-sans font-bold uppercase tracking-widest bg-white/5 px-2 py-1 rounded">{vc.scoreEnabled ? 'ON' : 'OFF'}</span>
+                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.scoreEnabled ? 'ON' : 'OFF'}</span>
                     )}
                   </div>
 
                   {vc.scoreEnabled && (
-                    <div className="px-3 pb-3 pt-1">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-white/30 text-[10px] font-sans">First to reach</span>
-                        <div className="flex items-center gap-1">
+                    <div className="px-4 pb-4 pt-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-white/40 text-[11px] md:text-xs uppercase tracking-wider font-sans font-medium">First to reach</span>
+                        <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
                               type="number"
@@ -136,13 +136,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                                 if (!isNaN(v)) updateVC({ targetScore: v });
                               }}
                               onBlur={() => updateVC({ targetScore: Math.max(10, Math.min(100, vc.targetScore)) })}
-                              className="w-14 bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-2 py-1 text-amber-300 font-cinzel font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500/50 transition-colors
+                              className="w-16 md:w-20 bg-[#1A1A1A]/80 border border-white/20 rounded-xl px-2 py-1.5 text-amber-300 font-cinzel font-bold text-lg md:text-xl text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
                                 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           ) : (
-                            <span className="bg-[#1A1A1A]/80 border border-white/5 rounded-lg px-2 py-1 text-amber-300/80 font-cinzel font-bold text-sm tabular-nums">{vc.targetScore}</span>
+                            <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.targetScore}</span>
                           )}
-                          <span className="text-white/30 text-[10px] font-sans">pts</span>
+                          <span className="text-white/30 text-[10px] md:text-xs tracking-widest font-sans font-bold uppercase">pts</span>
                         </div>
                       </div>
                       {isHost && (
@@ -154,11 +154,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                             step={5}
                             value={Math.max(10, Math.min(100, vc.targetScore))}
                             onChange={(e) => updateVC({ targetScore: Number(e.target.value) })}
-                            className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
-                              [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
+                              [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
                           />
-                          <div className="flex justify-between text-[9px] text-white/15 mt-1 font-sans">
+                          <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
                             <span>10</span>
                             <span>100</span>
                           </div>
@@ -169,37 +169,37 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 </div>
 
                 {/* Narrator rounds condition */}
-                <div className={`rounded-xl border transition-all duration-300 ${
+                <div className={`rounded-2xl border transition-all duration-300 ${
                   vc.narratorRoundsEnabled
-                    ? 'bg-[#1A1A1A]/50 border-amber-500/20'
+                    ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
                     : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between p-3 pb-2">
-                    <span className={`text-sm font-cinzel ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
+                  <div className="flex items-center justify-between p-4 pb-3">
+                    <span className={`text-base md:text-lg font-cinzel font-bold tracking-wide ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
                       By Rounds
                     </span>
                     {isHost ? (
                       <button
                         onClick={() => updateVC({ narratorRoundsEnabled: !vc.narratorRoundsEnabled })}
-                        className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${
-                          vc.narratorRoundsEnabled ? 'bg-amber-500/80' : 'bg-white/10'
+                        className={`relative w-12 h-6 md:w-14 md:h-7 rounded-full transition-colors duration-300 ${
+                          vc.narratorRoundsEnabled ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-white/10'
                         }`}
                         aria-label="Toggle rounds condition"
                       >
-                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
-                          vc.narratorRoundsEnabled ? 'translate-x-5' : 'translate-x-0'
+                        <span className={`absolute top-0.5 left-0.5 md:top-1 md:left-1 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
+                          vc.narratorRoundsEnabled ? 'translate-x-6' : 'translate-x-0'
                         }`} />
                       </button>
                     ) : (
-                      <span className="text-white/30 text-[10px] font-sans font-bold uppercase tracking-widest bg-white/5 px-2 py-1 rounded">{vc.narratorRoundsEnabled ? 'ON' : 'OFF'}</span>
+                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.narratorRoundsEnabled ? 'ON' : 'OFF'}</span>
                     )}
                   </div>
 
                   {vc.narratorRoundsEnabled && (
-                    <div className="px-3 pb-3 pt-1">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-white/30 text-[10px] font-sans">Each player narrates</span>
-                        <div className="flex items-center gap-1">
+                    <div className="px-4 pb-4 pt-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-white/40 text-[11px] md:text-xs uppercase tracking-wider font-sans font-medium">Each player narrates</span>
+                        <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
                               type="number"
@@ -212,13 +212,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                                 if (!isNaN(v)) updateVC({ narratorRounds: v });
                               }}
                               onBlur={() => updateVC({ narratorRounds: Math.max(1, Math.min(5, vc.narratorRounds)) })}
-                              className="w-12 bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-2 py-1 text-amber-300 font-cinzel font-bold text-sm text-center tabular-nums outline-none focus:border-amber-500/50 transition-colors
+                              className="w-16 md:w-20 bg-[#1A1A1A]/80 border border-white/20 rounded-xl px-2 py-1.5 text-amber-300 font-cinzel font-bold text-lg md:text-xl text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
                                 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           ) : (
-                            <span className="bg-[#1A1A1A]/80 border border-white/5 rounded-lg px-2 py-1 text-amber-300/80 font-cinzel font-bold text-sm tabular-nums">{vc.narratorRounds}</span>
+                            <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.narratorRounds}</span>
                           )}
-                          <span className="text-white/30 text-[10px] font-sans">x</span>
+                          <span className="text-white/30 text-[10px] md:text-xs tracking-widest font-sans font-bold uppercase">x</span>
                         </div>
                       </div>
                       {isHost && (
@@ -230,11 +230,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                             step={1}
                             value={Math.max(1, Math.min(5, vc.narratorRounds))}
                             onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
-                            className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/30
-                              [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
+                              [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
                           />
-                          <div className="flex justify-between text-[9px] text-white/15 mt-1 font-sans">
+                          <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
                             <span>1x</span>
                             <span>5x</span>
                           </div>
@@ -246,20 +246,20 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
                 {/* Info when both enabled */}
                 {vc.scoreEnabled && vc.narratorRoundsEnabled && (
-                  <p className="text-white/20 text-[10px] text-center px-2 font-sans mt-2">
+                  <p className="text-white/30 text-[11px] md:text-xs text-center px-4 font-sans mt-3 tracking-wide">
                     First condition reached ends the game
                   </p>
                 )}
               </div>
 
               {/* Deck Selection */}
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-3 font-sans font-medium">
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 font-sans font-semibold">
                   Card Pool
                 </p>
-                <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-xl p-1 relative z-0">
+                <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-[1.25rem] p-1.5 relative z-0">
                   <div
-                    className="absolute inset-y-1 bg-amber-500/20 border border-amber-500/30 rounded-lg transition-all duration-300 z-[-1]"
+                    className="absolute inset-y-1.5 bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all duration-300 z-[-1] shadow-[0_0_10px_rgba(245,158,11,0.1)]"
                     style={{
                       width: 'calc(33.333% - 4px)',
                       left: deckOption === 'original' ? '4px' : deckOption === 'new' ? 'calc(33.333% + 2px)' : 'calc(66.666%)',
@@ -270,8 +270,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       key={option}
                       onClick={() => isHost && setDeckOption(option)}
                       disabled={!isHost}
-                      className={`flex-1 py-2 text-xs font-cinzel font-bold tracking-wider transition-colors duration-200 uppercase rounded-lg
-                        ${deckOption === option ? 'text-amber-300' : 'text-white/30 hover:text-white/60'}
+                      className={`flex-1 py-3 md:py-3.5 text-sm md:text-base font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-xl
+                        ${deckOption === option ? 'text-amber-300' : 'text-white/40 hover:text-white/80'}
                         ${!isHost && 'cursor-default'}
                       `}
                     >
@@ -280,22 +280,22 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   ))}
                 </div>
                 {!isHost && (
-                  <p className="text-center mt-2 text-[10px] font-sans text-white/20">
+                  <p className="text-center mt-3 text-[11px] md:text-xs font-sans tracking-wide text-white/30">
                     Host is choosing the deck...
                   </p>
                 )}
               </div>
 
               {/* Actions */}
-              <div className="mt-6 space-y-2.5 md:space-y-3 pt-5 border-t border-white/5">
+              <div className="mt-8 space-y-3.5 pt-6 border-t border-white/10">
                 {isHost ? (
                   <>
                     <button
                       onClick={handleStartGame}
                       disabled={!canStart}
-                      className={`w-full py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-300 ${
+                      className={`w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 ${
                         canStart
-                          ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]'
+                          ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]'
                           : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                       }`}
                     >
@@ -305,25 +305,22 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     {canAddBot && (
                       <button
                         onClick={onAddBot}
-                        className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-2.5 md:py-3 rounded-xl font-cinzel font-bold uppercase tracking-widest text-xs md:text-sm transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                        className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
-                          <line x1="12" y1="5" x2="12" y2="19" />
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
+                        <span className="text-xl leading-none mr-1 font-sans font-light">+</span>
                         ADD BOT
                       </button>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-4 text-white/30 bg-[#1A1A1A]/30 rounded-xl border border-white/5 font-sans text-sm">
-                    <span className="w-1.5 h-1.5 bg-amber-400/60 rounded-full inline-block animate-pulse mr-2" />
+                  <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-base tracking-wide">
+                    <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                     Waiting for host to start...
                   </div>
                 )}
                 <button
                   onClick={onLeaveRoom}
-                  className="w-full bg-white/5 border border-white/10 text-white/30 hover:text-white/60 py-2.5 md:py-3 rounded-xl font-cinzel font-bold uppercase tracking-widest text-xs md:text-sm transition-all duration-200"
+                  className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
                 >
                   LEAVE ROOM
                 </button>
@@ -331,79 +328,79 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             </div>
 
             {/* Right Panel: Room Code & Players */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-5 md:p-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               {/* Room code */}
-              <div className="text-center mb-6 w-full">
-                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 font-sans font-medium">
+              <div className="text-center mb-10 w-full">
+                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 font-sans font-semibold">
                   Room Code
                 </p>
-                <div className="bg-[#1A1A1A]/50 rounded-xl px-5 py-3 inline-flex items-center gap-3 border border-white/10">
-                  <span className="text-2xl font-cinzel font-bold text-amber-300 tracking-wider">
+                <div className="bg-[#1A1A1A]/60 rounded-2xl px-6 md:px-8 py-4 md:py-5 inline-flex items-center gap-4 border border-white/10 shadow-inner">
+                  <span className="text-3xl md:text-4xl font-cinzel font-bold text-amber-300 tracking-[0.15em]">
                     {gameState.roomCode}
                   </span>
                   <button
                     onClick={handleCopyLink}
-                    className={`p-1.5 rounded-lg transition-all duration-200 ${
+                    className={`p-2.5 rounded-xl transition-all duration-300 ${
                       copied
-                        ? 'text-green-400 bg-green-500/10'
-                        : 'text-white/30 hover:text-white/60 hover:bg-white/5'
+                        ? 'text-green-400 bg-green-500/10 scale-110'
+                        : 'text-white/40 hover:text-amber-300 hover:bg-white/5'
                     }`}
                     title="Copy room link"
                     aria-label="Copy room link"
                   >
                     {copied ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                       </svg>
                     )}
                   </button>
                 </div>
-                <p className="text-white/20 text-[10px] mt-2 font-sans tracking-wide">
+                <p className="text-white/30 text-[11px] md:text-xs mt-3 font-sans tracking-widest uppercase">
                   {copied ? 'Link copied!' : 'Tap to copy invite link'}
                 </p>
               </div>
 
               {/* Player list */}
               <div className="w-full flex-1">
-                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-3 pl-1 font-sans font-medium">
+                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold">
                   Players ({gameState.players.length}/{GAME_CONFIG.MAX_PLAYERS})
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {gameState.players.map((player) => (
                     <div
                       key={player.id}
-                      className="flex items-center gap-2.5 bg-[#1A1A1A]/50 p-2.5 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-200 h-[64px]"
+                      className="flex items-center gap-3 md:gap-4 bg-[#1A1A1A]/60 p-3 md:p-3.5 rounded-2xl border border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80 transition-all duration-300 h-[76px] md:h-[84px] shadow-sm"
                     >
                       <div
-                        className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-sm shrink-0 shadow-lg"
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg md:text-xl shrink-0 shadow-lg border border-white/10"
                         style={{ backgroundColor: player.color }}
                       >
                         {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <span className="text-white font-cinzel text-sm block truncate">
+                      <div className="flex-1 min-w-0 pr-1">
+                        <span className="text-white font-cinzel font-bold text-base md:text-lg block truncate tracking-wide">
                           {player.name}
                         </span>
-                        <div className="flex flex-wrap gap-1.5 mt-0.5">
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
                           {player.id === currentPlayer?.id && (
-                            <span className="text-white/30 text-[9px] uppercase tracking-wider font-sans">(you)</span>
+                            <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium">(you)</span>
                           )}
                           {player.isBot && (
-                            <span className="text-amber-400/60 text-[9px] uppercase tracking-wider font-sans">(bot)</span>
+                            <span className="text-amber-400/60 text-[10px] uppercase tracking-widest font-sans font-medium">(bot)</span>
                           )}
                           {player.isHost && (
-                            <span className="text-amber-300 text-[9px] font-cinzel font-bold uppercase tracking-wider">
+                            <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]">
                               Host
                             </span>
                           )}
                           {!player.isConnected && !player.isBot && (
-                            <span className="text-red-400 text-[9px] font-sans">
+                            <span className="text-red-400 text-[10px] font-sans uppercase tracking-widest">
                               Offline
                             </span>
                           )}
@@ -413,11 +410,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && (
                         <button
                           onClick={() => onRemoveBot(player.id)}
-                          className="text-white/30 hover:text-red-400 text-sm w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-200"
+                          className="text-white/20 hover:text-red-400 text-lg w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-500/10 transition-all duration-300 mr-1"
                           title="Remove bot"
                           aria-label={`Remove bot ${player.name}`}
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
                           </svg>
@@ -429,12 +426,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {Array.from({ length: Math.max(0, GAME_CONFIG.MAX_PLAYERS - gameState.players.length) }).map((_, i) => (
                     <div
                       key={`empty-${i}`}
-                      className="flex items-center gap-2.5 bg-[#1A1A1A]/20 p-2.5 rounded-xl border border-dashed border-white/5 h-[64px]"
+                      className="flex items-center gap-3 md:gap-4 bg-[#1A1A1A]/20 p-3 md:p-3.5 rounded-2xl border border-dashed border-white/10 h-[76px] md:h-[84px] opacity-70"
                     >
-                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/5 flex items-center justify-center">
-                        <span className="text-white/15 text-lg">?</span>
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                        <span className="text-white/20 text-xl font-light">?</span>
                       </div>
-                      <span className="text-white/15 text-[10px] md:text-[11px] font-cinzel font-bold uppercase tracking-widest">Waiting...</span>
+                      <span className="text-white/20 text-[11px] md:text-xs font-cinzel font-bold uppercase tracking-[0.2em]">Waiting...</span>
                     </div>
                   ))}
                 </div>
