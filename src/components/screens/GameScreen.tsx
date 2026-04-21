@@ -286,36 +286,36 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Narrador escolhendo */}
             {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
-              <div className="flex flex-col items-center gap-6 animate-fade-in">
+              <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-4xl">
                 {isNarrator ? (
                   <>
                     {/* Announcement Card */}
-                    <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl p-8 md:p-12 rounded-2xl md:rounded-[2rem] text-center max-w-lg shadow-[0_0_40px_rgba(245,158,11,0.1)]">
-                      <h2 className="text-3xl md:text-4xl text-amber-300 font-cinzel font-bold mb-3 tracking-wider">
+                    <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-[0_0_50px_rgba(245,158,11,0.15)] flex flex-col items-center justify-center">
+                      <h2 className="text-4xl md:text-5xl text-amber-300 font-cinzel font-bold mb-4 tracking-[0.1em] leading-tight">
                         You are the Narrator
                       </h2>
-                      <p className="text-white/60 font-sans text-sm md:text-base uppercase tracking-widest mt-4">
+                      <p className="text-white/60 font-sans text-sm md:text-base uppercase tracking-[0.25em] mt-5 font-medium">
                         Choose a card and write a clue
                       </p>
                     </div>
 
                     {/* Input placeholder */}
-                    <div className="w-full max-w-lg">
+                    <div className="w-full max-w-2xl">
                       <input
                         type="text"
                         placeholder="Write a creative clue..."
-                        className="w-full bg-[#1A1A1A]/50 border border-white/20 p-5 rounded-full text-white text-center placeholder:text-white/30 outline-none transition-colors font-cinzel italic text-lg shadow-lg opacity-50"
+                        className="w-full bg-[#1A1A1A]/50 border border-white/20 p-6 md:p-8 rounded-[2rem] text-white text-center placeholder:text-white/30 outline-none transition-colors font-cinzel italic text-xl md:text-2xl shadow-lg opacity-50"
                         disabled
                       />
                     </div>
                   </>
                 ) : (
-                  <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-8 md:p-10 rounded-2xl md:rounded-[2rem] text-center max-w-lg shadow-2xl">
-                    <h2 className="text-xl text-white mb-3 font-cinzel font-bold tracking-widest uppercase text-amber-100">
+                  <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-2xl">
+                    <h2 className="text-2xl md:text-3xl text-white mb-4 font-cinzel font-bold tracking-[0.2em] uppercase text-amber-100/90">
                       Waiting...
                     </h2>
-                    <p className="text-white/60 font-sans text-sm tracking-wide">
-                      <span style={{ color: narrator?.color }} className="font-bold text-base bg-white/5 px-3 py-1 rounded-md mx-1">{narrator?.name}</span> is choosing a card
+                    <p className="text-white/60 font-sans text-base md:text-lg tracking-wider mt-6">
+                      <span style={{ color: narrator?.color }} className="font-bold text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5">{narrator?.name}</span> is choosing a card
                     </p>
                   </div>
                 )}
@@ -324,30 +324,30 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Outros escolhendo */}
             {gameState.phase === GamePhase.OTHERS_CHOOSING && (
-              <div className="flex flex-col items-center gap-8 animate-fade-in">
+              <div className="flex flex-col items-center gap-10 animate-fade-in w-full max-w-4xl">
                 {/* Clue Card */}
-                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-10 rounded-2xl md:rounded-[2.5rem] text-center max-w-lg">
-                  <p className="text-amber-200/50 text-[10px] uppercase tracking-[0.25em] mb-4 font-sans font-bold">The clue is</p>
-                  <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider leading-snug">
+                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-14 md:py-16 rounded-3xl md:rounded-[3rem] text-center w-full max-w-3xl flex flex-col items-center justify-center">
+                  <p className="text-amber-200/50 text-[11px] md:text-sm uppercase tracking-[0.3em] mb-6 md:mb-8 font-sans font-bold">The clue is</p>
+                  <h2 className="text-4xl md:text-6xl font-cinzel font-bold tracking-wider leading-tight">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
 
                 {/* Status message */}
-                <div className="text-center bg-[#1A1A1A]/40 px-8 py-4 rounded-full border border-white/5 backdrop-blur-sm">
+                <div className="text-center bg-[#1A1A1A]/40 px-10 py-5 rounded-full border border-white/5 backdrop-blur-sm">
                   {!isNarrator && !hasPlayed && (
-                    <p className="text-white/70 font-sans text-sm tracking-wide uppercase">
+                    <p className="text-white/70 font-sans text-sm md:text-base tracking-widest uppercase font-medium">
                       Choose a card from your hand that matches the clue
                     </p>
                   )}
                   {!isNarrator && hasPlayed && (
-                    <p className="text-amber-400 font-sans text-sm flex items-center gap-3 justify-center tracking-wider uppercase font-medium">
-                      <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.8)]"></span>
+                    <p className="text-amber-400 font-sans text-sm md:text-base flex items-center gap-3 justify-center tracking-widest uppercase font-bold">
+                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
                       Card sent! Waiting for others...
                     </p>
                   )}
                   {isNarrator && (
-                    <p className="text-white/40 font-sans text-sm tracking-widest uppercase">
+                    <p className="text-white/50 font-sans text-sm md:text-base tracking-widest uppercase font-medium">
                       Waiting for players to choose their cards...
                     </p>
                   )}
@@ -357,26 +357,26 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Votação */}
             {gameState.phase === GamePhase.VOTING && (
-              <div className="flex flex-col items-center gap-10 animate-fade-in w-full max-w-6xl">
+              <div className="flex flex-col items-center gap-12 animate-fade-in w-full max-w-7xl">
                 {/* Clue Card */}
-                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.1)] text-amber-300 px-10 py-6 rounded-2xl md:rounded-full text-center max-w-xl">
-                  <h2 className="text-2xl md:text-3xl font-cinzel font-bold tracking-wider px-6">
+                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-8 rounded-3xl md:rounded-full text-center max-w-4xl mx-auto flex items-center justify-center">
+                  <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider px-8 leading-tight">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
 
                 {/* Table Cards */}
-                <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+                <div className="flex flex-wrap justify-center gap-8 md:gap-10">
                   {gameState.tableCards.map((tableCard) => {
                     const isMine = tableCard.isMine === true;
                     const votesOnThis = Object.entries(gameState.votes)
                       .filter(([_, orderId]) => orderId === tableCard.orderId).length;
 
                     return (
-                      <div key={tableCard.orderId} className="flex flex-col items-center gap-3">
+                      <div key={tableCard.orderId} className="flex flex-col items-center gap-4">
                         <GameCard
                           card={tableCard.card}
-                          size="lg"
+                          size="xl"
                           disabled={isNarrator || hasVoted || isMine}
                           onClick={() => handleVoteSelect(tableCard)}
                           className={`${isMine ? 'opacity-50' : ''} ${!isMine && !hasVoted && !isNarrator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''
@@ -385,7 +385,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                           highlightColor="#f59e0b"
                         />
                         {/* Vote count */}
-                        <div className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold font-sans ${votesOnThis > 0
+                        <div className={`px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.2em] font-bold font-sans shadow-lg ${votesOnThis > 0
                             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                             : 'bg-[#1A1A1A]/50 text-white/30 border border-white/10'
                           }`}>
@@ -397,18 +397,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 </div>
 
                 {/* Status */}
-                <div className="text-center font-sans text-sm tracking-widest uppercase bg-[#1A1A1A]/40 px-8 py-3 rounded-full border border-white/5 backdrop-blur-sm mt-4">
+                <div className="text-center font-sans text-sm md:text-base tracking-[0.25em] uppercase bg-[#1A1A1A]/40 px-10 py-4 rounded-full border border-white/5 backdrop-blur-sm mt-6 font-medium">
                   {isNarrator && (
-                    <p className="text-white/40">You are the narrator, waiting for votes...</p>
+                    <p className="text-white/50">You are the narrator, waiting for votes...</p>
                   )}
                   {!isNarrator && hasVoted && (
-                    <p className="text-amber-400 font-medium flex items-center justify-center gap-3">
-                      <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.8)]"></span>
+                    <p className="text-amber-400 font-bold flex items-center justify-center gap-3">
+                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
                       Vote registered! Waiting...
                     </p>
                   )}
                   {!isNarrator && !hasVoted && (
-                    <p className="text-white/70">Click on the card you think belongs to the narrator</p>
+                    <p className="text-white/80">Click on the card you think belongs to the narrator</p>
                   )}
                 </div>
               </div>
