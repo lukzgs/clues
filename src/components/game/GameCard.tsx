@@ -2,7 +2,7 @@ import { Card } from '../../types';
 
 interface GameCardProps {
   card: Card;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   isHidden?: boolean;
   isSelected?: boolean;
   isHighlighted?: boolean;
@@ -28,6 +28,7 @@ export const GameCard: React.FC<GameCardProps> = ({
     sm: 'w-16 h-24 md:w-20 md:h-28',
     md: 'w-24 h-36 md:w-32 md:h-44 lg:w-36 lg:h-52',
     lg: 'w-32 h-48 md:w-40 md:h-56 lg:w-44 lg:h-64',
+    xl: 'w-48 h-[18rem] md:w-64 md:h-[24rem] lg:w-80 lg:h-[30rem]',
   };
 
   const isClickable = onClick && !disabled;
