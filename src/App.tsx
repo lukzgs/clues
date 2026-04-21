@@ -134,7 +134,7 @@ const App: React.FC = () => {
 
             {error && (
               <div className="mt-5 md:mt-6 w-full text-center" style={{ animation: 'fade-in-up 0.3s ease-out both' }}>
-                <p className="text-red-400 text-xs mb-3 bg-red-500/10 py-2 px-3 rounded-lg border border-red-500/20 font-sans">{error}</p>
+                <p className="text-red-400/90 text-[11px] uppercase tracking-[0.15em] text-center mb-3 w-full bg-red-950/30 border border-red-500/20 py-3 px-4 rounded-xl font-sans font-medium shadow-[0_0_10px_rgba(239,68,68,0.05)]">{error}</p>
                 <button
                   onClick={() => setAppState({ screen: 'join' })}
                   className="text-white/30 hover:text-white/60 text-sm font-sans transition-colors"

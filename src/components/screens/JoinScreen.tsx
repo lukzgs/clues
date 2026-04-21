@@ -79,7 +79,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               </div>
 
               {/* Name input */}
-              <div className="w-full mb-5 md:mb-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+              <div className="w-full mb-6 md:mb-7 relative" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
                 <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
                   Identity
                 </label>
@@ -93,14 +93,12 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   maxLength={20}
                   autoFocus
                 />
+                
+                {/* Error floating below input */}
+                <div className={`absolute top-full left-0 w-full pt-1.5 flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
+                  <span>{error}</span>
+                </div>
               </div>
-
-              {/* Error */}
-              {error && (
-                <p className="text-red-400 text-xs text-center mb-4 w-full bg-red-500/10 py-2 px-3 rounded-lg font-sans" style={{ animation: 'fade-in-up 0.3s ease-out both' }}>
-                  {error}
-                </p>
-              )}
 
               {/* Join button */}
               <div className="w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both' }}>
@@ -130,7 +128,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               </div>
 
               {/* Username field */}
-              <div className="w-full mb-5 md:mb-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+              <div className="w-full mb-6 md:mb-7 relative" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
                 <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
                   Identity
                 </label>
@@ -144,14 +142,12 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   maxLength={20}
                   autoFocus
                 />
+                
+                {/* Error floating below input */}
+                <div className={`absolute top-full left-0 w-full pt-1.5 flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
+                  <span>{error}</span>
+                </div>
               </div>
-
-              {/* Error */}
-              {error && (
-                <p className="text-red-400 text-xs text-center mb-4 w-full bg-red-500/10 py-2 px-3 rounded-lg font-sans" style={{ animation: 'fade-in-up 0.3s ease-out both' }}>
-                  {error}
-                </p>
-              )}
 
               {/* Create Room button */}
               <div className="w-full mb-6 md:mb-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both' }}>
