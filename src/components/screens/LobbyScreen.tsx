@@ -78,7 +78,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
         className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
       />
 
-      <div className="w-full max-w-[1000px] z-10 my-6 md:my-0">
+      <div className="w-full max-w-[1100px] z-10 my-6 md:my-0">
         <div
           className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col"
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
@@ -374,17 +374,17 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {gameState.players.map((player) => (
                     <div
                       key={player.id}
-                      className="flex items-center gap-3 md:gap-4 bg-[#1A1A1A]/60 p-3 md:p-3.5 rounded-2xl border border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80 transition-all duration-300 h-[76px] md:h-[84px] shadow-sm"
+                      className="flex items-center gap-3 bg-[#1A1A1A]/60 p-3 rounded-2xl border border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80 transition-all duration-300 h-[72px] md:h-[76px] shadow-sm"
                     >
                       <div
-                        className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg md:text-xl shrink-0 shadow-lg border border-white/10"
+                        className="w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg md:text-xl shrink-0 shadow-lg border border-white/10"
                         style={{ backgroundColor: player.color }}
                       >
                         {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
                       </div>
 
                       <div className="flex-1 min-w-0 pr-1">
-                        <span className="text-white font-cinzel font-bold text-base md:text-lg block truncate tracking-wide">
+                        <span className="text-white font-cinzel font-bold text-sm md:text-base block truncate tracking-wide">
                           {player.name}
                         </span>
                         <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -426,9 +426,9 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {Array.from({ length: Math.max(0, GAME_CONFIG.MAX_PLAYERS - gameState.players.length) }).map((_, i) => (
                     <div
                       key={`empty-${i}`}
-                      className="flex items-center gap-3 md:gap-4 bg-[#1A1A1A]/20 p-3 md:p-3.5 rounded-2xl border border-dashed border-white/10 h-[76px] md:h-[84px] opacity-70"
+                      className="flex items-center gap-3 bg-[#1A1A1A]/20 p-3 rounded-2xl border border-dashed border-white/10 h-[72px] md:h-[76px] opacity-70"
                     >
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                      <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
                         <span className="text-white/20 text-xl font-light">?</span>
                       </div>
                       <span className="text-white/20 text-[11px] md:text-xs font-cinzel font-bold uppercase tracking-[0.2em]">Waiting...</span>
