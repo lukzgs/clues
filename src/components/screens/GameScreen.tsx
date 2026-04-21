@@ -223,53 +223,53 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       </header>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden w-full relative">
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
-        <aside className="hidden lg:flex flex-col w-64 border-r border-white/10 bg-[#1A1A1A]/30 p-4">
-          <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-medium">
-            Players & Votes
+        <aside className="hidden lg:flex flex-col w-[320px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-8">
+          <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-6 font-sans font-bold text-center">
+            Pontuação Atual
           </h2>
-          <div className="space-y-2">
-            {gameState.players.map((player) => {
+          <div className="space-y-3">
+            {[...gameState.players]
+              .sort((a, b) => b.score - a.score)
+              .map((player) => {
               const status = getPlayerStatus(player);
               const isMe = player.id === playerId;
 
               return (
                 <div
                   key={player.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors border ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/20' : 'hover:bg-white/5 border-transparent'
+                  className={`flex items-center gap-4 p-4 rounded-3xl transition-colors border shadow-lg ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/10'
                     }`}
                 >
                   {/* Avatar */}
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg"
-                    style={{
-                      backgroundColor: player.color,
-                      border: player.id === narrator?.id ? '2px solid #f59e0b' : 'none'
-                    }}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 shadow-lg border border-white/10 ${
+                      status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1A1A1A]' : ''
+                    }`}
+                    style={{ backgroundColor: player.color }}
                   >
                     {player.name.charAt(0).toUpperCase()}
                   </div>
 
                   {/* Name & Score */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-cinzel font-medium text-sm truncate flex items-center gap-2">
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className="text-white font-cinzel font-bold text-lg md:text-xl truncate flex items-center gap-2">
                       {player.name}
-                      {isMe && <span className="text-white/30 font-sans text-[10px] uppercase tracking-wider">(YOU)</span>}
                       {player.isSpectator && <span className="text-red-400 text-[10px] bg-red-950/50 px-2 py-0.5 rounded-full border border-red-500/30">SPECTATOR</span>}
                     </div>
-                    <div className="text-white/40 font-sans text-xs mt-0.5">
-                      {player.score} Pts
+                    <div className="text-white/60 font-sans text-sm mt-0.5 flex items-baseline gap-1">
+                      {player.score} <span className="text-[10px] uppercase tracking-widest text-white/30">Pts</span>
                     </div>
                   </div>
 
                   {/* Status indicator */}
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${status === 'voted' || status === 'played'
-                      ? 'bg-green-500/20 text-green-400'
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md border shrink-0 ${status === 'voted' || status === 'played'
+                      ? 'bg-green-500/20 text-green-400 border-green-500/30'
                       : status === 'narrator'
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-slate-700 text-slate-500'
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                        : 'bg-black/40 text-white/30 border-white/5'
                     }`}>
                     {status === 'voted' || status === 'played' ? '✓' :
                       status === 'narrator' ? '★' : '?'}
@@ -281,7 +281,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </aside>
 
         {/* ===== CENTER CONTENT ===== */}
-        <main className="flex-1 flex flex-col overflow-y-auto">
+        <main className="flex-1 flex flex-col overflow-y-auto pb-6">
           <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
 
             {/* Fase: Narrador escolhendo */}
@@ -417,8 +417,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
           {currentPlayer && !currentPlayer.isSpectator && (
-            <div className="border-t border-white/5 bg-[#0F0F0F]/80 backdrop-blur-xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-              <div className="p-6 md:p-8">
+            <div className="pb-6 md:pb-10 pt-4 px-4">
+              <div className="max-w-6xl mx-auto">
                 {/* Label for disabled hand */}
                 {(gameState.phase === GamePhase.VOTING ||
                   (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed))) && (
@@ -430,24 +430,25 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   )}
 
                 {/* Cards */}
-                <div className={`flex justify-center gap-4 md:gap-6 flex-wrap ${gameState.phase === GamePhase.VOTING ||
+                <div className={`flex justify-center gap-4 md:gap-4 flex-nowrap overflow-x-auto pb-4 px-4 custom-scrollbar ${gameState.phase === GamePhase.VOTING ||
                     (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
                     (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator)
                     ? 'opacity-40 grayscale-[30%] scale-[0.98]'
                     : ''
                   }`}>
                   {currentPlayer.hand.map((card) => (
-                    <GameCard
-                      key={card.id}
-                      card={card}
-                      size="lg"
-                      disabled={
-                        (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
-                        (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
-                        gameState.phase === GamePhase.VOTING
-                      }
-                      onClick={() => handleCardSelect(card)}
-                    />
+                    <div key={card.id} className="shrink-0">
+                      <GameCard
+                        card={card}
+                        size="md"
+                        disabled={
+                          (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
+                          (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
+                          gameState.phase === GamePhase.VOTING
+                        }
+                        onClick={() => handleCardSelect(card)}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>

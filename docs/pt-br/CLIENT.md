@@ -91,7 +91,7 @@ Sala de espera antes do jogo começar.
 
 ### `GameScreen.tsx`
 
-Interface principal do jogo com renderização baseada em fase.
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em rolagem horizontal (estilo "edge-to-edge").
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|

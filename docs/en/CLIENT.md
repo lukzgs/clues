@@ -91,7 +91,7 @@ Waiting room before game starts.
 
 ### `GameScreen.tsx`
 
-Main game interface with phase-based rendering.
+Main game interface with phase-based rendering. Now features a floating sidebar scoreboard and a horizontal single-row scrollable player hand layout.
 
 | Prop | Type | Description |
 |------|------|-------------|
