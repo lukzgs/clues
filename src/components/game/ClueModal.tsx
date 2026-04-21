@@ -23,26 +23,24 @@ export const ClueModal: React.FC<ClueModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xl flex items-center justify-center p-4 md:p-6 animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-black/50 backdrop-blur-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-10 w-full max-w-lg border border-white/20 ring-1 ring-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-zoom-in"
+        className="relative bg-black/50 backdrop-blur-2xl rounded-3xl md:rounded-[2.5rem] p-6 md:p-8 w-full max-w-[420px] md:max-w-lg border border-white/20 ring-1 ring-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-zoom-in flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-start mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl text-amber-300 font-cinzel font-bold tracking-wider">Criar Pista</h2>
-          <button
-            onClick={onClose}
-            className="text-white/40 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors"
-          >
-            ×
-          </button>
-        </div>
+        {/* Close Button floating over the corner */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 md:top-6 md:right-6 text-white/40 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors z-10"
+        >
+          ×
+        </button>
 
-        {/* Carta selecionada */}
-        <div className="flex justify-center mb-8 drop-shadow-2xl">
-          <GameCard card={card} size="xl" />
+        {/* Carta selecionada com tamanho FULL para alinhar borda a borda do padding */}
+        <div className="w-full flex justify-center mb-6 md:mb-8 drop-shadow-2xl">
+          <GameCard card={card} size="full" />
         </div>
 
         {/* Input da pista */}
