@@ -119,7 +119,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
             <>
               {/* Title */}
               <div className="text-center mb-8 md:mb-10 w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
-                <h1 className="text-4xl md:text-5xl tracking-tight text-white mb-3" style={{ fontFamily: '"Cinzel", serif' }}>
+                <h1 className="text-4xl md:text-5xl tracking-tight text-white mb-3 font-cinzel">
                   Story Weaver
                 </h1>
                 <p className="text-[10px] font-sans text-white/40 uppercase tracking-[0.2em]">
