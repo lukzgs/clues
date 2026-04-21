@@ -4,6 +4,11 @@
 
 O servidor do jogo é implementado como um servidor PartyKit em `party/server.ts`. Ele gerencia o estado do jogo, conexões de jogadores e lógica do jogo através de conexões WebSocket.
 
+## Configurações
+
+As configurações do servidor estão no arquivo `game.config.json` e são refletidas em `src/config.ts`.
+Funcionalidades principais como os bots podem ser ativadas/desativadas através do atributo `ENABLE_BOTS` nesta configuração.
+
 ## Classe Principal: `GameServer`
 
 ```typescript

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { GameState, Player, VictoryCondition } from '../../types';
+import { GameState, Player, VictoryCondition, DeckOption } from '../../types';
 import { GAME_CONFIG } from '../../constants';
 
 interface LobbyScreenProps {
   gameState: GameState;
   currentPlayer: Player | undefined;
-  onStartGame: (victoryCondition: VictoryCondition) => void;
+  onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
   onLeaveRoom: () => void;
   onAddBot?: () => void;
   onRemoveBot?: (botId: string) => void;
@@ -21,7 +21,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 }) => {
   const canStart = gameState.players.length >= GAME_CONFIG.MIN_PLAYERS;
   const isHost = currentPlayer?.isHost ?? false;
-  const canAddBot = gameState.players.length < GAME_CONFIG.MAX_PLAYERS && onAddBot;
+  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_PLAYERS && onAddBot;
 
   const [copied, setCopied] = useState(false);
 
@@ -61,8 +61,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     });
   };
 
+  const [deckOption, setDeckOption] = useState<DeckOption>('mixed');
+
   const handleStartGame = () => {
-    onStartGame(vc);
+    onStartGame(vc, deckOption);
   };
 
   return (
@@ -250,6 +252,40 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 )}
               </div>
 
+              {/* Deck Selection */}
+              <div className="mt-4 pt-4 border-t border-white/5">
+                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-3 font-sans font-medium">
+                  Card Pool
+                </p>
+                <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-xl p-1 relative z-0">
+                  <div
+                    className="absolute inset-y-1 bg-amber-500/20 border border-amber-500/30 rounded-lg transition-all duration-300 z-[-1]"
+                    style={{
+                      width: 'calc(33.333% - 4px)',
+                      left: deckOption === 'original' ? '4px' : deckOption === 'new' ? 'calc(33.333% + 2px)' : 'calc(66.666%)',
+                    }}
+                  />
+                  {(['original', 'new', 'mixed'] as DeckOption[]).map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => isHost && setDeckOption(option)}
+                      disabled={!isHost}
+                      className={`flex-1 py-2 text-xs font-cinzel font-bold tracking-wider transition-colors duration-200 uppercase rounded-lg
+                        ${deckOption === option ? 'text-amber-300' : 'text-white/30 hover:text-white/60'}
+                        ${!isHost && 'cursor-default'}
+                      `}
+                    >
+                      {option === 'original' ? 'Original' : option === 'new' ? 'New' : 'Mixed'}
+                    </button>
+                  ))}
+                </div>
+                {!isHost && (
+                  <p className="text-center mt-2 text-[10px] font-sans text-white/20">
+                    Host is choosing the deck...
+                  </p>
+                )}
+              </div>
+
               {/* Actions */}
               <div className="mt-6 space-y-2.5 md:space-y-3 pt-5 border-t border-white/5">
                 {isHost ? (
@@ -374,7 +410,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         </div>
                       </div>
 
-                      {player.isBot && isHost && onRemoveBot && (
+                      {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && (
                         <button
                           onClick={() => onRemoveBot(player.id)}
                           className="text-white/30 hover:text-red-400 text-sm w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-200"
