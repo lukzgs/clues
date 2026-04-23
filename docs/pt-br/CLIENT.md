@@ -91,7 +91,11 @@ Sala de espera antes do jogo começar.
 
 ### `GameScreen.tsx`
 
-Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em rolagem horizontal (estilo "edge-to-edge").
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva sem barra de rolagem lateral (sem cortes na animação flexível e com cartas no tamanho "lg"). Efeito de "aura" luminosa em todo o entorno (hover glow).
+
+## Armazenamento de Sessão e Reconexão (F5)
+O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `clues:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
+Em caso de "F5", se este dado for avistado na inicialização via AppState, a tela de Pular é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
@@ -114,7 +118,7 @@ Localizados em `src/components/game/`:
 |------------|-----------|
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
-| `ClueModal.tsx` | Modal universal para o narrador inserir dica, jogadores selecionarem cartas e eleitores confirmarem votos |
+| `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
 | `ResultsView.tsx` | Resultados da rodada com pontuações, usando design de vidro e destaques dourados |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
 

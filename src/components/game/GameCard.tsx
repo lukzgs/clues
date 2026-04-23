@@ -41,7 +41,7 @@ export const GameCard: React.FC<GameCardProps> = ({
         relative rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300
         ${sizeClasses[size]}
         ${isClickable
-          ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20'
+          ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]'
           : ''
         }
         ${isSelected

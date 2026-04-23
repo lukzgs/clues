@@ -417,8 +417,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
           {currentPlayer && !currentPlayer.isSpectator && (
-            <div className="pb-6 md:pb-10 pt-4 px-4">
-              <div className="max-w-6xl mx-auto">
+            <div className="pb-6 md:pb-10 pt-4 w-full">
+              <div className="max-w-screen-2xl w-full mx-auto">
                 {/* Label for disabled hand */}
                 {(gameState.phase === GamePhase.VOTING ||
                   (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed))) && (
@@ -430,17 +430,17 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   )}
 
                 {/* Cards */}
-                <div className={`flex justify-center gap-4 md:gap-4 flex-nowrap overflow-x-auto pb-4 px-4 custom-scrollbar ${gameState.phase === GamePhase.VOTING ||
+                <div className={`flex justify-center gap-4 md:gap-6 flex-nowrap pb-6 pt-10 px-6 ${gameState.phase === GamePhase.VOTING ||
                     (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
                     (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator)
                     ? 'opacity-40 grayscale-[30%] scale-[0.98]'
                     : ''
                   }`}>
                   {currentPlayer.hand.map((card) => (
-                    <div key={card.id} className="shrink-0">
+                    <div key={card.id} className="last:pr-6 md:last:pr-0">
                       <GameCard
                         card={card}
-                        size="md"
+                        size="lg"
                         disabled={
                           (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
                           (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
