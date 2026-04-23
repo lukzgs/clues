@@ -239,7 +239,7 @@ export default class GameServer implements Party.Server {
     }
 
     // Reconnection: try to reclaim a disconnected player by ID
-    if (reconnectId && this.state.phase !== GamePhase.LOBBY) {
+    if (reconnectId) {
       const player = this.state.players.find(p => p.id === reconnectId && !p.isConnected && !p.isBot);
       if (player) {
         // Reclaim: map new connection to existing player

@@ -56,7 +56,7 @@ class GameServer implements Party.Server {
 
 | Function | Description |
 |----------|-------------|
-| `createDeck()` | Generates 713-card deck from local static assets (`/cards/new/X.avif`) |
+| `createDeck(option)` | Generates dynamic deck based on selected option (`ORIGINAL`, `NEW`, or `MIXED`) from local assets |
 | `shuffle(array)` | Fisher-Yates shuffle |
 | `generatePlayerId()` | Creates unique player ID |
 | `createInitialState()` | Returns fresh game state |
@@ -117,6 +117,7 @@ interface ServerGameState {
   winner: string | null;
   deck: Card[];  // Server-only, not sent to clients
   victoryCondition: VictoryCondition; // Configured by host at game start
+  deckOption: DeckOption; // Selected deck option
   currentRound: number; // 0-based round counter
 }
 ```
