@@ -67,7 +67,7 @@ export function useGameRoom({
   const hasJoinedRef = useRef(false);
 
   // sessionStorage key for reconnection
-  const storageKey = `clues:playerId:${roomCode}`;
+  const storageKey = 'clues:active_session';
 
   // Conecta ao servidor
   useEffect(() => {
@@ -86,7 +86,19 @@ export function useGameRoom({
 
       // Entra na sala (com validação)
       if (!hasJoinedRef.current) {
-        const savedPlayerId = sessionStorage.getItem(storageKey) || undefined;
+        let savedPlayerId: string | undefined = undefined;
+        try {
+          const sessionStr = sessionStorage.getItem(storageKey);
+          if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            if (session.roomCode === roomCode) {
+              savedPlayerId = session.playerId;
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to parse session storage');
+        }
+
         const result = JoinRoomSchema.safeParse({
           type: 'JOIN_ROOM',
           playerName,
@@ -108,8 +120,12 @@ export function useGameRoom({
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
-              // Persist playerId for reconnection
-              sessionStorage.setItem(storageKey, msg.yourPlayerId);
+              // Persist session for reconnection
+              sessionStorage.setItem(storageKey, JSON.stringify({
+                roomCode,
+                playerName,
+                playerId: msg.yourPlayerId,
+              }));
             }
             break;
 

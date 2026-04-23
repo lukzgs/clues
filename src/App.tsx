@@ -16,8 +16,23 @@ type AppState =
   | { screen: 'connecting'; roomCode: string; playerName: string }
   | { screen: 'game'; roomCode: string; playerName: string };
 
+const getInitialState = (): AppState => {
+  try {
+    const sessionStr = sessionStorage.getItem('clues:active_session');
+    if (sessionStr) {
+      const session = JSON.parse(sessionStr);
+      if (session.roomCode && session.playerName) {
+        return { screen: 'connecting', roomCode: session.roomCode, playerName: session.playerName };
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to parse session storage');
+  }
+  return { screen: 'join' };
+};
+
 const App: React.FC = () => {
-  const [appState, setAppState] = useState<AppState>({ screen: 'join' });
+  const [appState, setAppState] = useState<AppState>(getInitialState());
 
   // Hook do jogo - só conecta quando temos roomCode e playerName
   const {
@@ -52,6 +67,7 @@ const App: React.FC = () => {
 
   const handleLeaveRoom = useCallback(() => {
     leaveRoom();
+    sessionStorage.removeItem('clues:active_session');
     setAppState({ screen: 'join' });
   }, [leaveRoom]);
 
