@@ -8,6 +8,8 @@ import gameConfig from '../game.config.json';
 export const GAME_CONFIG = gameConfig as {
     readonly MIN_PLAYERS: number;
     readonly MAX_PLAYERS: number;
+    readonly MAX_PLAYERS_MIXED: number;
+    readonly MAX_CONNECTIONS: number;
     readonly HAND_SIZE: number;
     readonly WINNING_SCORE: number;
     readonly ORIGINAL_DECK_SIZE: number;
@@ -30,4 +32,6 @@ export const PLAYER_COLORS = [
     '#ec4899', // pink
     '#14b8a6', // teal
     '#f97316', // orange
+    '#06b6d4', // cyan
+    '#a3e635', // lime
 ] as const;

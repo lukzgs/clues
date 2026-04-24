@@ -17,6 +17,8 @@
 | Rate limiting | ✅ Complete |
 | Internationalization | 🚧 Partial |
 | Static card deck (341 cards) | ✅ Complete |
+| Spectator Mode | ✅ Complete |
+| Host Administration (Kick) | ✅ Complete |
 | In-game chat | ❌ Not started |
 
 ## Project Structure
@@ -63,6 +65,11 @@ clues/
 - **PartyKit** - Serverless WebSocket infrastructure
 - **Zod** - Runtime schema validation
 - **Vitest** - Fast unit and component testing framework
+
+## Limits
+
+- **Active Players**: 6 (Original deck), 10 (Mixed deck)
+- **Total Connections**: 20 (Players + Spectators)
 
 ## Related Documentation
 

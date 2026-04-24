@@ -17,6 +17,8 @@
 | Rate limiting | ✅ Completo |
 | Internacionalização | 🚧 Parcial |
 | Baralho de cartas estático (341 cartas) | ✅ Completo |
+| Modo Espectador | ✅ Completo |
+| Administração do Host (Expulsar) | ✅ Completo |
 | Chat no jogo | ❌ Não iniciado |
 
 ## Estrutura do Projeto
@@ -63,6 +65,11 @@ clues/
 - **PartyKit** - Infraestrutura WebSocket serverless
 - **Zod** - Validação de schemas em runtime
 - **Vitest** - Framework rápido para testes unitários e de componentes
+
+## Limites
+
+- **Jogadores Ativos**: 6 (Baralho Original), 10 (Baralho Misto)
+- **Total de Conexões**: 20 (Jogadores + Espectadores)
 
 ## Documentação Relacionada
 
