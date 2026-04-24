@@ -67,7 +67,7 @@ export function useGameRoom({
   const hasJoinedRef = useRef(false);
 
   // sessionStorage key for reconnection
-  const storageKey = 'clues:active_session';
+  const storageKey = 'story-weaver:active_session';
 
   // Conecta ao servidor
   useEffect(() => {

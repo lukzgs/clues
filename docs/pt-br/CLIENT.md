@@ -68,7 +68,7 @@ Localizadas em `src/components/screens/`:
 
 ### `JoinScreen.tsx`
 
-Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo Design System "Clues", que utiliza um visual "deep-black" com fortes elementos de "glassmorfismo", tons dourados e "Botões Míticos" com tipografia serifada.
+Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo Design System "Story Weaver", que utiliza um visual "deep-black" com fortes elementos de "glassmorfismo", tons dourados e "Botões Míticos" com tipografia serifada.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
@@ -94,7 +94,7 @@ Sala de espera antes do jogo começar.
 Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva sem barra de rolagem lateral (sem cortes na animação flexível e com cartas no tamanho "lg"). Efeito de "aura" luminosa em todo o entorno (hover glow).
 
 ## Armazenamento de Sessão e Reconexão (F5)
-O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `clues:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
+O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
 Em caso de "F5", se este dado for avistado na inicialização via AppState, a tela de Pular é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
 
 | Prop | Tipo | Descrição |

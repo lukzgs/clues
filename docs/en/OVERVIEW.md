@@ -1,8 +1,8 @@
-# Ethereal Clues - Project Overview
+# Story Weaver - Project Overview
 
 ## Description
 
-**Ethereal Clues** is a multiplayer card game inspired by Dixit, built with React and PartyKit WebSockets. Players take turns as the narrator, giving cryptic clues about their chosen card while others try to guess which card belongs to the narrator.
+**Story Weaver** is a multiplayer card game inspired by Dixit, built with React and PartyKit WebSockets. Players take turns as the narrator, giving cryptic clues about their chosen card while others try to guess which card belongs to the narrator.
 
 ## Current Development Status
 

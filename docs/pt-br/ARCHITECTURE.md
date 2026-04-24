@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Ethereal Clues segue uma arquitetura cliente-servidor com comunicação WebSocket em tempo real via PartyKit.
+Story Weaver segue uma arquitetura cliente-servidor com comunicação WebSocket em tempo real via PartyKit.
 
 ---
 

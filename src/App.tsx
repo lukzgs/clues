@@ -18,7 +18,7 @@ type AppState =
 
 const getInitialState = (): AppState => {
   try {
-    const sessionStr = sessionStorage.getItem('clues:active_session');
+    const sessionStr = sessionStorage.getItem('story-weaver:active_session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr);
       if (session.roomCode && session.playerName) {
@@ -67,7 +67,7 @@ const App: React.FC = () => {
 
   const handleLeaveRoom = useCallback(() => {
     leaveRoom();
-    sessionStorage.removeItem('clues:active_session');
+    sessionStorage.removeItem('story-weaver:active_session');
     setAppState({ screen: 'join' });
   }, [leaveRoom]);
 
@@ -165,7 +165,7 @@ const App: React.FC = () => {
         {/* Footer */}
         <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none">
           <p className="text-white/20 text-[10px] font-sans tracking-wide">
-            &copy; 2026 Clues. Crafted for imagination.
+            &copy; 2026 Story Weaver. Crafted for imagination.
           </p>
         </div>
       </div>

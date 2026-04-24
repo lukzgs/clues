@@ -445,7 +445,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
       {/* Footer */}
       <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
         <p className="text-white/20 text-[10px] font-sans tracking-wide">
-          &copy; 2026 Clues. Crafted for imagination.
+          &copy; 2026 Story Weaver. Crafted for imagination.
         </p>
       </div>
     </div>
