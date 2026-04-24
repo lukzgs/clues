@@ -231,5 +231,6 @@ export function getPublicState(
     phaseStartTime: state.phaseStartTime,
     afkKickVotes: state.afkKickVotes,
     deckOption: state.deckOption,
+    playersWhoReadied: state.playersWhoReadied,
   };
 }
