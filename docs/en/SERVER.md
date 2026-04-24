@@ -41,6 +41,9 @@ class GameServer implements Party.Server {
 | `handleStartGame` | `START_GAME` | Validates and starts game (host only) |
 | `handleAddBot` | `ADD_BOT` | Adds AI player (host only) |
 | `handleRemoveBot` | `REMOVE_BOT` | Removes AI player (host only) |
+| `handleKickPlayer` | `KICK_PLAYER` | Removes player from room and closes connection (host only) |
+| `handleToggleSpectator` | `TOGGLE_SPECTATOR` | Toggles player between active and spectator roles (host only) |
+| `handleRequestPlay` | `REQUEST_PLAY` | Spectator requests to become an active player |
 
 ### Game Phase
 
@@ -49,7 +52,7 @@ class GameServer implements Party.Server {
 | `handleSubmitClue` | `SUBMIT_CLUE` | Narrator submits card + clue |
 | `handlePlayCard` | `PLAY_CARD` | Non-narrator plays matching card |
 | `handleVote` | `VOTE` | Player votes for a card |
-| `handleNextRound` | `NEXT_ROUND` | Advances to next round |
+| `handleNextRound` | `NEXT_ROUND` | Marks player as ready; advances to next round when all active players are ready |
 | `handleRestartGame` | `RESTART_GAME` | Resets game to lobby |
 
 ## Utility Functions
@@ -119,6 +122,7 @@ interface ServerGameState {
   victoryCondition: VictoryCondition; // Configured by host at game start
   deckOption: DeckOption; // Selected deck option
   currentRound: number; // 0-based round counter
+  playersWhoReadied: string[]; // IDs of players who clicked "Next Round"
 }
 ```
 

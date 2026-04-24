@@ -22,6 +22,9 @@ enum ClientMessageType {
   RESTART_GAME = 'RESTART_GAME',
   ADD_BOT = 'ADD_BOT',
   REMOVE_BOT = 'REMOVE_BOT',
+  KICK_PLAYER = 'KICK_PLAYER',
+  TOGGLE_SPECTATOR = 'TOGGLE_SPECTATOR',
+  REQUEST_PLAY = 'REQUEST_PLAY',
 }
 ```
 
@@ -39,6 +42,9 @@ enum ClientMessageType {
 | `RESTART_GAME` | (none) | GAME_OVER |
 | `ADD_BOT` | (none) | LOBBY (host only) |
 | `REMOVE_BOT` | `botId: string` | LOBBY (host only) |
+| `KICK_PLAYER` | `playerId: string` | Any (host only) |
+| `TOGGLE_SPECTATOR` | `playerId: string` | LOBBY (host only) |
+| `REQUEST_PLAY` | (none) | LOBBY (spectators only) |
 
 ### Example Messages
 
@@ -67,6 +73,7 @@ enum ServerMessageType {
   SYNC_STATE = 'SYNC_STATE',
   PLAYER_JOINED = 'PLAYER_JOINED',
   PLAYER_LEFT = 'PLAYER_LEFT',
+  PLAYER_KICKED = 'PLAYER_KICKED',
   ERROR = 'ERROR',
 }
 ```
@@ -78,6 +85,7 @@ enum ServerMessageType {
 | `SYNC_STATE` | `gameState: GameState, yourPlayerId: string` | Full state sync |
 | `PLAYER_JOINED` | `player: Player` (without hand) | Player joined notification |
 | `PLAYER_LEFT` | `playerId: string, playerName: string` | Player left notification |
+| `PLAYER_KICKED` | `playerId: string` | Player kicked notification |
 | `ERROR` | `message: string, code?: string` | Error notification |
 
 ### Example Messages

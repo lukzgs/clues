@@ -57,6 +57,9 @@ interface UseGameRoomOptions {
   leaveRoom: () => void;
   addBot: () => void;
   removeBot: (botId: string) => void;
+  kickPlayer: (playerId: string) => void;
+  toggleSpectator: (playerId: string) => void;
+  requestPlay: () => void;
 }
 ```
 
@@ -88,6 +91,9 @@ Sala de espera antes do jogo começar.
 | `onLeaveRoom` | `() => void` | Sai da sala |
 | `onAddBot` | `() => void` | Adiciona jogador bot (host) |
 | `onRemoveBot` | `(botId: string) => void` | Remove bot (host) |
+| `onKickPlayer` | `(playerId: string) => void` | Expulsa jogador (host) |
+| `onToggleSpectator` | `(playerId: string) => void` | Alterna papel de espectador (host) |
+| `onRequestPlay` | `() => void` | Solicita entrar como jogador (espectador) |
 
 ### `GameScreen.tsx`
 
@@ -107,6 +113,7 @@ Em caso de "F5", se este dado for avistado na inicialização via AppState, a te
 | `onNextRound` | `() => void` | Avançar rodada |
 | `onRestartGame` | `() => void` | Reiniciar jogo |
 | `onLeaveRoom` | `() => void` | Sair da sala |
+| `onKickPlayer` | `(playerId: string) => void` | Expulsa jogador (host) |
 
 ---
 
@@ -119,7 +126,8 @@ Localizados em `src/components/game/`:
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
-| `ResultsView.tsx` | Resultados da rodada com pontuações, usando design de vidro e destaques dourados |
+| `ResultsView.tsx` | Resultados da rodada; exige que todos os jogadores ativos cliquem em "Próxima Rodada" |
+| `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
 
 ---

@@ -83,7 +83,13 @@ export default class GameServer implements Party.Server {
       currentRound: 0,
       phaseStartTime: Date.now(),
       afkKickVotes: [],
+      playersWhoReadied: [],
     };
+  }
+
+  // [SPECTATOR] Returns max active players based on deck option
+  private getMaxPlayersForDeck(deckOption: DeckOption): number {
+    return deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   }
 
   // ============================================
@@ -221,6 +227,19 @@ export default class GameServer implements Party.Server {
         case 'VOTE_KICK_AFK':
           if (playerId) this.handleVoteKickAfk(playerId);
           break;
+
+        // [SPECTATOR] Handlers de spectator/kick
+        case 'KICK_PLAYER':
+          if (playerId) this.handleKickPlayer(playerId, msg.targetPlayerId);
+          break;
+
+        case 'TOGGLE_SPECTATOR':
+          if (playerId) this.handleToggleSpectator(playerId, msg.targetPlayerId);
+          break;
+
+        case 'REQUEST_PLAY':
+          if (playerId) this.handleRequestPlay(playerId);
+          break;
       }
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
@@ -257,14 +276,43 @@ export default class GameServer implements Party.Server {
       // reconnectId invalid or player already connected — fall through to normal join
     }
 
-    // Verifica fase
+    // Verifica fase — allow mid-game join as spectator
     if (this.state.phase !== GamePhase.LOBBY) {
-      this.sendError(conn, 'Jogo já em andamento');
+      // Mid-game: check total connections limit
+      if (this.state.players.length >= GAME_CONFIG.MAX_CONNECTIONS) {
+        this.sendError(conn, 'Sala cheia');
+        return;
+      }
+
+      // Create spectator player
+      const playerId = generatePlayerId();
+      const playerIndex = this.state.players.length;
+
+      const newPlayer: Player = {
+        id: playerId,
+        name: playerName.trim() || `Jogador ${playerIndex + 1}`,
+        score: 0,
+        hand: [],
+        color: PLAYER_COLORS[playerIndex % PLAYER_COLORS.length],
+        isConnected: true,
+        isHost: false,
+        isSpectator: true, // Mid-game joins are always spectators
+      };
+
+      this.state.players.push(newPlayer);
+      this.connections.set(conn.id, playerId);
+
+      this.broadcast({
+        type: ServerMessageType.PLAYER_JOINED,
+        player: { ...newPlayer, hand: [] },
+      });
+
+      this.broadcastState();
       return;
     }
 
-    // Verifica limite de jogadores
-    if (this.state.players.length >= GAME_CONFIG.MAX_PLAYERS) {
+    // Verifica limite total de conexões
+    if (this.state.players.length >= GAME_CONFIG.MAX_CONNECTIONS) {
       this.sendError(conn, 'Sala cheia');
       return;
     }
@@ -329,8 +377,15 @@ export default class GameServer implements Party.Server {
       return;
     }
 
-    // Verifica minimo de jogadores
-    if (this.state.players.length < GAME_CONFIG.MIN_PLAYERS) {
+    // [SPECTATOR] Verifica minimo de jogadores ATIVOS (não spectators)
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    if (activePlayers.length < GAME_CONFIG.MIN_PLAYERS) {
+      return;
+    }
+
+    // [SPECTATOR] Verifica maximo de jogadores ativos para o deck selecionado
+    const maxPlayers = this.getMaxPlayersForDeck(deckOption);
+    if (activePlayers.length > maxPlayers) {
       return;
     }
 
@@ -351,14 +406,25 @@ export default class GameServer implements Party.Server {
     this.state.deckOption = deckOption;
     this.state.deck = shuffle(createDeck(deckOption, GAME_CONFIG.ORIGINAL_DECK_SIZE, GAME_CONFIG.NEW_DECK_SIZE));
 
+    // [SPECTATOR] Distribui cartas apenas para jogadores ativos
     this.state.players.forEach(p => {
-      p.hand = this.state.deck.splice(0, GAME_CONFIG.HAND_SIZE);
-      p.score = 0;
+      if (!p.isSpectator) {
+        p.hand = this.state.deck.splice(0, GAME_CONFIG.HAND_SIZE);
+        p.score = 0;
+      } else {
+        p.hand = [];
+        p.score = 0;
+      }
     });
 
-    // Inicia o jogo
+    // Inicia o jogo — primeiro narrador deve ser ativo
     this.changePhase(GamePhase.NARRATOR_CHOOSING);
-    this.state.narratorIndex = 0;
+    // Find first active player as narrator
+    let narratorIdx = 0;
+    while (narratorIdx < this.state.players.length && this.state.players[narratorIdx].isSpectator) {
+      narratorIdx++;
+    }
+    this.state.narratorIndex = narratorIdx;
     this.state.currentClue = '';
     this.state.tableCards = [];
     this.state.votes = {};
@@ -498,6 +564,12 @@ export default class GameServer implements Party.Server {
       this.state.winner = winnerId;
     } else {
       this.changePhase(GamePhase.RESULTS);
+      // [BOT] Auto-ready bots so they don't block round advancement
+      this.state.players.forEach(p => {
+        if (p.isBot && !p.isSpectator) {
+          this.state.playersWhoReadied.push(p.id);
+        }
+      });
     }
   }
 
@@ -505,22 +577,41 @@ export default class GameServer implements Party.Server {
     if (this.state.phase !== GamePhase.RESULTS) return;
 
     const player = this.state.players.find(p => p.id === playerId);
-    if (!player?.isHost) return;
+    if (!player) return;
+
+    // Spectators cannot ready up
+    if (player.isSpectator) return;
+
+    // Mark player as ready
+    if (!this.state.playersWhoReadied.includes(playerId)) {
+      this.state.playersWhoReadied.push(playerId);
+    }
+
+    // Check if all active (non-spectator) players are ready
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    const allReady = activePlayers.every(p => this.state.playersWhoReadied.includes(p.id));
+
+    if (!allReady) {
+      this.broadcastState();
+      return;
+    }
+
+    // All players are ready — advance to next round
 
     // Increment round counter
     this.state.currentRound++;
 
-    // Distribute a new card to each player
+    // [SPECTATOR] Distribute a new card only to active players
     this.state.players.forEach(p => {
-      if (this.state.deck.length > 0) {
+      if (!p.isSpectator && this.state.deck.length > 0) {
         p.hand.push(this.state.deck.shift()!);
       }
     });
 
-    // Próximo narrador (pula desconectados)
+    // Próximo narrador (pula desconectados e spectators)
     let nextIndex = (this.state.narratorIndex + 1) % this.state.players.length;
     let attempts = 0;
-    while (!this.state.players[nextIndex].isConnected && attempts < this.state.players.length) {
+    while ((!this.state.players[nextIndex].isConnected || this.state.players[nextIndex].isSpectator) && attempts < this.state.players.length) {
       nextIndex = (nextIndex + 1) % this.state.players.length;
       attempts++;
     }
@@ -541,11 +632,12 @@ export default class GameServer implements Party.Server {
     const player = this.state.players.find(p => p.id === playerId);
     if (!player?.isHost) return;
 
-    // Mantém jogadores, reseta o resto
+    // [SPECTATOR] Mantém jogadores e preserva status de spectator
     const players = this.state.players.map(p => ({
       ...p,
       score: 0,
       hand: [],
+      // isSpectator is preserved — spectators can request to play in lobby
     }));
 
     this.state = {
@@ -557,6 +649,126 @@ export default class GameServer implements Party.Server {
   }
 
   // ============================================
+  // [SPECTATOR] KICK & SPECTATOR HANDLERS
+  // ============================================
+
+  private handleKickPlayer(hostId: string, targetId: string) {
+    const host = this.state.players.find(p => p.id === hostId);
+    if (!host?.isHost) return;
+
+    const target = this.state.players.find(p => p.id === targetId);
+    if (!target) return;
+
+    // Cannot kick yourself
+    if (hostId === targetId) return;
+
+    // Remove player from state
+    this.state.players = this.state.players.filter(p => p.id !== targetId);
+
+    // Clean up their votes and table cards
+    delete this.state.votes[targetId];
+    this.state.tableCards = this.state.tableCards.filter(tc => tc.playerId !== targetId);
+    this.state.playersWhoReadied = this.state.playersWhoReadied.filter(id => id !== targetId);
+    this.state.afkKickVotes = this.state.afkKickVotes.filter(id => id !== targetId);
+
+    // If kicked player was host (shouldn't happen but safety), reassign
+    if (target.isHost && this.state.players.length > 0) {
+      const newHost = this.state.players.find(p => !p.isSpectator) || this.state.players[0];
+      newHost.isHost = true;
+    }
+
+    // Close the kicked player's connection
+    for (const [connId, pId] of this.connections) {
+      if (pId === targetId) {
+        const conn = this.room.getConnection(connId);
+        if (conn) {
+          this.sendToConnection(conn, {
+            type: ServerMessageType.PLAYER_KICKED,
+            playerId: targetId,
+            playerName: target.name,
+          });
+        }
+        this.connections.delete(connId);
+        break;
+      }
+    }
+
+    // Broadcast to remaining players
+    this.broadcast({
+      type: ServerMessageType.PLAYER_KICKED,
+      playerId: target.id,
+      playerName: target.name,
+    });
+
+    // If during game, check if narrator was kicked or phase needs progression
+    if (this.state.phase !== GamePhase.LOBBY) {
+      // If narrator was kicked, skip to next round
+      if (this.state.narratorIndex >= this.state.players.length) {
+        this.state.narratorIndex = this.state.narratorIndex % Math.max(1, this.state.players.length);
+      }
+      const narrator = this.state.players[this.state.narratorIndex];
+      if (!narrator || narrator.id === targetId || narrator.isSpectator) {
+        // Skip to results and advance
+        if (this.state.phase === GamePhase.NARRATOR_CHOOSING) {
+          this.changePhase(GamePhase.RESULTS);
+          const hostPlayer = this.state.players.find(p => p.isHost);
+          if (hostPlayer) this.handleNextRound(hostPlayer.id);
+          return;
+        }
+      }
+
+      // Check if phase can now progress (fewer players needed)
+      this.checkPhaseProgression();
+    }
+
+    this.broadcastState();
+  }
+
+  private handleToggleSpectator(hostId: string, targetId: string) {
+    // Only in lobby
+    if (this.state.phase !== GamePhase.LOBBY) return;
+
+    const host = this.state.players.find(p => p.id === hostId);
+    if (!host?.isHost) return;
+
+    const target = this.state.players.find(p => p.id === targetId);
+    if (!target) return;
+
+    // Cannot toggle yourself
+    if (hostId === targetId) return;
+
+    if (target.isSpectator) {
+      // Spectator → Player: check max active players
+      const activePlayers = this.state.players.filter(p => !p.isSpectator);
+      const maxPlayers = this.getMaxPlayersForDeck(this.state.deckOption);
+      if (activePlayers.length >= maxPlayers) return;
+      target.isSpectator = false;
+    } else {
+      // Player → Spectator: check min players would still be met
+      target.isSpectator = true;
+    }
+
+    this.broadcastState();
+  }
+
+  private handleRequestPlay(playerId: string) {
+    // Only in lobby
+    if (this.state.phase !== GamePhase.LOBBY) return;
+
+    const player = this.state.players.find(p => p.id === playerId);
+    if (!player) return;
+    if (!player.isSpectator) return; // Already a player
+
+    // Check max active players
+    const activePlayers = this.state.players.filter(p => !p.isSpectator);
+    const maxPlayers = this.getMaxPlayersForDeck(this.state.deckOption);
+    if (activePlayers.length >= maxPlayers) return;
+
+    player.isSpectator = false;
+    this.broadcastState();
+  }
+
+  // ============================================
   // AFK & TIMEOUT SYSTEM
   // ============================================
 
@@ -564,6 +776,7 @@ export default class GameServer implements Party.Server {
     this.state.phase = newPhase;
     this.state.phaseStartTime = Date.now();
     this.state.afkKickVotes = [];
+    this.state.playersWhoReadied = [];
   }
 
   private getAfkPlayers(): Player[] {

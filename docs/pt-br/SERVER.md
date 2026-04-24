@@ -41,6 +41,9 @@ class GameServer implements Party.Server {
 | `handleStartGame` | `START_GAME` | Valida e inicia jogo (apenas host) |
 | `handleAddBot` | `ADD_BOT` | Adiciona jogador IA (apenas host) |
 | `handleRemoveBot` | `REMOVE_BOT` | Remove jogador IA (apenas host) |
+| `handleKickPlayer` | `KICK_PLAYER` | Remove jogador da sala e fecha conexão (apenas host) |
+| `handleToggleSpectator` | `TOGGLE_SPECTATOR` | Alterna jogador entre papéis de ativo e espectador (apenas host) |
+| `handleRequestPlay` | `REQUEST_PLAY` | Espectador solicita tornar-se um jogador ativo |
 
 ### Fase de Jogo
 
@@ -49,7 +52,7 @@ class GameServer implements Party.Server {
 | `handleSubmitClue` | `SUBMIT_CLUE` | Narrador envia carta + dica |
 | `handlePlayCard` | `PLAY_CARD` | Não-narrador joga carta |
 | `handleVote` | `VOTE` | Jogador vota em uma carta |
-| `handleNextRound` | `NEXT_ROUND` | Avança para próxima rodada |
+| `handleNextRound` | `NEXT_ROUND` | Marca jogador como pronto; avança para próxima rodada quando todos os jogadores ativos estão prontos |
 | `handleRestartGame` | `RESTART_GAME` | Reseta jogo para lobby |
 
 ## Funções Utilitárias
@@ -119,6 +122,7 @@ interface ServerGameState {
   victoryCondition: VictoryCondition; // Configurado pelo host ao iniciar
   deckOption: DeckOption; // Opção de baralho selecionada
   currentRound: number; // Contador de rodadas (base 0)
+  playersWhoReadied: string[]; // IDs dos jogadores que clicaram em "Próxima Rodada"
 }
 ```
 

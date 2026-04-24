@@ -45,6 +45,10 @@ interface UseGameRoomReturn {
   // [BOT] Ações de bots
   addBot: () => void;
   removeBot: (botId: string) => void;
+  // [SPECTATOR] Ações de spectator/kick
+  kickPlayer: (targetId: string) => void;
+  toggleSpectator: (targetId: string) => void;
+  requestPlay: () => void;
 
   // AFK
   voteKickAfk: () => void;
@@ -139,6 +143,15 @@ export function useGameRoom({
 
           case ServerMessageType.PLAYER_LEFT:
             // Poderia mostrar toast, mas o SYNC_STATE já atualiza
+            break;
+
+          // [SPECTATOR] Handle kick notification
+          case ServerMessageType.PLAYER_KICKED:
+            if ((msg as any).playerId === playerId) {
+              // We were kicked — close connection
+              setError('Você foi removido da sala');
+              socket.close();
+            }
             break;
         }
       } catch (e) {
@@ -247,6 +260,19 @@ export function useGameRoom({
     send({ type: ClientMessageType.VOTE_KICK_AFK });
   }, [send]);
 
+  // [SPECTATOR] Ações de spectator/kick
+  const kickPlayer = useCallback((targetId: string) => {
+    send({ type: ClientMessageType.KICK_PLAYER, targetPlayerId: targetId });
+  }, [send]);
+
+  const toggleSpectator = useCallback((targetId: string) => {
+    send({ type: ClientMessageType.TOGGLE_SPECTATOR, targetPlayerId: targetId });
+  }, [send]);
+
+  const requestPlay = useCallback(() => {
+    send({ type: ClientMessageType.REQUEST_PLAY });
+  }, [send]);
+
   return {
     gameState,
     playerId,
@@ -262,5 +288,8 @@ export function useGameRoom({
     addBot,
     removeBot,
     voteKickAfk,
+    kickPlayer,
+    toggleSpectator,
+    requestPlay,
   };
 }

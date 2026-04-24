@@ -84,6 +84,21 @@ export const VoteKickAfkSchema = z.object({
     type: z.literal('VOTE_KICK_AFK'),
 });
 
+// [SPECTATOR] Schemas de spectator/kick
+export const KickPlayerSchema = z.object({
+    type: z.literal('KICK_PLAYER'),
+    targetPlayerId: z.string().min(1),
+});
+
+export const ToggleSpectatorSchema = z.object({
+    type: z.literal('TOGGLE_SPECTATOR'),
+    targetPlayerId: z.string().min(1),
+});
+
+export const RequestPlaySchema = z.object({
+    type: z.literal('REQUEST_PLAY'),
+});
+
 // ============================================
 // UNION DE TODAS AS MENSAGENS
 // ============================================
@@ -100,6 +115,9 @@ export const ClientMessageSchema = z.discriminatedUnion('type', [
     AddBotSchema,
     RemoveBotSchema,
     VoteKickAfkSchema,
+    KickPlayerSchema,
+    ToggleSpectatorSchema,
+    RequestPlaySchema,
 ]);
 
 // ============================================

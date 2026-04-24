@@ -65,6 +65,7 @@ export interface GameState {
   phaseStartTime: number; // Timestamp de quando a fase atual começou
   afkKickVotes: string[]; // Array de playerIds que votaram para expulsar o jogador AFK
   deckOption: DeckOption;
+  playersWhoReadied: string[]; // IDs of players who already clicked "Next Round"
 }
 
 // Estado completo do servidor (não exposto ao cliente)
@@ -86,6 +87,10 @@ export enum ClientMessageType {
   NEXT_ROUND = 'NEXT_ROUND',
   RESTART_GAME = 'RESTART_GAME',
   VOTE_KICK_AFK = 'VOTE_KICK_AFK',
+  // [SPECTATOR] Mensagens para controle de spectators/kick
+  KICK_PLAYER = 'KICK_PLAYER',
+  TOGGLE_SPECTATOR = 'TOGGLE_SPECTATOR',
+  REQUEST_PLAY = 'REQUEST_PLAY',
   // [BOT] Mensagens para controle de bots
   ADD_BOT = 'ADD_BOT',
   REMOVE_BOT = 'REMOVE_BOT',
@@ -145,6 +150,21 @@ export interface VoteKickAfkMessage {
   type: ClientMessageType.VOTE_KICK_AFK;
 }
 
+// [SPECTATOR] Mensagens de spectator/kick
+export interface KickPlayerMessage {
+  type: ClientMessageType.KICK_PLAYER;
+  targetPlayerId: string;
+}
+
+export interface ToggleSpectatorMessage {
+  type: ClientMessageType.TOGGLE_SPECTATOR;
+  targetPlayerId: string;
+}
+
+export interface RequestPlayMessage {
+  type: ClientMessageType.REQUEST_PLAY;
+}
+
 export type ClientMessage =
   | JoinRoomMessage
   | LeaveRoomMessage
@@ -156,7 +176,10 @@ export type ClientMessage =
   | RestartGameMessage
   | AddBotMessage
   | RemoveBotMessage
-  | VoteKickAfkMessage;
+  | VoteKickAfkMessage
+  | KickPlayerMessage
+  | ToggleSpectatorMessage
+  | RequestPlayMessage;
 
 // ============================================
 // MENSAGENS SERVIDOR -> CLIENTE
@@ -166,6 +189,7 @@ export enum ServerMessageType {
   SYNC_STATE = 'SYNC_STATE',
   PLAYER_JOINED = 'PLAYER_JOINED',
   PLAYER_LEFT = 'PLAYER_LEFT',
+  PLAYER_KICKED = 'PLAYER_KICKED',
   ERROR = 'ERROR',
 }
 
@@ -192,8 +216,15 @@ export interface ErrorMessage {
   code?: string;
 }
 
+export interface PlayerKickedMessage {
+  type: ServerMessageType.PLAYER_KICKED;
+  playerId: string;
+  playerName: string;
+}
+
 export type ServerMessage =
   | SyncStateMessage
   | PlayerJoinedMessage
   | PlayerLeftMessage
+  | PlayerKickedMessage
   | ErrorMessage;

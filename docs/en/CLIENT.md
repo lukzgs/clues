@@ -57,6 +57,9 @@ interface UseGameRoomOptions {
   leaveRoom: () => void;
   addBot: () => void;
   removeBot: (botId: string) => void;
+  kickPlayer: (playerId: string) => void;
+  toggleSpectator: (playerId: string) => void;
+  requestPlay: () => void;
 }
 ```
 
@@ -88,6 +91,9 @@ Waiting room before game starts.
 | `onLeaveRoom` | `() => void` | Leaves the room |
 | `onAddBot` | `() => void` | Adds bot player (host) |
 | `onRemoveBot` | `(botId: string) => void` | Removes bot (host) |
+| `onKickPlayer` | `(playerId: string) => void` | Kicks player (host) |
+| `onToggleSpectator` | `(playerId: string) => void` | Toggles spectator role (host) |
+| `onRequestPlay` | `() => void` | Requests to join as player (spectator) |
 
 ### `GameScreen.tsx`
 
@@ -107,6 +113,7 @@ When the app reloads, it automatically bypasses the `JoinScreen`, injects the `r
 | `onNextRound` | `() => void` | Advance round |
 | `onRestartGame` | `() => void` | Restart game |
 | `onLeaveRoom` | `() => void` | Leave room |
+| `onKickPlayer` | `(playerId: string) => void` | Kicks player (host) |
 
 ---
 
@@ -119,7 +126,8 @@ Located in `src/components/game/`:
 | `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |
-| `ResultsView.tsx` | Round results with scores, updated to match the game's aesthetic |
+| `ResultsView.tsx` | Round results with scores; requires all active players to click "Next Round" |
+| `KickConfirmModal.tsx` | Confirmation modal for host to kick players |
 | `GameOverView.tsx` | Final scores and winner |
 
 ---

@@ -50,6 +50,9 @@ const App: React.FC = () => {
     addBot,
     removeBot,
     voteKickAfk,
+    kickPlayer,
+    toggleSpectator,
+    requestPlay,
   } = useGameRoom({
     roomCode: appState.screen !== 'join' ? appState.roomCode : '',
     playerName: appState.screen !== 'join' ? appState.playerName : '',
@@ -182,6 +185,9 @@ const App: React.FC = () => {
         onLeaveRoom={handleLeaveRoom}
         onAddBot={addBot}
         onRemoveBot={removeBot}
+        onKickPlayer={kickPlayer}
+        onToggleSpectator={toggleSpectator}
+        onRequestPlay={requestPlay}
       />
     );
   }
@@ -198,6 +204,7 @@ const App: React.FC = () => {
       onRestartGame={restartGame}
       onLeaveRoom={handleLeaveRoom}
       voteKickAfk={voteKickAfk}
+      onKickPlayer={kickPlayer}
     />
   );
 };
