@@ -9,6 +9,9 @@ interface LobbyScreenProps {
   onLeaveRoom: () => void;
   onAddBot?: () => void;
   onRemoveBot?: (botId: string) => void;
+  onKickPlayer?: (targetId: string) => void;
+  onToggleSpectator?: (targetId: string) => void;
+  onRequestPlay?: () => void;
 }
 
 export const LobbyScreen: React.FC<LobbyScreenProps> = ({
@@ -18,10 +21,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   onLeaveRoom,
   onAddBot,
   onRemoveBot,
+  onKickPlayer,
+  onToggleSpectator,
+  onRequestPlay,
 }) => {
-  const canStart = gameState.players.length >= GAME_CONFIG.MIN_PLAYERS;
+  const activePlayers = gameState.players.filter(p => !p.isSpectator);
+  const spectators = gameState.players.filter(p => p.isSpectator);
   const isHost = currentPlayer?.isHost ?? false;
-  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_PLAYERS && onAddBot;
+  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && onAddBot;
 
   const [copied, setCopied] = useState(false);
 
@@ -63,6 +70,9 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
   const [deckOption, setDeckOption] = useState<DeckOption>('mixed');
 
+  const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
+  const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS;
+
   const handleStartGame = () => {
     onStartGame(vc, deckOption);
   };
@@ -78,7 +88,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
         className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
       />
 
-      <div className="w-full max-w-[1100px] z-10 my-6 md:my-0">
+      <div className="w-full max-w-[1250px] z-10 my-6 md:my-0">
         <div
           className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col"
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
@@ -312,6 +322,26 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       </button>
                     )}
                   </>
+                ) : currentPlayer?.isSpectator ? (
+                  <div className="space-y-3">
+                    {onRequestPlay && (
+                      <button
+                        onClick={onRequestPlay}
+                        disabled={activePlayers.length >= maxPlayersForDeck}
+                        className={`w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 ${
+                          activePlayers.length < maxPlayersForDeck
+                            ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]'
+                            : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
+                        }`}
+                      >
+                        {activePlayers.length < maxPlayersForDeck ? 'Join as Player' : 'Lobby Full'}
+                      </button>
+                    )}
+                    <div className="text-center py-3 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      You are a spectator
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-base tracking-wide">
                     <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
@@ -368,51 +398,92 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {/* Player list */}
               <div className="w-full flex-1">
                 <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold">
-                  Players ({gameState.players.length}/{GAME_CONFIG.MAX_PLAYERS})
+                  Players ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} spectator{spectators.length !== 1 ? 's' : ''}</span>}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {gameState.players.map((player) => (
                     <div
                       key={player.id}
-                      className="flex items-center gap-3 bg-[#1A1A1A]/60 p-3 rounded-2xl border border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80 transition-all duration-300 h-[72px] md:h-[76px] shadow-sm"
+                      className={`flex items-center gap-3 bg-[#1A1A1A]/60 p-3 rounded-2xl border transition-all duration-300 h-[72px] md:h-[76px] shadow-sm ${
+                        player.isSpectator
+                          ? 'border-white/5 opacity-60'
+                          : 'border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80'
+                      }`}
                     >
                       <div
-                        className="w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg md:text-xl shrink-0 shadow-lg border border-white/10"
+                        className={`w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg md:text-xl shrink-0 shadow-lg border border-white/10 ${player.isSpectator ? 'grayscale-[50%]' : ''}`}
                         style={{ backgroundColor: player.color }}
                       >
-                        {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
+                        {player.isSpectator ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        ) : player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
                       </div>
 
-                      <div className="flex-1 min-w-0 pr-1">
+                      <div className="flex-1 min-w-0">
                         <span className="text-white font-cinzel font-bold text-sm md:text-base block truncate tracking-wide">
                           {player.name}
                         </span>
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
                           {player.id === currentPlayer?.id && (
-                            <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium">(you)</span>
-                          )}
-                          {player.isBot && (
-                            <span className="text-amber-400/60 text-[10px] uppercase tracking-widest font-sans font-medium">(bot)</span>
+                            <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium shrink-0">(you)</span>
                           )}
                           {player.isHost && (
-                            <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]">
+                            <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)] shrink-0">
                               Host
                             </span>
                           )}
+                          {player.isSpectator && (
+                            <span className="text-blue-400/70 text-[10px] font-sans font-bold uppercase tracking-widest shrink-0">
+                              Spectator
+                            </span>
+                          )}
                           {!player.isConnected && !player.isBot && (
-                            <span className="text-red-400 text-[10px] font-sans uppercase tracking-widest">
+                            <span className="text-red-400 text-[10px] font-sans uppercase tracking-widest shrink-0">
                               Offline
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && (
+                      {/* Host actions: toggle spectator + kick (not on self) */}
+                      {isHost && player.id !== currentPlayer?.id && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          {/* Toggle spectator */}
+                          {onToggleSpectator && (
+                            <button
+                              onClick={() => onToggleSpectator(player.id)}
+                              className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-300 ${
+                                player.isSpectator
+                                  ? 'text-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10'
+                                  : 'text-white/20 hover:text-blue-400 hover:bg-blue-500/10'
+                              }`}
+                              title={player.isSpectator ? 'Make player' : 'Make spectator'}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                          )}
+                          {/* Kick */}
+                          {onKickPlayer && (
+                            <button
+                              onClick={() => onKickPlayer(player.id)}
+                              className="text-white/20 hover:text-red-400 w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-500/10 transition-all duration-300"
+                              title="Remove player"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Bot remove (legacy) */}
+                      {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && !onKickPlayer && (
                         <button
                           onClick={() => onRemoveBot(player.id)}
                           className="text-white/20 hover:text-red-400 text-lg w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-500/10 transition-all duration-300 mr-1"
                           title="Remove bot"
-                          aria-label={`Remove bot ${player.name}`}
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -423,7 +494,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     </div>
                   ))}
 
-                  {Array.from({ length: Math.max(0, GAME_CONFIG.MAX_PLAYERS - gameState.players.length) }).map((_, i) => (
+                  {Array.from({ length: Math.max(0, maxPlayersForDeck - activePlayers.length) }).map((_, i) => (
                     <div
                       key={`empty-${i}`}
                       className="flex items-center gap-3 bg-[#1A1A1A]/20 p-3 rounded-2xl border border-dashed border-white/10 h-[72px] md:h-[76px] opacity-70"

@@ -5,12 +5,14 @@ interface ResultsViewProps {
   gameState: GameState;
   playerId: string;
   onNextRound: () => void;
+  onLeaveRoom: () => void;
 }
 
 export const ResultsView: React.FC<ResultsViewProps> = ({
   gameState,
   playerId,
   onNextRound,
+  onLeaveRoom,
 }) => {
   const narrator = gameState.players[gameState.narratorIndex];
   const currentPlayer = gameState.players.find(p => p.id === playerId);
@@ -43,7 +45,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
             <div key={tableCard.orderId} className="flex flex-col items-center gap-4">
               <GameCard
                 card={tableCard.card}
-                size="lg"
+                size="table"
                 isHighlighted={isNarratorCard}
                 highlightColor={isNarratorCard ? '#f59e0b' : 'transparent'}
                 className={isNarratorCard ? "shadow-[0_0_25px_rgba(245,158,11,0.4)]" : "opacity-80"}
@@ -64,7 +66,12 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                 />
                 
                 {owner?.name}
-                {isNarratorCard && <span className="text-amber-400 animate-pulse ml-1">★</span>}
+                {isNarratorCard && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 animate-pulse ml-1">
+                    <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+                    <line x1="2" y1="19" x2="22" y2="19" />
+                  </svg>
+                )}
               </div>
 
               {/* Votos recebidos */}
@@ -94,6 +101,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         <h3 className="text-white/40 font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6">Pontuação Atual</h3>
         <div className="space-y-3 w-full">
           {[...gameState.players]
+            .filter(p => !p.isSpectator)
             .sort((a, b) => b.score - a.score)
             .map((player, index) => (
               <div
@@ -127,25 +135,54 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                 <div className={`font-sans font-black text-2xl tracking-tighter ${index === 0 ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/80'}`}>
                   {player.score}
                 </div>
+
+                {/* Ready Indicator */}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs ml-2 shrink-0 border transition-all duration-300 ${
+                  (gameState.playersWhoReadied ?? []).includes(player.id)
+                    ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.15)]'
+                    : 'bg-black/40 text-white/15 border-white/5'
+                }`}>
+                  {(gameState.playersWhoReadied ?? []).includes(player.id) ? (
+                    <span className="leading-none mt-[-1px] font-bold">✓</span>
+                  ) : (
+                    <span className="leading-none opacity-30 text-[10px]">•</span>
+                  )}
+                </div>
               </div>
             ))}
         </div>
       </div>
 
-      {/* Botão próxima rodada */}
-      {isHost ? (
+      {/* Actions */}
+      <div className="w-full max-w-lg space-y-3">
+        {!(gameState.playersWhoReadied ?? []).includes(playerId) && !currentPlayer?.isSpectator ? (
+          <button
+            onClick={onNextRound}
+            className="w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]"
+          >
+            Next Round →
+          </button>
+        ) : currentPlayer?.isSpectator ? (
+          <div className="text-center py-4 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Watching as spectator
+          </div>
+        ) : (
+          <div className="text-center py-4 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide">
+            <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+            Waiting for all players...
+            <span className="text-white/20 text-[10px] uppercase tracking-widest ml-2 font-semibold">
+              {(gameState.playersWhoReadied ?? []).length}/{gameState.players.filter(p => !p.isSpectator).length}
+            </span>
+          </div>
+        )}
         <button
-          onClick={onNextRound}
-          className="bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] px-10 md:px-12 py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-300"
+          onClick={onLeaveRoom}
+          className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
         >
-          Próxima Rodada →
+          Leave Room
         </button>
-      ) : (
-        <p className="text-white/40 font-sans text-sm flex items-center gap-2">
-          <span className="w-2 h-2 bg-white/40 rounded-full animate-pulse"></span>
-          Aguardando host iniciar próxima rodada...
-        </p>
-      )}
+      </div>
     </div>
   );
 };

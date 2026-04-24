@@ -5,7 +5,8 @@ import {
   ClueModal,
   ResultsView,
   GameOverView,
-  AfkAlertBar
+  AfkAlertBar,
+  KickConfirmModal
 } from '../game';
 
 interface GameScreenProps {
@@ -18,6 +19,7 @@ interface GameScreenProps {
   onRestartGame: () => void;
   onLeaveRoom: () => void;
   voteKickAfk: () => void;
+  onKickPlayer?: (targetId: string) => void;
 }
 
 export const GameScreen: React.FC<GameScreenProps> = ({
@@ -30,9 +32,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   onRestartGame,
   onLeaveRoom,
   voteKickAfk,
+  onKickPlayer,
 }) => {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showClueModal, setShowClueModal] = useState(false);
+  const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -118,9 +122,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     }
   };
 
-  // Verificar status de voto/jogou para um jogador
+  // Verificar status de voto/jogou/pronto para um jogador
   const getPlayerStatus = (player: typeof gameState.players[0]) => {
     if (player.id === narrator?.id) return 'narrator';
+    
+    // Na fase de resultados, mostra quem já clicou em "Próxima Rodada"
+    if (gameState.phase === GamePhase.RESULTS) {
+      return (gameState.playersWhoReadied ?? []).includes(player.id) ? 'readied' : 'waiting';
+    }
+
     if (gameState.phase === GamePhase.VOTING) {
       return gameState.votes[player.id] !== undefined ? 'voted' : 'waiting';
     }
@@ -147,6 +157,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             gameState={gameState}
             playerId={playerId}
             onNextRound={onNextRound}
+            onLeaveRoom={onLeaveRoom}
           />
         </div>
       </div>
@@ -193,8 +204,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       />
 
       {currentPlayer?.isSpectator && (
-        <div className="bg-red-900/40 border-b border-red-500/30 text-red-200 text-center py-2 text-sm font-medium">
-          Você está no Modo Espectador (Inativo por tempo excedido).
+        <div className="bg-blue-900/30 border-b border-blue-500/20 text-blue-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Spectator Mode
         </div>
       )}
 
@@ -232,10 +244,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </h2>
           <div className="space-y-3">
             {[...gameState.players]
+              .filter(p => !p.isSpectator)
               .sort((a, b) => b.score - a.score)
               .map((player) => {
               const status = getPlayerStatus(player);
               const isMe = player.id === playerId;
+              const isHost = currentPlayer?.isHost ?? false;
 
               return (
                 <div
@@ -243,7 +257,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   className={`flex items-center gap-4 p-4 rounded-3xl transition-colors border shadow-lg ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/10'
                     }`}
                 >
-                  {/* Avatar */}
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 shadow-lg border border-white/10 ${
                       status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1A1A1A]' : ''
@@ -253,11 +266,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     {player.name.charAt(0).toUpperCase()}
                   </div>
 
-                  {/* Name & Score */}
                   <div className="flex-1 min-w-0 pr-2">
-                    <div className="text-white font-cinzel font-bold text-lg md:text-xl truncate flex items-center gap-2">
+                    <div className="text-white font-cinzel font-bold text-lg md:text-xl truncate">
                       {player.name}
-                      {player.isSpectator && <span className="text-red-400 text-[10px] bg-red-950/50 px-2 py-0.5 rounded-full border border-red-500/30">SPECTATOR</span>}
                     </div>
                     <div className="text-white/60 font-sans text-sm mt-0.5 flex items-baseline gap-1">
                       {player.score} <span className="text-[10px] uppercase tracking-widest text-white/30">Pts</span>
@@ -265,19 +276,71 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   </div>
 
                   {/* Status indicator */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md border shrink-0 ${status === 'voted' || status === 'played'
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md border shrink-0 transition-all duration-300 ${
+                    status === 'voted' || status === 'played'
                       ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                      : status === 'narrator'
-                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                      : status === 'readied' || status === 'narrator'
+                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]'
                         : 'bg-black/40 text-white/30 border-white/5'
                     }`}>
-                    {status === 'voted' || status === 'played' ? '✓' :
-                      status === 'narrator' ? '★' : '?'}
+                    {status === 'voted' || status === 'played' ? (
+                      <span className="leading-none mt-[-2px]">✓</span>
+                    ) : status === 'readied' ? (
+                      <span className="leading-none mt-[-2px]">✓</span>
+                    ) : status === 'narrator' ? (
+                      <div className="flex items-center justify-center w-full h-full pb-0.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-300">
+                          <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+                          <line x1="2" y1="19" x2="22" y2="19" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <span className="leading-none opacity-40">?</span>
+                    )}
                   </div>
+
+                  {/* Kick button (host only, not self) */}
+                  {isHost && !isMe && onKickPlayer && (
+                    <button
+                      onClick={() => setKickTarget({ id: player.id, name: player.name })}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
+                      title="Remove player"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  )}
                 </div>
               );
             })}
           </div>
+
+          {/* Spectators section */}
+          {gameState.players.filter(p => p.isSpectator).length > 0 && (
+            <div className="mt-6 pt-5 border-t border-white/5">
+              <h3 className="text-white/25 text-[10px] uppercase tracking-[0.2em] mb-3 font-sans font-bold text-center flex items-center justify-center gap-2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Spectators ({gameState.players.filter(p => p.isSpectator).length})
+              </h3>
+              <div className="space-y-2">
+                {gameState.players.filter(p => p.isSpectator).map(player => (
+                  <div key={player.id} className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-white/40 text-xs font-bold border border-white/10 grayscale-[50%]" style={{ backgroundColor: player.color }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <span className="text-white/30 font-sans text-sm truncate flex-1">{player.name}</span>
+                    {(currentPlayer?.isHost ?? false) && onKickPlayer && player.id !== playerId && (
+                      <button
+                        onClick={() => setKickTarget({ id: player.id, name: player.name })}
+                        className="w-6 h-6 flex items-center justify-center rounded text-white/10 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </aside>
 
         {/* ===== CENTER CONTENT ===== */}
@@ -324,31 +387,46 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Outros escolhendo */}
             {gameState.phase === GamePhase.OTHERS_CHOOSING && (
-              <div className="flex flex-col items-center gap-10 animate-fade-in w-full max-w-4xl">
+              <div className="flex flex-col items-center gap-8 md:gap-12 animate-fade-in w-full max-w-4xl">
                 {/* Clue Card */}
-                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-14 md:py-16 rounded-3xl md:rounded-[3rem] text-center w-full max-w-3xl flex flex-col items-center justify-center">
-                  <p className="text-amber-200/50 text-[11px] md:text-sm uppercase tracking-[0.3em] mb-6 md:mb-8 font-sans font-bold">The clue is</p>
-                  <h2 className="text-4xl md:text-6xl font-cinzel font-bold tracking-wider leading-tight">
+                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-10 py-8 md:py-10 rounded-2xl md:rounded-[2rem] text-center w-full max-w-lg flex flex-col items-center justify-center">
+                  <p className="text-amber-200/50 text-[9px] md:text-xs uppercase tracking-[0.4em] mb-3 md:mb-4 font-sans font-bold opacity-60">The clue is</p>
+                  <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider leading-tight">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
 
-                {/* Status message */}
-                <div className="text-center bg-[#1A1A1A]/40 px-10 py-5 rounded-full border border-white/5 backdrop-blur-sm">
-                  {!isNarrator && !hasPlayed && (
-                    <p className="text-white/70 font-sans text-sm md:text-base tracking-widest uppercase font-medium">
-                      Choose a card from your hand that matches the clue
-                    </p>
-                  )}
+                {/* Cards on table (face down) — only played cards, growing from center */}
+                {gameState.tableCards.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-2 max-w-[1000px] mx-auto">
+                    {gameState.tableCards.map((tc, i) => (
+                      <div 
+                        key={tc.orderId} 
+                        className="animate-zoom-in" 
+                        style={{ animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}
+                      >
+                        <GameCard
+                          card={{ id: -1, imageUrl: '/cards/new/back_001.avif' }}
+                          size="table"
+                          disabled
+                          className="shadow-2xl brightness-90 contrast-125"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Status message (Simple, no pill) */}
+                <div className="text-center pt-2">
                   {!isNarrator && hasPlayed && (
-                    <p className="text-amber-400 font-sans text-sm md:text-base flex items-center gap-3 justify-center tracking-widest uppercase font-bold">
-                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
+                    <p className="text-amber-400/80 font-sans text-xs md:text-sm flex items-center gap-3 justify-center tracking-[0.2em] uppercase font-bold">
+                      <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
                       Card sent! Waiting for others...
                     </p>
                   )}
                   {isNarrator && (
-                    <p className="text-white/50 font-sans text-sm md:text-base tracking-widest uppercase font-medium">
-                      Waiting for players to choose their cards...
+                    <p className="text-white/40 font-sans text-xs md:text-sm tracking-[0.2em] uppercase font-medium">
+                      Players are choosing their cards...
                     </p>
                   )}
                 </div>
@@ -357,7 +435,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Votação */}
             {gameState.phase === GamePhase.VOTING && (
-              <div className="flex flex-col items-center gap-12 animate-fade-in w-full max-w-7xl">
+              <div className="flex flex-col items-center gap-10 animate-fade-in w-full max-w-7xl">
                 {/* Clue Card */}
                 <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-8 rounded-3xl md:rounded-full text-center max-w-4xl mx-auto flex items-center justify-center">
                   <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider px-8 leading-tight">
@@ -366,17 +444,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 </div>
 
                 {/* Table Cards */}
-                <div className="flex flex-wrap justify-center gap-8 md:gap-10">
+                <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-[1000px] mx-auto">
                   {gameState.tableCards.map((tableCard) => {
                     const isMine = tableCard.isMine === true;
-                    const votesOnThis = Object.entries(gameState.votes)
-                      .filter(([_, orderId]) => orderId === tableCard.orderId).length;
 
                     return (
-                      <div key={tableCard.orderId} className="flex flex-col items-center gap-4">
+                      <div key={tableCard.orderId} className="flex flex-col items-center">
                         <GameCard
                           card={tableCard.card}
-                          size="xl"
+                          size="table"
                           disabled={isNarrator || hasVoted || isMine}
                           onClick={() => handleVoteSelect(tableCard)}
                           className={`${isMine ? 'opacity-50' : ''} ${!isMine && !hasVoted && !isNarrator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''
@@ -384,32 +460,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                           isHighlighted={hasVoted && gameState.votes[playerId] === tableCard.orderId}
                           highlightColor="#f59e0b"
                         />
-                        {/* Vote count */}
-                        <div className={`px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.2em] font-bold font-sans shadow-lg ${votesOnThis > 0
-                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            : 'bg-[#1A1A1A]/50 text-white/30 border border-white/10'
-                          }`}>
-                          {votesOnThis} Vote{votesOnThis !== 1 ? 's' : ''}
-                        </div>
                       </div>
                     );
                   })}
-                </div>
-
-                {/* Status */}
-                <div className="text-center font-sans text-sm md:text-base tracking-[0.25em] uppercase bg-[#1A1A1A]/40 px-10 py-4 rounded-full border border-white/5 backdrop-blur-sm mt-6 font-medium">
-                  {isNarrator && (
-                    <p className="text-white/50">You are the narrator, waiting for votes...</p>
-                  )}
-                  {!isNarrator && hasVoted && (
-                    <p className="text-amber-400 font-bold flex items-center justify-center gap-3">
-                      <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
-                      Vote registered! Waiting...
-                    </p>
-                  )}
-                  {!isNarrator && !hasVoted && (
-                    <p className="text-white/80">Click on the card you think belongs to the narrator</p>
-                  )}
                 </div>
               </div>
             )}
@@ -419,15 +472,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           {currentPlayer && !currentPlayer.isSpectator && (
             <div className="pb-6 md:pb-10 pt-4 w-full">
               <div className="max-w-screen-2xl w-full mx-auto">
-                {/* Label for disabled hand */}
-                {(gameState.phase === GamePhase.VOTING ||
-                  (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed))) && (
-                    <div className="text-center mb-6">
-                      <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium bg-black/50 px-6 py-2.5 rounded-full border border-white/10 shadow-lg backdrop-blur-md">
-                        Your hand is inactive during the {gameState.phase === GamePhase.VOTING ? 'voting' : 'waiting'} phase
-                      </span>
-                    </div>
-                  )}
 
                 {/* Cards */}
                 <div className={`flex justify-center gap-4 md:gap-6 flex-nowrap pb-6 pt-10 px-6 ${gameState.phase === GamePhase.VOTING ||
@@ -470,6 +514,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           onClose={() => { setShowClueModal(false); setSelectedCard(null); }}
           onNextCard={handleNextCard}
           onPrevCard={handlePrevCard}
+        />
+      )}
+
+      {/* [SPECTATOR] Kick confirmation modal */}
+      {kickTarget && onKickPlayer && (
+        <KickConfirmModal
+          playerName={kickTarget.name}
+          onConfirm={() => {
+            onKickPlayer(kickTarget.id);
+            setKickTarget(null);
+          }}
+          onCancel={() => setKickTarget(null)}
         />
       )}
     </div>
