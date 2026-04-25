@@ -66,6 +66,15 @@ clues/
 - **Zod** - Validação de schemas em runtime
 - **Vitest** - Framework rápido para testes unitários e de componentes
 
+## Deploy
+
+- **Backend**: Hospedado no [PartyKit Cloud](https://partykit.io).
+- **Frontend**: Hospedado no [Cloudflare Pages](https://pages.cloudflare.com).
+  - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit (ex: `clues-party.username.partykit.dev`).
+  - Utiliza o arquivo `_redirects` para suporte a rotas SPA.
+
+## Domínio do Jogo
+
 ## Limites
 
 - **Jogadores Ativos**: 6 (Baralho Original), 10 (Baralho Misto)

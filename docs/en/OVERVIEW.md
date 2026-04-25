@@ -57,6 +57,13 @@ clues/
 5. **Results**: Scores are calculated and displayed
 6. **Repeat or Game Over**: Next round or winner declared
 
+## Deployment
+
+- **Backend**: Hosted on [PartyKit Cloud](https://partykit.io).
+- **Frontend**: Hosted on [Cloudflare Pages](https://pages.cloudflare.com).
+  - Requires `VITE_PARTYKIT_HOST` environment variable pointing to the PartyKit URL (e.g., `clues-party.username.partykit.dev`).
+  - Uses `_redirects` file for SPA routing support.
+
 ## Key Technologies
 
 - **React 19** - UI framework with hooks

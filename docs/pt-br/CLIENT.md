@@ -132,6 +132,21 @@ Localizados em `src/components/game/`:
 
 ---
 
+## Configuração de Deploy
+
+### Variáveis de Ambiente
+O cliente utiliza `VITE_PARTYKIT_HOST` para determinar o endereço do servidor WebSocket.
+- **Desenvolvimento**: O padrão é `localhost:1999`.
+- **Produção**: Deve ser configurada na plataforma de deploy (ex: Cloudflare Pages).
+
+### Suporte a SPA no Cloudflare Pages
+Um arquivo `_redirects` está incluído no diretório `public/` para garantir que a navegação direta para sub-rotas (como `/lobby/SALAID`) sirva corretamente o `index.html`.
+
+### Tratamento de Erros
+A aplicação possui uma interface de erro unificada para problemas de conexão e erros de validação. A tela de erro de conexão no `App.tsx` foi polida para corresponder ao estilo sutil "flutuante" dos erros de validação da `JoinScreen`.
+
+---
+
 ## Validação
 
 ### Schemas Zod (`src/schemas/messages.ts`)

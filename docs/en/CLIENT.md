@@ -132,6 +132,21 @@ Located in `src/components/game/`:
 
 ---
 
+## Deployment Configuration
+
+### Environment Variables
+The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
+- **Development**: Defaults to `localhost:1999`.
+- **Production**: Must be set in the deployment platform (e.g., Cloudflare Pages).
+
+### Cloudflare Pages SPA Support
+A `_redirects` file is included in the `public/` directory to ensure that direct navigation to sub-routes (like `/lobby/ROOMID`) correctly serves `index.html`.
+
+### Error Handling
+The application features a unified error UI for connection issues and validation errors. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.
+
+---
+
 ## Validation
 
 ### Zod Schemas (`src/schemas/messages.ts`)
