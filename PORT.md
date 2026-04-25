@@ -11,16 +11,16 @@ https://clues.any-pages.workers.dev/
 Ethereal Clues
 
 ## Contexto
-O objetivo principal foi criar uma versão digital imersiva e acessível do clássico jogo de tabuleiro Dixit para jogar com amigos à distância. O desafio técnico consistiu em garantir a sincronização perfeita de estado entre múltiplos clientes em tempo real, orquestrando fluxos complexos de jogo como informações ocultas, votações simultâneas e transições de fase instantâneas.
+Criação de uma versão digital imersiva do clássico jogo de tabuleiro Dixit. O foco técnico foi a implementação de sincronização de estado de alta fidelidade em tempo real, gerenciando fluxos complexos como informações ocultas, votações simultâneas e transições de fase assíncronas.
 
 ## Solução
-Desenvolvimento de uma plataforma multiplayer robusta usando React 19 e PartyKit. Implementei uma máquina de estados centralizada no backend que controla rigorosamente as fases da rodada (escolha de dica, seleção de cartas, votação e resultados). A solução inclui validação rigorosa de dados com Zod, suporte a bots com IA (Google Gemini) e um design dark premium com foco em experiência do usuário.
+Plataforma multiplayer desenvolvida com React 19 e PartyKit. Utiliza uma máquina de estados centralizada no servidor para controle rigoroso das rodadas, validação de dados com Zod e suporte a oponentes de IA (Gemini), tudo sob uma interface dark com estética premium.
 
 ## Tecnologias
 React 19, TypeScript, Vite, TailwindCSS 4, PartyKit (WebSockets), Zod, Gemini AI
 
 ## Arquitetura
-Arquitetura orientada a eventos (Event-Driven) cliente-servidor via WebSockets. O servidor PartyKit atua como a única fonte da verdade, mantendo o estado da sala em memória e transmitindo atualizações parciais para os clientes. O frontend é uma SPA (Single Page Application) reativa que mapeia o estado do servidor para componentes de UI dinâmicos.
+Arquitetura orientada a eventos via WebSockets (PartyKit), onde o servidor mantém a verdade única do estado em memória. O frontend SPA reage instantaneamente às transmissões de estado, garantindo uma experiência fluida e sincronizada entre todos os clientes.
 
 <!-- en -->
 
@@ -28,13 +28,13 @@ Arquitetura orientada a eventos (Event-Driven) cliente-servidor via WebSockets. 
 Ethereal Clues
 
 ## Context
-The primary goal was to create an immersive and accessible digital version of the classic board game Dixit for playing with friends remotely. The technical challenge consisted of ensuring perfect state synchronization across multiple clients in real-time, orchestrating complex game flows such as hidden information, simultaneous voting, and instantaneous phase transitions.
+Digital recreation of the board game Dixit. The technical focus was implementing high-fidelity real-time state synchronization, managing complex flows such as hidden information, simultaneous voting, and asynchronous phase transitions.
 
 ## Solution
-Developed a robust multiplayer platform using React 19 and PartyKit. I implemented a centralized state machine on the backend that strictly controls the round phases (clue choosing, card selection, voting, and results). The solution includes rigorous data validation with Zod, AI bot support (Google Gemini), and a premium dark design focused on user experience.
+Multiplayer platform built with React 19 and PartyKit. It features a centralized server-side state machine for round control, Zod data validation, and AI bot support (Gemini), delivered through a premium dark-themed interface.
 
 ## Stack
 React 19, TypeScript, Vite, TailwindCSS 4, PartyKit (WebSockets), Zod, Gemini AI
 
 ## Architecture
-Event-driven client-server architecture via WebSockets. The PartyKit server acts as the single source of truth, maintaining room state in-memory and broadcasting partial updates to clients. The frontend is a reactive SPA (Single Page Application) that maps server state to dynamic UI components.
+Event-driven architecture via WebSockets (PartyKit) with the server acting as the single source of truth. The SPA frontend reacts instantly to state broadcasts, ensuring a fluid and synchronized experience across all clients.
