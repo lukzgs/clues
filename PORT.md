@@ -3,7 +3,7 @@
 > Multiplayer card game inspired by Dixit — real-time, browser-based.
 
 ## Link
-https://clues.lukzgs.pages.dev/
+https://clues.any-pages.workers.dev/
 
 <!-- pt -->
 
