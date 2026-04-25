@@ -97,8 +97,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             
             {/* Left Panel: Game Options */}
             <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
-              <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-5 font-sans font-semibold">
-                Game Options
+              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-5 font-sans font-bold">
+                OPÇÕES DO JOGO
               </p>
 
               <div className="space-y-4 flex-1">
@@ -109,8 +109,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
                   <div className="flex items-center justify-between p-4 pb-3">
-                    <span className={`text-base md:text-lg font-cinzel font-bold tracking-wide ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
-                      By Score
+                    <span className={`text-sm md:text-lg font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                      POR PONTUAÇÃO
                     </span>
                     {isHost ? (
                       <button
@@ -132,7 +132,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {vc.scoreEnabled && (
                     <div className="px-4 pb-4 pt-1">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-white/40 text-[11px] md:text-xs uppercase tracking-wider font-sans font-medium">First to reach</span>
+                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">PRIMEIRO A CHEGAR</span>
                         <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
@@ -152,7 +152,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           ) : (
                             <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.targetScore}</span>
                           )}
-                          <span className="text-white/30 text-[10px] md:text-xs tracking-widest font-sans font-bold uppercase">pts</span>
+                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">PONTOS</span>
                         </div>
                       </div>
                       {isHost && (
@@ -185,8 +185,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
                 }`}>
                   <div className="flex items-center justify-between p-4 pb-3">
-                    <span className={`text-base md:text-lg font-cinzel font-bold tracking-wide ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
-                      By Rounds
+                    <span className={`text-sm md:text-lg font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
+                      POR RODADAS
                     </span>
                     {isHost ? (
                       <button
@@ -208,7 +208,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   {vc.narratorRoundsEnabled && (
                     <div className="px-4 pb-4 pt-1">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-white/40 text-[11px] md:text-xs uppercase tracking-wider font-sans font-medium">Each player narrates</span>
+                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">CADA JOGADOR NARRA</span>
                         <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
@@ -228,7 +228,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           ) : (
                             <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.narratorRounds}</span>
                           )}
-                          <span className="text-white/30 text-[10px] md:text-xs tracking-widest font-sans font-bold uppercase">x</span>
+                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">VEZES</span>
                         </div>
                       </div>
                       {isHost && (
@@ -257,15 +257,15 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 {/* Info when both enabled */}
                 {vc.scoreEnabled && vc.narratorRoundsEnabled && (
                   <p className="text-white/30 text-[11px] md:text-xs text-center px-4 font-sans mt-3 tracking-wide">
-                    First condition reached ends the game
+                    A primeira condição atingida encerra o jogo
                   </p>
                 )}
               </div>
 
               {/* Deck Selection */}
               <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 font-sans font-semibold">
-                  Card Pool
+                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
+                  PISCINA DE CARTAS
                 </p>
                 <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-[1.25rem] p-1.5 relative z-0">
                   <div
@@ -280,18 +280,18 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       key={option}
                       onClick={() => isHost && setDeckOption(option)}
                       disabled={!isHost}
-                      className={`flex-1 py-3 md:py-3.5 text-sm md:text-base font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-xl
+                      className={`flex-1 py-3 md:py-3.5 text-[11px] md:text-base font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-xl
                         ${deckOption === option ? 'text-amber-300' : 'text-white/40 hover:text-white/80'}
                         ${!isHost && 'cursor-default'}
                       `}
                     >
-                      {option === 'original' ? 'Original' : option === 'new' ? 'New' : 'Mixed'}
+                      {option === 'original' ? 'Original' : option === 'new' ? 'Novo' : 'Misturado'}
                     </button>
                   ))}
                 </div>
                 {!isHost && (
                   <p className="text-center mt-3 text-[11px] md:text-xs font-sans tracking-wide text-white/30">
-                    Host is choosing the deck...
+                    O anfitrião está escolhendo o baralho...
                   </p>
                 )}
               </div>
@@ -303,13 +303,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     <button
                       onClick={handleStartGame}
                       disabled={!canStart}
-                      className={`w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 ${
+                      className={`w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-widest text-base md:text-lg transition-all duration-300 ${
                         canStart
                           ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]'
                           : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                       }`}
                     >
-                      {canStart ? 'Start Game' : `Min ${GAME_CONFIG.MIN_PLAYERS} players`}
+                      {canStart ? 'INICIAR JOGO' : `Mínimo ${GAME_CONFIG.MIN_PLAYERS} jogadores`}
                     </button>
 
                     {canAddBot && (
@@ -334,25 +334,25 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                             : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                         }`}
                       >
-                        {activePlayers.length < maxPlayersForDeck ? 'Join as Player' : 'Lobby Full'}
+                        {activePlayers.length < maxPlayersForDeck ? 'ENTRAR COMO JOGADOR' : 'Lobby Lotado'}
                       </button>
                     )}
                     <div className="text-center py-3 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                      You are a spectator
+                      Você é um espectador
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-base tracking-wide">
                     <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                    Waiting for host to start...
+                    Aguardando o host iniciar...
                   </div>
                 )}
                 <button
                   onClick={onLeaveRoom}
                   className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
                 >
-                  LEAVE ROOM
+                  SAIA DA SALA
                 </button>
               </div>
             </div>
@@ -361,8 +361,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               {/* Room code */}
               <div className="text-center mb-10 w-full">
-                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 font-sans font-semibold">
-                  Room Code
+                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
+                  CÓDIGO DA SALA
                 </p>
                 <div className="bg-[#1A1A1A]/60 rounded-2xl px-6 md:px-8 py-4 md:py-5 inline-flex items-center gap-4 border border-white/10 shadow-inner">
                   <span className="text-3xl md:text-4xl font-cinzel font-bold text-amber-300 tracking-[0.15em]">
@@ -391,14 +391,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   </button>
                 </div>
                 <p className="text-white/30 text-[11px] md:text-xs mt-3 font-sans tracking-widest uppercase">
-                  {copied ? 'Link copied!' : 'Tap to copy invite link'}
+                  {copied ? 'Link copiado!' : 'Toque para copiar o link'}
                 </p>
               </div>
 
               {/* Player list */}
               <div className="w-full flex-1">
                 <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold">
-                  Players ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} spectator{spectators.length !== 1 ? 's' : ''}</span>}
+                  JOGADORES ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} {spectators.length !== 1 ? 'espectadores' : 'espectador'}</span>}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {gameState.players.map((player) => (
@@ -429,17 +429,17 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           )}
                           {player.isHost && (
                             <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)] shrink-0">
-                              Host
+                              ANFITRIÃO
                             </span>
                           )}
                           {player.isSpectator && (
                             <span className="text-blue-400/70 text-[10px] font-sans font-bold uppercase tracking-widest shrink-0">
-                              Spectator
+                              ESPECTADOR
                             </span>
                           )}
                           {!player.isConnected && !player.isBot && (
                             <span className="text-red-400 text-[10px] font-sans uppercase tracking-widest shrink-0">
-                              Offline
+                              DESCONECTADO
                             </span>
                           )}
                         </div>
@@ -502,7 +502,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
                         <span className="text-white/20 text-xl font-light">?</span>
                       </div>
-                      <span className="text-white/20 text-[11px] md:text-xs font-cinzel font-bold uppercase tracking-[0.2em]">Waiting...</span>
+                      <span className="text-white/20 text-[10px] font-cinzel font-bold uppercase tracking-[0.2em]">AGUARDANDO...</span>
                     </div>
                   ))}
                 </div>

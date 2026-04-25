@@ -79,10 +79,7 @@ Initial screen for creating or joining rooms. Recently updated to feature the ne
 | `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Joins existing room |
 | `prefillRoomCode` | `string \| undefined` | Optional room code from URL params (`?room=ABC123`). When provided, the screen renders in "Invite Mode", hiding the create room options and automatically pre-filling the code. |
 
-### `LobbyScreen.tsx`
-
-Waiting room before game starts.
-
+### `LobbyScreen.tsx` | Configurações do jogo, lista de jogadores e seleção de baralho. Apresenta o sistema de design "Mythic" padronizado com tipografia polida e interface totalmente em português. |
 | Prop | Type | Description |
 |------|------|-------------|
 | `gameState` | `GameState` | Current game state |
@@ -124,6 +121,7 @@ Located in `src/components/game/`:
 | Component | Description |
 |-----------|-------------|
 | `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
+| `LobbyScreen.tsx` | Game settings, player list, and deck selection. Features a standardized "Mythic" design system with polished typography and full Portuguese localization for the interface. |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |
 | `ResultsView.tsx` | Round results with scores; only displays received votes for each card; requires all active players to click "Next Round" |

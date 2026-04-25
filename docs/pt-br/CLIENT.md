@@ -81,7 +81,7 @@ Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo D
 
 ### `LobbyScreen.tsx`
 
-Sala de espera antes do jogo começar.
+Configurações do jogo, lista de jogadores e seleção de baralho. Apresenta o sistema de design "Mythic" padronizado com tipografia polida e interface totalmente em português.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
