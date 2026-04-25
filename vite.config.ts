@@ -13,7 +13,11 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [react(), tailwindcss()],
     define: {
-      'import.meta.env.VITE_PARTYKIT_HOST': JSON.stringify(env.PARTYKIT_HOST || 'localhost:1999')
+      'import.meta.env.VITE_PARTYKIT_HOST': JSON.stringify(
+        env.VITE_PARTYKIT_HOST || 
+        env.PARTYKIT_HOST || 
+        (mode === 'production' ? 'clues-party.lukzgs.partykit.dev' : 'localhost:1999')
+      )
     },
     resolve: {
       alias: {

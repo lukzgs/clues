@@ -140,7 +140,9 @@ The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 - **Production**: Must be set in the deployment platform (e.g., Cloudflare Pages).
 
 ### Cloudflare Pages Configuration
-The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address. This must be set in the Cloudflare Pages dashboard for production builds.
+The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
+- **Development**: Defaults to `localhost:1999`.
+- **Production**: Defaults to `clues-party.lukzgs.partykit.dev` if the environment variable is not explicitly set.
 
 ### Error Handling
 The application features a unified error UI for connection issues and validation errors. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.

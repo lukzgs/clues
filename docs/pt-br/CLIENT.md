@@ -140,7 +140,9 @@ O cliente utiliza `VITE_PARTYKIT_HOST` para determinar o endereço do servidor W
 - **Produção**: Deve ser configurada na plataforma de deploy (ex: Cloudflare Pages).
 
 ### Configuração no Cloudflare Pages
-O cliente utiliza `VITE_PARTYKIT_HOST` para determinar o endereço do servidor WebSocket. Esta variável deve ser configurada no painel do Cloudflare Pages para builds de produção.
+O cliente utiliza `VITE_PARTYKIT_HOST` para determinar o endereço do servidor WebSocket.
+- **Desenvolvimento**: O padrão é `localhost:1999`.
+- **Produção**: O padrão é `clues-party.lukzgs.partykit.dev` caso a variável de ambiente não seja configurada explicitamente.
 
 ### Tratamento de Erros
 A aplicação possui uma interface de erro unificada para problemas de conexão e erros de validação. A tela de erro de conexão no `App.tsx` foi polida para corresponder ao estilo sutil "flutuante" dos erros de validação da `JoinScreen`.

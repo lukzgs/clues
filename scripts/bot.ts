@@ -81,7 +81,7 @@ interface GameState {
 // CONFIGURAÇÃO
 // ============================================
 
-const PARTYKIT_HOST = process.env.PARTYKIT_HOST || 'localhost:1999';
+const PARTYKIT_HOST = process.env.VITE_PARTYKIT_HOST || process.env.PARTYKIT_HOST || 'localhost:1999';
 const CLUES = [
     'Mistério', 'Sonho', 'Viagem', 'Memória', 'Esperança',
     'Reflexo', 'Silêncio', 'Aventura', 'Magia', 'Destino',

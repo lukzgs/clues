@@ -71,7 +71,7 @@ clues/
 - **Backend**: Hospedado no [PartyKit Cloud](https://partykit.io).
 - **Frontend**: Hospedado no [Cloudflare Pages](https://pages.cloudflare.com).
   - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit (ex: `clues-party.username.partykit.dev`).
-  - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit.
+  - Requer a variável de ambiente `VITE_PARTYKIT_HOST`. Se não for fornecida em produção, o padrão é `clues-party.lukzgs.partykit.dev`.
 
 ## Domínio do Jogo
 
