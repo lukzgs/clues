@@ -151,17 +151,18 @@ const App: React.FC = () => {
               Joining room...
             </p>
 
-            {error && (
-              <div className="mt-5 md:mt-6 w-full text-center" style={{ animation: 'fade-in-up 0.3s ease-out both' }}>
-                <p className="text-red-400/90 text-[11px] uppercase tracking-[0.15em] text-center mb-3 w-full bg-red-950/30 border border-red-500/20 py-3 px-4 rounded-xl font-sans font-medium shadow-[0_0_10px_rgba(239,68,68,0.05)]">{error}</p>
-                <button
-                  onClick={() => setAppState({ screen: 'join' })}
-                  className="text-white/30 hover:text-white/60 text-sm font-sans transition-colors"
-                >
-                  ← Back
-                </button>
+            {/* Error Display */}
+            <div className={`mt-5 md:mt-6 w-full text-center transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+              <div className="flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium mb-4">
+                <span>{error}</span>
               </div>
-            )}
+              <button
+                onClick={() => setAppState({ screen: 'join' })}
+                className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
+              >
+                ← Back
+              </button>
+            </div>
           </div>
         </div>
 
