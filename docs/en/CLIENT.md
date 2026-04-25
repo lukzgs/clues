@@ -139,8 +139,8 @@ The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 - **Development**: Defaults to `localhost:1999`.
 - **Production**: Must be set in the deployment platform (e.g., Cloudflare Pages).
 
-### Cloudflare Pages SPA Support
-The build script (`npm run build`) automatically creates a copy of `index.html` named `404.html` in the `dist/` directory. This is the recommended approach for Cloudflare Pages to ensure that direct navigation to sub-routes correctly serves the application.
+### Cloudflare Pages Configuration
+The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address. This must be set in the Cloudflare Pages dashboard for production builds.
 
 ### Error Handling
 The application features a unified error UI for connection issues and validation errors. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.
