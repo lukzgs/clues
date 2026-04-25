@@ -126,7 +126,7 @@ Located in `src/components/game/`:
 | `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |
-| `ResultsView.tsx` | Round results with scores; requires all active players to click "Next Round" |
+| `ResultsView.tsx` | Round results with scores; only displays received votes for each card; requires all active players to click "Next Round" |
 | `KickConfirmModal.tsx` | Confirmation modal for host to kick players |
 | `GameOverView.tsx` | Final scores and winner |
 

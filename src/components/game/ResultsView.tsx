@@ -75,11 +75,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
               </div>
 
               {/* Votos recebidos */}
-              <div className="flex gap-2 min-h-[32px] mt-1 bg-[#0A0A0A]/40 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
-                {votesOnThis.length === 0 ? (
-                  <span className="text-white/20 text-[10px] font-sans uppercase tracking-widest">Nenhum voto</span>
-                ) : (
-                  votesOnThis.map((voter) => voter && (
+              {votesOnThis.length > 0 && (
+                <div className="flex gap-2 min-h-[32px] mt-1 bg-[#0A0A0A]/40 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
+                  {votesOnThis.map((voter) => voter && (
                     <div
                       key={voter.id}
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-[0_0_10px_rgba(0,0,0,0.5)] border border-white/20 transition-transform hover:scale-110"
@@ -88,9 +86,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     >
                       {voter.name.charAt(0).toUpperCase()}
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
