@@ -71,7 +71,7 @@ clues/
 - **Backend**: Hospedado no [PartyKit Cloud](https://partykit.io).
 - **Frontend**: Hospedado no [Cloudflare Pages](https://pages.cloudflare.com).
   - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit (ex: `clues-party.username.partykit.dev`).
-  - Utiliza o arquivo `_redirects` para suporte a rotas SPA.
+  - Utiliza uma cópia do `index.html` chamada `404.html` (gerada no build) para suporte a rotas SPA.
 
 ## Domínio do Jogo
 

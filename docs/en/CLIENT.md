@@ -140,7 +140,7 @@ The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 - **Production**: Must be set in the deployment platform (e.g., Cloudflare Pages).
 
 ### Cloudflare Pages SPA Support
-A `_redirects` file is included in the `public/` directory to ensure that direct navigation to sub-routes (like `/lobby/ROOMID`) correctly serves `index.html`.
+The build script (`npm run build`) automatically creates a copy of `index.html` named `404.html` in the `dist/` directory. This is the recommended approach for Cloudflare Pages to ensure that direct navigation to sub-routes correctly serves the application.
 
 ### Error Handling
 The application features a unified error UI for connection issues and validation errors. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.

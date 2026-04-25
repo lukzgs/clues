@@ -61,8 +61,8 @@ clues/
 
 - **Backend**: Hosted on [PartyKit Cloud](https://partykit.io).
 - **Frontend**: Hosted on [Cloudflare Pages](https://pages.cloudflare.com).
-  - Requires `VITE_PARTYKIT_HOST` environment variable pointing to the PartyKit URL (e.g., `clues-party.username.partykit.dev`).
-  - Uses `_redirects` file for SPA routing support.
+  - Requires `VITE_PARTYKIT_HOST` environment variable pointing to the PartyKit URL (e.g., `clues-party.lukzgs.partykit.dev`).
+  - Uses a `404.html` copy of `index.html` (generated during build) for SPA routing support.
 
 ## Key Technologies
 
