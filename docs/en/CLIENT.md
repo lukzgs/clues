@@ -79,7 +79,8 @@ Initial screen for creating or joining rooms. Recently updated to feature the ne
 | `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Joins existing room |
 | `prefillRoomCode` | `string \| undefined` | Optional room code from URL params (`?room=ABC123`). When provided, the screen renders in "Invite Mode", hiding the create room options and automatically pre-filling the code. |
 
-### `LobbyScreen.tsx` | Configurações do jogo, lista de jogadores e seleção de baralho. Apresenta o sistema de design "Mythic" padronizado com tipografia polida e interface totalmente em português. |
+### `LobbyScreen.tsx`
+Game settings, player list, and deck selection. Optimized for mobile with a dedicated host settings modal, localized interface, and a scrollable player list to maintain layout consistency across devices. Featuring the standardized "Mythic" design system.
 | Prop | Type | Description |
 |------|------|-------------|
 | `gameState` | `GameState` | Current game state |

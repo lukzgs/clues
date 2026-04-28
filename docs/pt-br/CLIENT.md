@@ -80,8 +80,7 @@ Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo D
 | `prefillRoomCode` | `string \| undefined` | Código da sala opcional proveniente dos parâmetros da URL (`?room=ABC123`). Quando fornecido, a tela é renderizada no "Modo Convite" (Invite Mode), escondendo as opções de criação e pré-preenchendo automaticamente o código. |
 
 ### `LobbyScreen.tsx`
-
-Configurações do jogo, lista de jogadores e seleção de baralho. Apresenta o sistema de design "Mythic" padronizado com tipografia polida e interface totalmente em português.
+Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada para mobile com um modal dedicado para configurações do host, interface localizada e lista de jogadores com rolagem interna para manter a consistência do layout em todos os dispositivos. Apresenta o sistema de design "Mythic" padronizado.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
