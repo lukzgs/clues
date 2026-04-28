@@ -30,6 +30,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const isHost = currentPlayer?.isHost ?? false;
   const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && onAddBot;
 
+  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
@@ -77,26 +78,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     onStartGame(vc, deckOption);
   };
 
-  return (
-    <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
-      {/* Ambient Lighting — same as JoinScreen */}
-      <div
-        className="fixed inset-0 pointer-events-none z-[-1]"
-        style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
-      />
-      <div
-        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
-      />
-
-      <div className="w-full max-w-[1250px] z-10 my-6 md:my-0">
-        <div
-          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col"
-          style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
-            
-            {/* Left Panel: Game Options */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+  const renderGameOptions = () => (
+    <>
               <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-5 font-sans font-bold">
                 OPÇÕES DO JOGO
               </p>
@@ -256,7 +239,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
                 {/* Info when both enabled */}
                 {vc.scoreEnabled && vc.narratorRoundsEnabled && (
-                  <p className="text-white/30 text-[11px] md:text-xs text-center px-4 font-sans mt-3 tracking-wide">
+                  <p className="text-white/30 text-[10px] md:text-[11px] text-center px-4 font-sans font-bold uppercase tracking-[0.15em] mt-3">
                     A primeira condição atingida encerra o jogo
                   </p>
                 )}
@@ -295,9 +278,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   </p>
                 )}
               </div>
+    </>
+  );
 
-              {/* Actions */}
-              <div className="mt-8 space-y-3.5 pt-6 border-t border-white/10">
+  const renderActions = () => (
+    <>
+      <div className="mt-8 space-y-3.5 pt-6 border-t border-white/10">
                 {isHost ? (
                   <>
                     <button
@@ -310,6 +296,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       }`}
                     >
                       {canStart ? 'INICIAR JOGO' : `Mínimo ${GAME_CONFIG.MIN_PLAYERS} jogadores`}
+                    </button>
+
+                    <button
+                      onClick={() => setIsMobileOptionsOpen(true)}
+                      className="lg:hidden w-full bg-[#1A1A1A]/80 border border-amber-500/30 text-amber-300 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:bg-amber-500/10 hover:border-amber-400"
+                    >
+                      CONFIGURAÇÕES
                     </button>
 
                     {canAddBot && (
@@ -352,13 +345,40 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   onClick={onLeaveRoom}
                   className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
                 >
-                  SAIA DA SALA
+                  SAIR
                 </button>
+              </div>
+    </>
+  );
+
+  return (
+    <div className="relative h-[100dvh] overflow-hidden flex items-center justify-center p-3 md:p-4">
+      {/* Ambient Lighting — same as JoinScreen */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[-1]"
+        style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
+      />
+      <div
+        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+      />
+
+      <div className="w-full max-w-[1250px] z-10 h-full max-h-[95dvh] md:max-h-[90dvh] flex flex-col">
+        <div
+          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col flex-1 min-h-0"
+          style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 flex-1 min-h-0">
+            
+            {/* Left Panel: Game Options (Desktop Only) */}
+            <div className="hidden lg:flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+              {renderGameOptions()}
+              <div className="mt-8 pt-6 border-t border-white/10">
+                {renderActions()}
               </div>
             </div>
 
             {/* Right Panel: Room Code & Players */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8 min-h-0" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               {/* Room code */}
               <div className="text-center mb-10 w-full">
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
@@ -390,17 +410,15 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     )}
                   </button>
                 </div>
-                <p className="text-white/30 text-[11px] md:text-xs mt-3 font-sans tracking-widest uppercase">
-                  {copied ? 'Link copiado!' : 'Toque para copiar o link'}
-                </p>
+
               </div>
 
               {/* Player list */}
-              <div className="w-full flex-1">
-                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold">
+              <div className="w-full flex-1 min-h-0 flex flex-col">
+                <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold shrink-0">
                   JOGADORES ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} {spectators.length !== 1 ? 'espectadores' : 'espectador'}</span>}
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
                   {gameState.players.map((player) => (
                     <div
                       key={player.id}
@@ -494,18 +512,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     </div>
                   ))}
 
-                  {Array.from({ length: Math.max(0, maxPlayersForDeck - activePlayers.length) }).map((_, i) => (
-                    <div
-                      key={`empty-${i}`}
-                      className="flex items-center gap-3 bg-[#1A1A1A]/20 p-3 rounded-2xl border border-dashed border-white/10 h-[72px] md:h-[76px] opacity-70"
-                    >
-                      <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
-                        <span className="text-white/20 text-xl font-light">?</span>
-                      </div>
-                      <span className="text-white/20 text-[10px] font-cinzel font-bold uppercase tracking-[0.2em]">AGUARDANDO...</span>
-                    </div>
-                  ))}
+
                 </div>
+              </div>
+
+              {/* Mobile Only: Actions */}
+              <div className="lg:hidden">
+                {renderActions()}
               </div>
             </div>
 
@@ -519,6 +532,29 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
           &copy; 2026 Story Weaver. Crafted for imagination.
         </p>
       </div>
+
+      {/* Mobile Options Modal */}
+      {isMobileOptionsOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsMobileOptionsOpen(false)}></div>
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-transparent backdrop-blur-xl z-20 pb-2 border-b border-white/10">
+              <h3 className="text-amber-300 font-cinzel font-bold text-lg tracking-widest">CONFIGURAÇÕES</h3>
+              <button 
+                onClick={() => setIsMobileOptionsOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Close"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            {renderGameOptions()}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

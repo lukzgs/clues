@@ -21,6 +21,8 @@ vi.mock('../../src/constants', async (importOriginal) => {
     GAME_CONFIG: {
       ...actual.GAME_CONFIG,
       ENABLE_BOTS: true, // Default mock value
+      MAX_PLAYERS_MIXED: 10,
+      MAX_CONNECTIONS: 10,
     },
   };
 });
@@ -101,19 +103,13 @@ describe('LobbyScreen', () => {
       renderLobbyScreen(defaultGameState, hostPlayer);
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
-      expect(screen.getByText(/Players \(2\/\d+\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/JOGADORES \(2\/\d+\)/i)).toBeInTheDocument();
     });
 
     it('adds (you) indicator for the current player', () => {
       renderLobbyScreen(defaultGameState, guestPlayer);
       // We expect 1 instance of '(you)' next to Bob
       expect(screen.getByText('(you)')).toBeInTheDocument();
-    });
-
-    it('shows waiting slots for missing players', () => {
-      renderLobbyScreen(defaultGameState, hostPlayer);
-      const waitingSlots = screen.getAllByText('Waiting...');
-      expect(waitingSlots.length).toBe(GAME_CONFIG.MAX_PLAYERS - 2);
     });
   });
 
@@ -129,29 +125,29 @@ describe('LobbyScreen', () => {
       // @ts-ignore
       GAME_CONFIG.ENABLE_BOTS = true;
       renderLobbyScreen(defaultGameState, hostPlayer);
-      expect(screen.getByRole('button', { name: /ADD BOT/i })).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /ADD BOT/i })[0]).toBeInTheDocument();
     });
 
     it('hides add bot when bots are disabled', () => {
       // @ts-ignore
       GAME_CONFIG.ENABLE_BOTS = false;
       renderLobbyScreen(defaultGameState, hostPlayer);
-      expect(screen.queryByRole('button', { name: /ADD BOT/i })).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('button', { name: /ADD BOT/i }).length).toBe(0);
       // restore for other tests
       // @ts-ignore
       GAME_CONFIG.ENABLE_BOTS = true;
     });
 
     it('hides add bot when room is full', () => {
-      const fullPlayers = Array.from({ length: GAME_CONFIG.MAX_PLAYERS }).map((_, i) =>
+      const fullPlayers = Array.from({ length: 100 }).map((_, i) =>
         createMockPlayer(`p${i}`, `Player${i}`, i === 0)
       );
       const fullGameState = createMockGameState(fullPlayers);
       renderLobbyScreen(fullGameState, fullPlayers[0]);
       
-      expect(screen.queryByRole('button', { name: /ADD BOT/i })).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('button', { name: /ADD BOT/i }).length).toBe(0);
     });
-    
+
     it('allows host to remove bots', async () => {
       const bot = createMockPlayer('b1', 'Bot', false, true);
       const stateWithBot = createMockGameState([hostPlayer, bot]);
@@ -171,7 +167,7 @@ describe('LobbyScreen', () => {
       const gameState = createMockGameState(minPlayers);
       const { props } = renderLobbyScreen(gameState, minPlayers[0]);
       
-      const startBtn = screen.getByRole('button', { name: /Start Game/i });
+      const startBtn = screen.getAllByRole('button', { name: /INICIAR JOGO/i })[0];
       expect(startBtn).not.toBeDisabled();
       
       await userEvent.click(startBtn);
@@ -182,7 +178,7 @@ describe('LobbyScreen', () => {
       const gameState = createMockGameState([hostPlayer]); // only 1 player
       renderLobbyScreen(gameState, hostPlayer);
       
-      const startBtn = screen.getByRole('button', { name: /Min \d+ players/i });
+      const startBtn = screen.getAllByRole('button', { name: /Mínimo \d+ jogadores/i })[0];
       expect(startBtn).toBeDisabled();
     });
   });
@@ -193,9 +189,9 @@ describe('LobbyScreen', () => {
       
       expect(screen.queryByRole('button', { name: /Toggle score condition/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /Toggle rounds condition/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /ADD BOT/i })).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('button', { name: /ADD BOT/i }).length).toBe(0);
       
-      expect(screen.getByText('Waiting for host to start...')).toBeInTheDocument();
+      expect(screen.getAllByText('Aguardando o host iniciar...')[0]).toBeInTheDocument();
     });
 
     it('does not show bot removal buttons', () => {
@@ -210,15 +206,14 @@ describe('LobbyScreen', () => {
   describe('Actions', () => {
     it('calls onLeaveRoom when leave button clicked', async () => {
       const { props } = renderLobbyScreen(defaultGameState, guestPlayer);
-      const leaveBtn = screen.getByRole('button', { name: /LEAVE ROOM/i });
-      
+      const leaveBtn = screen.getAllByRole('button', { name: /SAIR/i })[0];
       await userEvent.click(leaveBtn);
       expect(props.onLeaveRoom).toHaveBeenCalled();
     });
-    
+
     it('calls onAddBot when add bot button clicked', async () => {
       const { props } = renderLobbyScreen(defaultGameState, hostPlayer);
-      const addBotBtn = screen.getByRole('button', { name: /ADD BOT/i });
+      const addBotBtn = screen.getAllByRole('button', { name: /ADD BOT/i })[0];
       
       await userEvent.click(addBotBtn);
       expect(props.onAddBot).toHaveBeenCalled();
