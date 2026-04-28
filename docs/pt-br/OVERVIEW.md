@@ -1,8 +1,8 @@
-# Ethereal Clues - Visão Geral do Projeto
+# Story Weaver - Visão Geral do Projeto
 
 ## Descrição
 
-**Ethereal Clues** é um jogo de cartas multiplayer inspirado em Dixit, construído com React e WebSockets via PartyKit. Os jogadores se revezam como narrador, dando dicas enigmáticas sobre a carta escolhida enquanto os outros tentam adivinhar qual carta pertence ao narrador.
+**Story Weaver** é um jogo de cartas multiplayer inspirado em Dixit, construído com React e WebSockets via PartyKit. Os jogadores se revezam como narrador, dando dicas enigmáticas sobre a carta escolhida enquanto os outros tentam adivinhar qual carta pertence ao narrador.
 
 ## Status de Desenvolvimento Atual
 
@@ -24,7 +24,7 @@
 ## Estrutura do Projeto
 
 ```
-clues/
+story-weaver/
 ├── src/                    # Frontend (React)
 │   ├── App.tsx             # Componente principal
 │   ├── components/
@@ -70,8 +70,8 @@ clues/
 
 - **Backend**: Hospedado no [PartyKit Cloud](https://partykit.io).
 - **Frontend**: Hospedado no [Cloudflare Pages](https://pages.cloudflare.com).
-  - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit (ex: `clues-party.username.partykit.dev`).
-  - Requer a variável de ambiente `VITE_PARTYKIT_HOST`. Se não for fornecida em produção, o padrão é `clues-party.lukzgs.partykit.dev`.
+  - Requer a variável de ambiente `VITE_PARTYKIT_HOST` apontando para a URL do PartyKit (ex: `story-weaver-party.username.partykit.dev`).
+  - Requer a variável de ambiente `VITE_PARTYKIT_HOST`. Se não for fornecida em produção, o padrão é `story-weaver-party.lukzgs.partykit.dev`.
 
 ## Domínio do Jogo
 

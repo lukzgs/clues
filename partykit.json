@@ -1,5 +1,5 @@
 {
-  "name": "clues-party",
+  "name": "story-weaver-party",
   "$schema": "https://www.partykit.io/schema.json",
   "main": "party/server.ts",
   "compatibilityDate": "2024-01-01",

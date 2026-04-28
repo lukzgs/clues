@@ -1,4 +1,4 @@
-# Project Report - Ethereal Clues
+# Project Report - Story Weaver
 
 > Generated on February 9, 2026
 

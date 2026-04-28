@@ -24,7 +24,7 @@
 ## Project Structure
 
 ```
-clues/
+story-weaver/
 ├── src/                    # Frontend (React)
 │   ├── App.tsx             # Main app component
 │   ├── components/
@@ -64,7 +64,7 @@ clues/
 ### Cloudflare Pages Configuration
 The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 - **Development**: Defaults to `localhost:1999`.
-- **Production**: Defaults to `clues-party.lukzgs.partykit.dev` if the environment variable is not explicitly set.
+- **Production**: Defaults to `story-weaver-party.lukzgs.partykit.dev` if the environment variable is not explicitly set.
 
 ## Key Technologies
 

@@ -1,4 +1,4 @@
-# Ethereal Clues
+# Story Weaver
 
 > Multiplayer card game inspired by Dixit — real-time, browser-based.
 
@@ -8,7 +8,7 @@ https://clues.any-pages.workers.dev/
 <!-- pt -->
 
 ## Título
-Ethereal Clues
+Story Weaver
 
 ## Contexto
 Criação de uma versão digital imersiva do clássico jogo de tabuleiro Dixit. O foco técnico foi a implementação de sincronização de estado de alta fidelidade em tempo real, gerenciando fluxos complexos como informações ocultas, votações simultâneas e transições de fase assíncronas.
@@ -25,7 +25,7 @@ Arquitetura orientada a eventos via WebSockets (PartyKit), onde o servidor mant�
 <!-- en -->
 
 ## Title
-Ethereal Clues
+Story Weaver
 
 ## Context
 Digital recreation of the board game Dixit. The technical focus was implementing high-fidelity real-time state synchronization, managing complex flows such as hidden information, simultaneous voting, and asynchronous phase transitions.

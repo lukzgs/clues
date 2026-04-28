@@ -1,4 +1,4 @@
-# Ethereal Clues - Dixit Multiplayer
+# Story Weaver - Dixit Multiplayer
 
 Um jogo multiplayer inspirado em Dixit, com IA integrada via Gemini.
 
