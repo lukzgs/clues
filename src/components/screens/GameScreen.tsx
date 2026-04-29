@@ -37,6 +37,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showClueModal, setShowClueModal] = useState(false);
   const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
+  const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('row');
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -344,7 +345,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </aside>
 
         {/* ===== CENTER CONTENT ===== */}
-        <main className="flex-1 flex flex-col overflow-y-auto pb-6">
+        <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-6">
           <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
 
             {/* Fase: Narrador escolhendo */}
@@ -470,27 +471,67 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
           {currentPlayer && !currentPlayer.isSpectator && (
-            <div className="pb-6 md:pb-10 pt-4 w-full">
+            <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-white/10 md:border-none relative z-10 px-4 md:px-0">
               <div className="max-w-screen-2xl w-full mx-auto">
+                <div className="md:hidden flex justify-between items-center mb-4 pt-2 px-2">
+                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">Sua Mão</span>
+                  <div className="flex bg-black/40 rounded-xl border border-white/10 p-1 backdrop-blur-sm">
+                    <button
+                      onClick={() => setMobileView('row')}
+                      className={`p-2 rounded-lg transition-all ${mobileView === 'row' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver em carrossel"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="18" rx="1" ry="1"/><rect x="18" y="5" width="3" height="14" rx="1" ry="1"/><rect x="3" y="5" width="3" height="14" rx="1" ry="1"/></svg>
+                    </button>
+                    <button
+                      onClick={() => setMobileView('grid-2')}
+                      className={`p-2 rounded-lg transition-all ${mobileView === 'grid-2' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver 2 por linha"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" ry="1"/><rect x="14" y="3" width="7" height="7" rx="1" ry="1"/><rect x="14" y="14" width="7" height="7" rx="1" ry="1"/><rect x="3" y="14" width="7" height="7" rx="1" ry="1"/></svg>
+                    </button>
+                    <button
+                      onClick={() => setMobileView('grid-1')}
+                      className={`p-2 rounded-lg transition-all ${mobileView === 'grid-1' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver 1 por linha"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="5" rx="1" ry="1"/><rect x="4" y="13" width="16" height="5" rx="1" ry="1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
                 {/* Cards */}
-                <div className={`flex justify-center gap-4 md:gap-6 flex-nowrap pb-6 pt-10 px-6 ${gameState.phase === GamePhase.VOTING ||
-                    (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
-                    (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator)
-                    ? 'opacity-40 grayscale-[30%] scale-[0.98]'
-                    : ''
-                  }`}>
+                <div className={`
+                    ${mobileView === 'row' ? 'flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 gap-4 hide-scrollbar' : ''}
+                    ${mobileView === 'grid-2' ? 'grid grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pb-4 hide-scrollbar' : ''}
+                    ${mobileView === 'grid-1' ? 'flex flex-col gap-4 max-h-[50vh] overflow-y-auto pb-4 hide-scrollbar' : ''}
+                    md:flex md:flex-row md:justify-center md:gap-6 md:flex-nowrap md:overflow-visible md:pb-6 md:pt-10 md:px-6
+                    ${gameState.phase === GamePhase.VOTING || (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) || (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator)
+                      ? 'opacity-40 grayscale-[30%] md:scale-[0.98]'
+                      : ''
+                    }
+                  `}>
                   {currentPlayer.hand.map((card) => (
-                    <div key={card.id} className="last:pr-6 md:last:pr-0">
+                    <div 
+                      key={card.id} 
+                      className={`
+                        shrink-0
+                        ${mobileView === 'row' ? 'w-[50vw] max-w-[220px] snap-center snap-always' : ''}
+                        ${mobileView === 'grid-2' ? 'w-full' : ''}
+                        ${mobileView === 'grid-1' ? 'w-full max-w-[320px] mx-auto' : ''}
+                        md:w-auto md:max-w-none
+                      `}
+                    >
                       <GameCard
                         card={card}
-                        size="lg"
+                        size="full"
                         disabled={
                           (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
                           (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
                           gameState.phase === GamePhase.VOTING
                         }
                         onClick={() => handleCardSelect(card)}
+                        className="md:!w-40 md:!h-56 lg:!w-44 lg:!h-64 md:!aspect-auto"
                       />
                     </div>
                   ))}

@@ -99,6 +99,15 @@
   backface-visibility: hidden;
 }
 
+/* Esconder barra de rolagem (mobile) */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ===== SCROLLBAR ===== */
 
 ::-webkit-scrollbar {
