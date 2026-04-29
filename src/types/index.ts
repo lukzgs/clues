@@ -49,6 +49,13 @@ export interface VictoryCondition {
   narratorRounds: number;      // Each player narrates X times
 }
 
+export interface PhaseTimeouts {
+  narrator: number;       // in seconds
+  othersChoosing: number; // in seconds
+  voting: number;         // in seconds
+  results: number;        // in seconds
+}
+
 export interface GameState {
   roomCode: string;
   phase: GamePhase;
@@ -66,6 +73,7 @@ export interface GameState {
   afkKickVotes: string[]; // Array de playerIds que votaram para expulsar o jogador AFK
   deckOption: DeckOption;
   playersWhoReadied: string[]; // IDs of players who already clicked "Next Round"
+  phaseTimeouts: PhaseTimeouts;
 }
 
 // Estado completo do servidor (não exposto ao cliente)
@@ -110,6 +118,7 @@ export interface StartGameMessage {
   type: ClientMessageType.START_GAME;
   victoryCondition: VictoryCondition;
   deckOption: DeckOption;
+  phaseTimeouts: PhaseTimeouts;
 }
 
 export interface SubmitClueMessage {

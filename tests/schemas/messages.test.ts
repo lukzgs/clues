@@ -366,6 +366,12 @@ describe('StartGameSchema', () => {
         narratorRounds: 2,
       },
       deckOption: 'mixed',
+      phaseTimeouts: {
+        narrator: 60,
+        othersChoosing: 45,
+        voting: 30,
+        results: 15,
+      },
     });
     expect(result.success).toBe(true);
   });

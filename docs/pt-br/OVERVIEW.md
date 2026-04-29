@@ -19,6 +19,7 @@
 | Baralho de cartas estático (341 cartas) | ✅ Completo |
 | Modo Espectador | ✅ Completo |
 | Administração do Host (Expulsar) | ✅ Completo |
+| Tempos de fase customizáveis | ✅ Completo |
 | Chat no jogo | ❌ Não iniciado |
 
 ## Estrutura do Projeto

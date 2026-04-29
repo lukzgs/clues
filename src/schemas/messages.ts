@@ -40,10 +40,18 @@ export const VictoryConditionSchema = z.object({
     narratorRounds: z.number().int().min(1).max(5),
 });
 
+export const PhaseTimeoutsSchema = z.object({
+    narrator: z.number().int().min(0).max(120),
+    othersChoosing: z.number().int().min(0).max(120),
+    voting: z.number().int().min(0).max(120),
+    results: z.number().int().min(0).max(120),
+});
+
 export const StartGameSchema = z.object({
     type: z.literal('START_GAME'),
     victoryCondition: VictoryConditionSchema,
     deckOption: z.enum(['original', 'new', 'mixed']),
+    phaseTimeouts: PhaseTimeoutsSchema,
 });
 
 export const SubmitClueSchema = z.object({

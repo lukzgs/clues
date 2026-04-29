@@ -34,7 +34,7 @@ enum ClientMessageType {
 |----------|---------|-------------|
 | `JOIN_ROOM` | `playerName: string` | Qualquer |
 | `LEAVE_ROOM` | (nenhum) | Qualquer |
-| `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption` | LOBBY (apenas host) |
+| `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts` | LOBBY (apenas host) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (apenas narrador) |
 | `PLAY_CARD` | `cardId: number` | OTHERS_CHOOSING (não-narradores) |
 | `VOTE` | `orderId: number` | VOTING (não-narradores) |
@@ -54,6 +54,14 @@ enum ClientMessageType {
 
 // Enviar uma dica como narrador
 { type: 'SUBMIT_CLUE', cardId: 42, clue: 'Um sonho dentro de um sonho' }
+
+// Iniciar jogo com condições de vitória, opção de baralho e tempos de fase
+{ 
+  type: 'START_GAME', 
+  victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 }, 
+  deckOption: 'mixed',
+  phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 }
+}
 
 // Votar em uma carta
 { type: 'VOTE', orderId: 3 }

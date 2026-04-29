@@ -7,6 +7,7 @@ import {
   ServerMessage,
   VictoryCondition,
   DeckOption,
+  PhaseTimeouts,
 } from '../types';
 import { PARTYKIT_HOST } from '../constants';
 import {
@@ -35,7 +36,7 @@ interface UseGameRoomReturn {
   error: string | null;
 
   // Acoes
-  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
+  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
   vote: (orderId: number) => void;
@@ -187,14 +188,17 @@ export function useGameRoom({
   // AÇÕES DO JOGO
   // ============================================
 
-  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption) => {
+  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
     const result = StartGameSchema.safeParse({
       type: ClientMessageType.START_GAME,
       victoryCondition,
       deckOption,
+      phaseTimeouts,
     });
     if (result.success) {
       send(result.data);
+    } else {
+      console.error('Validation failed for START_GAME:', result.error);
     }
   }, [send]);
 

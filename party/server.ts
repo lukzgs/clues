@@ -9,6 +9,7 @@ import {
   ClientMessageType,
   ServerMessageType,
   DeckOption,
+  PhaseTimeouts,
 } from "../src/types";
 import { PLAYER_COLORS } from "../src/config";
 import { ClientMessageSchema } from "../src/schemas";
@@ -84,6 +85,7 @@ export default class GameServer implements Party.Server {
       phaseStartTime: Date.now(),
       afkKickVotes: [],
       playersWhoReadied: [],
+      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
     };
   }
 
@@ -192,7 +194,7 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'START_GAME':
-          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption);
+          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts);
           break;
 
         case 'SUBMIT_CLUE':
@@ -369,7 +371,7 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption) {
+  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) {
     const player = this.state.players.find(p => p.id === playerId);
 
     // Apenas host pode iniciar
@@ -400,6 +402,14 @@ export default class GameServer implements Party.Server {
       targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
       narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
       narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
+    };
+
+    // Apply phase timeouts from host
+    this.state.phaseTimeouts = {
+      narrator: Math.max(0, Math.min(120, phaseTimeouts.narrator)),
+      othersChoosing: Math.max(0, Math.min(120, phaseTimeouts.othersChoosing)),
+      voting: Math.max(0, Math.min(120, phaseTimeouts.voting)),
+      results: Math.max(0, Math.min(120, phaseTimeouts.results)),
     };
 
     // Create and shuffle deck based on option

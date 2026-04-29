@@ -152,6 +152,8 @@ interface GameState {
   narratorRoundsPlayed: Record<string, number>;
   deckOption: DeckOption;
   afkKickVotes: Record<string, string[]>;
+  phaseTimeouts: PhaseTimeouts;
+  phaseStartTime: number | null;
 }
 ```
 

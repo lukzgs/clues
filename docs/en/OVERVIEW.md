@@ -19,6 +19,7 @@
 | Static card deck (341 cards) | ✅ Complete |
 | Spectator Mode | ✅ Complete |
 | Host Administration (Kick) | ✅ Complete |
+| Customizable phase timeouts | ✅ Complete |
 | In-game chat | ❌ Not started |
 
 ## Project Structure
