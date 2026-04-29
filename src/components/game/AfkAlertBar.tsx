@@ -105,35 +105,35 @@ export function AfkAlertBar({ gameState, voteKickAfk, currentPlayerId }: AfkAler
 
   // Timer expirou -> Mostra o modal superior
   return (
-    <div className="fixed top-0 left-0 w-full z-[100] flex justify-center p-4 pointer-events-none animate-in slide-in-from-top-4">
-      <div className="bg-red-950/90 backdrop-blur-md border border-red-500/50 rounded-2xl shadow-2xl p-4 flex flex-col md:flex-row items-center gap-4 max-w-2xl w-full pointer-events-auto">
-        <div className="flex items-center gap-3 text-red-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <div className="flex flex-col">
-            <span className="font-bold font-cinzel tracking-wider text-sm md:text-base">Tempo Esgotado</span>
-            <span className="text-xs md:text-sm text-red-300/80 font-inter">
-              Aguardando: {afkPlayers.map(p => p.name).join(', ')}
+    <div className="fixed bottom-0 md:top-0 md:bottom-auto left-0 w-full z-[100] flex justify-center p-3 md:p-4 pointer-events-none animate-in slide-in-from-bottom-4 md:slide-in-from-top-4">
+      <div className="bg-red-950/90 backdrop-blur-md border border-red-500/50 rounded-2xl shadow-[0_0_40px_rgba(220,38,38,0.2)] p-3 md:p-4 flex flex-col md:flex-row items-center gap-3 max-w-2xl w-full pointer-events-auto">
+        <div className="flex flex-col md:flex-row items-center gap-2.5 text-red-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 shrink-0 opacity-80 mb-0.5 md:mb-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <span className="font-bold font-cinzel tracking-[0.1em] uppercase text-xs md:text-sm text-red-100">Tempo Esgotado</span>
+            <span className="text-[10px] md:text-xs text-red-300/80 font-sans tracking-wide mt-0.5">
+              Aguardando: <span className="font-semibold text-red-200">{afkPlayers.map(p => p.name).join(', ')}</span>
             </span>
           </div>
         </div>
 
-        <div className="md:ml-auto flex items-center gap-3 w-full md:w-auto">
+        <div className="md:ml-auto flex items-center justify-center gap-2 w-full md:w-auto mt-2 md:mt-0">
           {!isSpectator && !hasVoted && (
             <button
               onClick={voteKickAfk}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors font-inter"
+              className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-[0.1em] font-sans transition-colors shadow-lg"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
               Expulsar AFKs
             </button>
           )}
           {(!isSpectator && hasVoted) && (
-            <span className="text-red-300/70 text-sm italic whitespace-nowrap font-inter">
+            <span className="flex-1 md:flex-none text-center bg-red-900/40 border border-red-500/20 px-4 py-2 rounded-xl text-red-300/80 text-[10px] md:text-xs italic uppercase tracking-[0.1em] whitespace-nowrap font-sans">
               Você votou
             </span>
           )}
-          <div className="bg-black/40 px-3 py-1.5 rounded-lg text-sm font-medium text-red-200 whitespace-nowrap font-inter">
-            Votos: {currentVotes} / {majority}
+          <div className="bg-black/60 px-3 py-2 rounded-xl text-[10px] md:text-xs font-bold tracking-widest text-red-200 whitespace-nowrap font-sans border border-red-500/20 shadow-inner">
+            Votos: <span className="text-white ml-1">{currentVotes} / {majority}</span>
           </div>
         </div>
       </div>

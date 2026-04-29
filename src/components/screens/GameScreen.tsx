@@ -38,6 +38,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [showClueModal, setShowClueModal] = useState(false);
   const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('row');
+  const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -350,7 +351,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Narrador escolhendo */}
             {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
-              <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-4xl">
+              <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-4xl lg:mb-auto lg:mt-8">
                 {isNarrator ? (
                   <>
                     {/* Announcement Card */}
@@ -379,7 +380,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                       Waiting...
                     </h2>
                     <p className="text-white/60 font-sans text-base md:text-lg tracking-wider mt-6">
-                      <span style={{ color: narrator?.color }} className="font-bold text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5">{narrator?.name}</span> is choosing a card
+                      <span style={{ color: narrator?.color }} className="font-cinzel font-bold uppercase tracking-wider text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5 shadow-inner">{narrator?.name}</span> <span className="uppercase tracking-[0.1em] font-sans text-xs md:text-sm font-medium ml-2">is choosing a card</span>
                     </p>
                   </div>
                 )}
@@ -444,20 +445,66 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   </h2>
                 </div>
 
+                {/* Table Cards Header with View Toggles (Mobile Only) */}
+                <div className="w-full md:hidden flex justify-between items-center px-4 mt-2 mb-[-1rem]">
+                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">Cartas na Mesa</span>
+                  <div className="flex bg-black/40 rounded-xl border border-white/10 p-1 backdrop-blur-sm">
+                    <button
+                      onClick={() => setTableMobileView('row')}
+                      className={`p-2 rounded-lg transition-all ${tableMobileView === 'row' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver em carrossel"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="18" rx="1" ry="1"/><rect x="18" y="5" width="3" height="14" rx="1" ry="1"/><rect x="3" y="5" width="3" height="14" rx="1" ry="1"/></svg>
+                    </button>
+                    <button
+                      onClick={() => setTableMobileView('grid-2')}
+                      className={`p-2 rounded-lg transition-all ${tableMobileView === 'grid-2' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver 2 por linha"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" ry="1"/><rect x="14" y="3" width="7" height="7" rx="1" ry="1"/><rect x="14" y="14" width="7" height="7" rx="1" ry="1"/><rect x="3" y="14" width="7" height="7" rx="1" ry="1"/></svg>
+                    </button>
+                    <button
+                      onClick={() => setTableMobileView('grid-1')}
+                      className={`p-2 rounded-lg transition-all ${tableMobileView === 'grid-1' ? 'bg-amber-500/20 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'text-white/40 hover:text-white/80'}`}
+                      aria-label="Ver 1 por linha"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="5" rx="1" ry="1"/><rect x="4" y="13" width="16" height="5" rx="1" ry="1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Table Cards */}
-                <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-[1000px] mx-auto">
+                <div className={`
+                  w-full px-4 md:px-0
+                  ${tableMobileView === 'row' ? 'flex overflow-x-auto snap-x snap-mandatory pb-4 gap-4 hide-scrollbar -mx-4 px-4' : ''}
+                  ${tableMobileView === 'grid-2' ? 'grid grid-cols-2 gap-3 pb-4' : ''}
+                  ${tableMobileView === 'grid-1' ? 'flex flex-col gap-4 pb-4' : ''}
+                  md:flex md:flex-wrap md:justify-center md:gap-6 md:max-w-[1000px] md:mx-auto md:overflow-visible
+                `}>
                   {gameState.tableCards.map((tableCard) => {
                     const isMine = tableCard.isMine === true;
 
                     return (
-                      <div key={tableCard.orderId} className="flex flex-col items-center">
+                      <div 
+                        key={tableCard.orderId} 
+                        className={`
+                          flex flex-col items-center shrink-0
+                          ${tableMobileView === 'row' ? 'w-[60vw] max-w-[260px] snap-center snap-always' : ''}
+                          ${tableMobileView === 'grid-2' ? 'w-full' : ''}
+                          ${tableMobileView === 'grid-1' ? 'w-full max-w-[360px] mx-auto' : ''}
+                          md:w-auto md:max-w-none
+                        `}
+                      >
                         <GameCard
                           card={tableCard.card}
-                          size="table"
+                          size="full"
                           disabled={isNarrator || hasVoted || isMine}
                           onClick={() => handleVoteSelect(tableCard)}
-                          className={`${isMine ? 'opacity-50' : ''} ${!isMine && !hasVoted && !isNarrator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''
-                            }`}
+                          className={`
+                            ${isMine ? 'opacity-50' : ''} 
+                            ${!isMine && !hasVoted && !isNarrator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''}
+                            md:!w-48 md:!h-72 lg:!w-56 lg:!h-84 md:!aspect-auto
+                          `}
                           isHighlighted={hasVoted && gameState.votes[playerId] === tableCard.orderId}
                           highlightColor="#f59e0b"
                         />

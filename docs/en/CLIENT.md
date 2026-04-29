@@ -121,11 +121,11 @@ Located in `src/components/game/`:
 
 | Component | Description |
 |-----------|-------------|
-| `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK |
+| `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK. Features a refined design with border-glow and glassmorphism effects. |
 | `LobbyScreen.tsx` | Game settings, player list, and deck selection. Features a standardized "Mythic" design system with polished typography and full Portuguese localization for the interface. |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |
-| `ResultsView.tsx` | Round results with scores; only displays received votes for each card; requires all active players to click "Next Round" |
+| `ResultsView.tsx` | Round results with scores; only displays received votes for each card; requires all active players to click "Next Round". Now features a pulsing status indicator for waiting states. |
 | `KickConfirmModal.tsx` | Confirmation modal for host to kick players |
 | `GameOverView.tsx` | Final scores and winner |
 

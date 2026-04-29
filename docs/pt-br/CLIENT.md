@@ -122,10 +122,10 @@ Localizados em `src/components/game/`:
 
 | Componente | Descrição |
 |------------|-----------|
-| `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK |
+| `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK. Apresenta um design refinado com brilho de borda e glassmorfismo. |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
-| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada" |
+| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". Agora apresenta um indicador de status pulsante para estados de espera. |
 | `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
 
