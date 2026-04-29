@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { GameState, Player, VictoryCondition, DeckOption } from '../../types';
+import { GameState, Player, VictoryCondition, DeckOption, PhaseTimeouts } from '../../types';
 import { GAME_CONFIG } from '../../constants';
 
 interface LobbyScreenProps {
   gameState: GameState;
   currentPlayer: Player | undefined;
-  onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
+  onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
   onLeaveRoom: () => void;
   onAddBot?: () => void;
   onRemoveBot?: (botId: string) => void;
@@ -74,17 +74,28 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS;
 
+  const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>({
+    narrator: 60,
+    othersChoosing: 45,
+    voting: 30,
+    results: 15,
+  });
+
+  const updateTimeout = (key: keyof PhaseTimeouts, value: number) => {
+    setPhaseTimeouts(prev => ({ ...prev, [key]: Math.max(0, Math.min(120, value)) }));
+  };
+
   const handleStartGame = () => {
-    onStartGame(vc, deckOption);
+    onStartGame(vc, deckOption, phaseTimeouts);
   };
 
   const renderGameOptions = () => (
-    <>
-              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-5 font-sans font-bold">
-                OPÇÕES DO JOGO
-              </p>
+    <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+      <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-5 font-sans font-bold shrink-0">
+        OPÇÕES DO JOGO
+      </p>
 
-              <div className="space-y-4 flex-1">
+      <div className="space-y-4">
                 {/* Score condition */}
                 <div className={`rounded-2xl border transition-all duration-300 ${
                   vc.scoreEnabled
@@ -273,12 +284,70 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   ))}
                 </div>
                 {!isHost && (
-                  <p className="text-center mt-3 text-[11px] md:text-xs font-sans tracking-wide text-white/30">
+                  <p className="text-center mt-3 text-[10px] md:text-xs font-cinzel font-bold uppercase tracking-widest text-white/30">
                     O anfitrião está escolhendo o baralho...
                   </p>
                 )}
               </div>
-    </>
+
+              {/* Phase Timeouts */}
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
+                  TEMPO DAS FASES (SEGUNDOS)
+                </p>
+                <div className="space-y-4">
+                  {[
+                    { key: 'narrator' as keyof PhaseTimeouts, label: 'NARRADOR' },
+                    { key: 'othersChoosing' as keyof PhaseTimeouts, label: 'ESCOLHA DE CARTAS' },
+                    { key: 'voting' as keyof PhaseTimeouts, label: 'VOTAÇÃO' },
+                    { key: 'results' as keyof PhaseTimeouts, label: 'RANKING / RESULTADOS' },
+                  ].map(({ key, label }) => (
+                    <div key={key} className="bg-[#1A1A1A]/30 border border-white/5 rounded-2xl p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm md:text-base font-cinzel font-bold text-white/80">{label}</span>
+                        <div className="flex items-center gap-1.5 bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-3 py-1.5">
+                          {isHost ? (
+                            <input
+                              type="number"
+                              min={0}
+                              max={120}
+                              step={1}
+                              value={phaseTimeouts[key]}
+                              onChange={(e) => {
+                                const v = Number(e.target.value);
+                                if (!isNaN(v)) setPhaseTimeouts(prev => ({ ...prev, [key]: v }));
+                              }}
+                              onBlur={() => updateTimeout(key, phaseTimeouts[key])}
+                              className="w-14 bg-transparent text-amber-300 font-cinzel font-bold text-lg tabular-nums outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                          ) : (
+                            <span className="text-amber-300 font-cinzel font-bold text-lg tabular-nums">{phaseTimeouts[key]}</span>
+                          )}
+                          <span className="text-white/30 text-[10px] font-sans uppercase font-bold tracking-widest">SEG</span>
+                        </div>
+                      </div>
+                      {isHost ? (
+                        <input
+                          type="range"
+                          min={0}
+                          max={120}
+                          step={1}
+                          value={phaseTimeouts[key]}
+                          onChange={(e) => updateTimeout(key, Number(e.target.value))}
+                          className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
+                            [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                        />
+                      ) : (
+                        <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-full bg-amber-500/30 transition-all duration-300" style={{ width: `${(phaseTimeouts[key] / 120) * 100}%` }} />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+    </div>
   );
 
   const renderActions = () => (
@@ -336,7 +405,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-base tracking-wide">
+                  <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
                     <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                     Aguardando o host iniciar...
                   </div>
@@ -370,9 +439,9 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 flex-1 min-h-0">
             
             {/* Left Panel: Game Options (Desktop Only) */}
-            <div className="hidden lg:flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+            <div className="hidden lg:flex flex-col h-full min-h-0 bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
               {renderGameOptions()}
-              <div className="mt-8 pt-6 border-t border-white/10">
+              <div className="mt-8 pt-6 border-t border-white/10 shrink-0">
                 {renderActions()}
               </div>
             </div>
@@ -384,31 +453,35 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
                   CÓDIGO DA SALA
                 </p>
-                <div className="bg-[#1A1A1A]/60 rounded-2xl px-6 md:px-8 py-4 md:py-5 inline-flex items-center gap-4 border border-white/10 shadow-inner">
-                  <span className="text-3xl md:text-4xl font-cinzel font-bold text-amber-300 tracking-[0.15em]">
-                    {gameState.roomCode}
-                  </span>
-                  <button
-                    onClick={handleCopyLink}
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
-                      copied
-                        ? 'text-green-400 bg-green-500/10 scale-110'
-                        : 'text-white/40 hover:text-amber-300 hover:bg-white/5'
-                    }`}
-                    title="Copy room link"
-                    aria-label="Copy room link"
-                  >
-                    {copied ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                      </svg>
-                    )}
-                  </button>
+                <div className="relative inline-flex items-center justify-center max-w-full">
+                  <div className="bg-[#1A1A1A]/60 rounded-2xl px-5 sm:px-8 md:px-12 py-3.5 md:py-5 inline-flex items-center justify-center border border-white/10 shadow-inner">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-cinzel font-bold text-amber-300 tracking-[0.15em] ml-1">
+                      {gameState.roomCode}
+                    </span>
+                  </div>
+                  <div className="absolute left-full ml-2 sm:ml-3 md:ml-4 flex items-center">
+                    <button
+                      onClick={handleCopyLink}
+                      className={`p-2.5 sm:p-3 md:p-3.5 rounded-xl transition-all duration-300 border shadow-sm ${
+                        copied
+                          ? 'text-green-400 border-green-500/30 bg-green-500/10 scale-105'
+                          : 'text-white/40 border-white/10 bg-[#1A1A1A]/60 hover:text-amber-300 hover:border-white/20 hover:bg-[#1A1A1A]/80 hover:scale-105'
+                      }`}
+                      title="Copy room link"
+                      aria-label="Copy room link"
+                    >
+                      {copied ? (
+                        <svg className="w-5 h-5 md:w-[22px] md:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 md:w-[22px] md:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
               </div>
