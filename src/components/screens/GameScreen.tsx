@@ -6,7 +6,8 @@ import {
   ResultsView,
   GameOverView,
   AfkAlertBar,
-  KickConfirmModal
+  KickConfirmModal,
+  LeaveConfirmModal
 } from '../game';
 
 interface GameScreenProps {
@@ -37,8 +38,28 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [showClueModal, setShowClueModal] = useState(false);
   const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('row');
   const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}?room=${gameState.roomCode}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -213,25 +234,66 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       )}
 
       {/* ===== HEADER ===== */}
-      <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-white/10 bg-[#1A1A1A]/40 backdrop-blur-md">
-        {/* Left: Phase & Timer */}
-        <div className="flex items-center gap-4">
-          <h1 className="text-white font-bold tracking-wide text-sm md:text-base">
+      <header className="grid grid-cols-3 items-center px-4 md:px-8 py-3.5 md:py-5 border-b border-white/10 bg-black/40 backdrop-blur-2xl z-20">
+        {/* Left: Phase Title (Desktop Only) */}
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-full border border-amber-500/30 bg-black/50 ring-1 ring-amber-500/10 shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200">
+              <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+              <line x1="2" y1="19" x2="22" y2="19" />
+            </svg>
+          </div>
+          <h1 className="hidden md:block text-white font-cinzel font-bold tracking-[0.15em] text-lg uppercase truncate">
             {phaseLabels[gameState.phase]}
           </h1>
         </div>
 
-        {/* Right: Room Code & Settings */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-white/40 text-xs">
-            <span className="font-mono">ROOM CODE: <span className="text-white">{gameState.roomCode}</span></span>
+        {/* Center: Room Code Pill (Always Centered) */}
+        <div className="justify-self-center">
+          <div className="flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 py-1.5 border border-white/10 shadow-inner">
+            <span className="text-sm md:text-base font-cinzel font-bold text-amber-300 tracking-widest mr-3">
+              {gameState.roomCode}
+            </span>
+            <button
+              onClick={handleCopyLink}
+              className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 border ${
+                copied
+                  ? 'text-green-400 border-green-500/30 bg-green-500/10'
+                  : 'text-white/40 border-white/10 bg-white/5 hover:text-amber-300'
+              }`}
+              title="Copiar link da sala"
+            >
+              {copied ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              )}
+            </button>
           </div>
+        </div>
+
+        {/* Right: Exit Icon */}
+        <div className="justify-self-end">
           <button
-            onClick={onLeaveRoom}
+            onClick={() => setShowLeaveConfirm(true)}
             aria-label="Sair da sala"
-            className="w-8 h-8 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all duration-300 group"
           >
-            Sair
+            <svg 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="md:w-[22px] md:h-[22px] transition-transform group-hover:-translate-x-0.5"
+            >
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 5 12 10 7" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
           </button>
         </div>
       </header>
@@ -614,6 +676,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             setKickTarget(null);
           }}
           onCancel={() => setKickTarget(null)}
+        />
+      )}
+      {/* Leave confirmation modal */}
+      {showLeaveConfirm && (
+        <LeaveConfirmModal
+          onConfirm={onLeaveRoom}
+          onCancel={() => setShowLeaveConfirm(false)}
         />
       )}
     </div>

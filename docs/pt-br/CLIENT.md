@@ -95,8 +95,7 @@ Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada pa
 | `onRequestPlay` | `() => void` | Solicita entrar como jogador (espectador) |
 
 ### `GameScreen.tsx`
-
-Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva sem barra de rolagem lateral (sem cortes na animação flexível e com cartas no tamanho "lg"). Efeito de "aura" luminosa em todo o entorno (hover glow).
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita do código da sala, funcionalidade de cópia integrada e ícone de logout estilizado com modal de confirmação.
 
 ## Armazenamento de Sessão e Reconexão (F5)
 O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
@@ -127,6 +126,7 @@ Localizados em `src/components/game/`:
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
 | `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". Agora apresenta um indicador de status pulsante para estados de espera. |
 | `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
+| `LeaveConfirmModal.tsx` | Modal de confirmação para que os jogadores saiam da sessão de jogo com segurança |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
 
 ---

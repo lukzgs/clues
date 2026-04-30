@@ -4,3 +4,4 @@ export { ResultsView } from './ResultsView';
 export { GameOverView } from './GameOverView';
 export { AfkAlertBar } from './AfkAlertBar';
 export { KickConfirmModal } from './KickConfirmModal';
+export { LeaveConfirmModal } from './LeaveConfirmModal';
