@@ -107,17 +107,17 @@ export function AfkAlertBar({ gameState, voteKickAfk, currentPlayerId }: AfkAler
   return (
     <div className="fixed bottom-0 md:top-0 md:bottom-auto left-0 w-full z-[100] flex justify-center p-3 md:p-4 pointer-events-none animate-in slide-in-from-bottom-4 md:slide-in-from-top-4">
       <div className="bg-red-950/90 backdrop-blur-md border border-red-500/50 rounded-2xl shadow-[0_0_40px_rgba(220,38,38,0.2)] p-3 md:p-4 flex flex-col md:flex-row items-center gap-3 max-w-2xl w-full pointer-events-auto">
-        <div className="flex flex-col md:flex-row items-center gap-2.5 text-red-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 shrink-0 opacity-80 mb-0.5 md:mb-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <span className="font-bold font-cinzel tracking-[0.1em] uppercase text-xs md:text-sm text-red-100">Tempo Esgotado</span>
-            <span className="text-[10px] md:text-xs text-red-300/80 font-sans tracking-wide mt-0.5">
+        <div className="flex items-center gap-3 text-red-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 shrink-0 opacity-90"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div className="flex flex-col items-start text-left">
+            <span className="font-bold font-cinzel tracking-[0.1em] uppercase text-[11px] md:text-sm text-red-100 leading-tight">Tempo Esgotado</span>
+            <span className="text-[9px] md:text-xs text-red-300/80 font-sans tracking-wide mt-0.5 leading-none">
               Aguardando: <span className="font-semibold text-red-200">{afkPlayers.map(p => p.name).join(', ')}</span>
             </span>
           </div>
         </div>
 
-        <div className="md:ml-auto flex items-center justify-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+        <div className="md:ml-auto flex items-center justify-center gap-2 w-full md:w-auto mt-1.5 md:mt-0">
           {!isSpectator && !hasVoted && (
             <button
               onClick={voteKickAfk}
