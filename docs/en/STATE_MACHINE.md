@@ -161,10 +161,14 @@ interface GameState {
 
 ## Narrator Rotation
 
-After each round, the narrator index advances:
+After each round, the narrator index advances to the next connected, active player:
 
 ```typescript
-narratorIndex = (narratorIndex + 1) % players.length;
+let nextIndex = (narratorIndex + 1) % players.length;
+while (!players[nextIndex].isConnected || players[nextIndex].isSpectator) {
+  nextIndex = (nextIndex + 1) % players.length;
+}
+narratorIndex = nextIndex;
 ```
 
 ---
