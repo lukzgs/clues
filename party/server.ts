@@ -522,6 +522,10 @@ export default class GameServer implements Party.Server {
     const narrator = this.state.players[this.state.narratorIndex];
     if (narrator.id === playerId) return; // Narrador não vota
 
+    // Spectators cannot vote
+    const voter = this.state.players.find(p => p.id === playerId);
+    if (voter?.isSpectator) return;
+
     // Verifica se já votou
     if (this.state.votes[playerId] !== undefined) return;
 
@@ -672,6 +676,9 @@ export default class GameServer implements Party.Server {
     // Cannot kick yourself
     if (hostId === targetId) return;
 
+    // Save narrator ID before removal for re-location after array shift
+    const currentNarratorId = this.state.players[this.state.narratorIndex]?.id;
+
     // Remove player from state
     this.state.players = this.state.players.filter(p => p.id !== targetId);
 
@@ -712,12 +719,14 @@ export default class GameServer implements Party.Server {
 
     // If during game, check if narrator was kicked or phase needs progression
     if (this.state.phase !== GamePhase.LOBBY) {
-      // If narrator was kicked, skip to next round
-      if (this.state.narratorIndex >= this.state.players.length) {
-        this.state.narratorIndex = this.state.narratorIndex % Math.max(1, this.state.players.length);
-      }
+      // Re-locate narrator by ID after array shift
+      const newNarratorIdx = this.state.players.findIndex(p => p.id === currentNarratorId);
+      this.state.narratorIndex = newNarratorIdx >= 0
+        ? newNarratorIdx
+        : Math.min(this.state.narratorIndex, Math.max(0, this.state.players.length - 1));
+
       const narrator = this.state.players[this.state.narratorIndex];
-      if (!narrator || narrator.id === targetId || narrator.isSpectator) {
+      if (!narrator || narrator.isSpectator) {
         // Skip to results and advance
         if (this.state.phase === GamePhase.NARRATOR_CHOOSING) {
           this.changePhase(GamePhase.RESULTS);
@@ -806,8 +815,7 @@ export default class GameServer implements Party.Server {
           this.state.votes[p.id] === undefined
         );
       case GamePhase.RESULTS:
-        const host = activePlayers.find(p => p.isHost);
-        return host ? [host] : [];
+        return activePlayers.filter(p => !this.state.playersWhoReadied.includes(p.id));
       default:
         return [];
     }
