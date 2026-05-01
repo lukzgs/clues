@@ -42,6 +42,8 @@ stateDiagram-v2
 | `START_GAME` | Apenas host |
 | `ADD_BOT` | Apenas host |
 | `REMOVE_BOT` | Apenas host |
+| `TOGGLE_SPECTATOR` | Host (qualquer), Jogador (próprio) |
+| `REQUEST_PLAY` | Espectador |
 
 **Transição**: `START_GAME` → `NARRATOR_CHOOSING`
 

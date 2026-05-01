@@ -42,7 +42,7 @@ class GameServer implements Party.Server {
 | `handleAddBot` | `ADD_BOT` | Adds AI player (host only) |
 | `handleRemoveBot` | `REMOVE_BOT` | Removes AI player (host only) |
 | `handleKickPlayer` | `KICK_PLAYER` | Removes player from room and closes connection (host only) |
-| `handleToggleSpectator` | `TOGGLE_SPECTATOR` | Toggles player between active and spectator roles (host only) |
+| `handleToggleSpectator` | `TOGGLE_SPECTATOR` | Toggles player between active and spectator roles (host can toggle anyone, players can toggle themselves) |
 | `handleRequestPlay` | `REQUEST_PLAY` | Spectator requests to become an active player |
 
 ### Game Phase
