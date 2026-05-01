@@ -40,6 +40,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showScoreModal, setShowScoreModal] = useState(false);
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('row');
   const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
 
@@ -181,6 +182,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             playerId={playerId}
             onNextRound={onNextRound}
             onLeaveRoom={onLeaveRoom}
+            onKickPlayer={onKickPlayer}
+            isHost={currentPlayer?.isHost ?? false}
           />
         </div>
       </div>
@@ -235,8 +238,25 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
       {/* ===== HEADER ===== */}
       <header className="grid grid-cols-3 items-center px-4 md:px-8 py-3.5 md:py-5 border-b border-white/10 bg-black/40 backdrop-blur-2xl z-20">
-        {/* Left: Phase Title (Desktop Only) */}
+        {/* Left: Phase Title (Desktop) + Score Button (Mobile) */}
         <div className="flex items-center gap-3">
+          {/* Mobile: Score button */}
+          <button
+            onClick={() => setShowScoreModal(true)}
+            className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-amber-300 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all duration-300"
+            title="Ver pontuação"
+            aria-label="Ver pontuação"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+          </button>
+          {/* Desktop: Phase label */}
           <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-full border border-amber-500/30 bg-black/50 ring-1 ring-amber-500/10 shadow-[0_0_10px_rgba(245,158,11,0.1)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200">
               <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -302,7 +322,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <div className="flex flex-1 overflow-hidden w-full relative">
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
-        <aside className="hidden lg:flex flex-col w-[320px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-8">
+        <aside className="hidden lg:flex flex-col w-[260px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
           <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-6 font-sans font-bold text-center">
             Pontuação Atual
           </h2>
@@ -391,7 +411,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-white/40 text-xs font-bold border border-white/10 grayscale-[50%]" style={{ backgroundColor: player.color }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </div>
-                    <span className="text-white/30 font-sans text-sm truncate flex-1">{player.name}</span>
+                    <span className="text-white/30 font-cinzel font-bold text-sm truncate flex-1">{player.name}</span>
                     {(currentPlayer?.isHost ?? false) && onKickPlayer && player.id !== playerId && (
                       <button
                         onClick={() => setKickTarget({ id: player.id, name: player.name })}
@@ -634,6 +654,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                       <GameCard
                         card={card}
                         size="full"
+                        loading="eager"
                         disabled={
                           (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator) ||
                           (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
@@ -685,6 +706,85 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           onCancel={() => setShowLeaveConfirm(false)}
         />
       )}
+
+      {/* Mobile Score Modal */}
+      {showScoreModal && (
+        <div className="lg:hidden fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowScoreModal(false)} />
+          <div className="relative bg-black/90 backdrop-blur-2xl border border-white/20 rounded-t-3xl w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-amber-300 font-cinzel font-bold text-base tracking-widest uppercase">Pontuação Atual</h3>
+              <button
+                onClick={() => setShowScoreModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="space-y-2">
+              {[...gameState.players]
+                .filter(p => !p.isSpectator)
+                .sort((a, b) => b.score - a.score)
+                .map((player, index) => {
+                  const status = getPlayerStatus(player);
+                  const isMe = player.id === playerId;
+                  return (
+                    <div
+                      key={player.id}
+                      className={`flex items-center gap-3 p-3 rounded-2xl border ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5'}`}
+                    >
+                      <span className={`w-6 text-center font-cinzel font-bold text-sm shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/30'}`}>{index + 1}°</span>
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/10 ${status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black' : ''}`}
+                        style={{ backgroundColor: player.color }}
+                      >
+                        {player.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-cinzel font-bold text-sm truncate">{player.name}{isMe && <span className="text-white/30 font-sans text-[10px] ml-1">(você)</span>}</div>
+                      </div>
+                      <div className={`font-sans font-black text-xl shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/80'}`}>{player.score}</div>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border ${
+                        status === 'voted' || status === 'played' || status === 'readied'
+                          ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                          : status === 'narrator'
+                            ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                            : 'bg-black/40 text-white/30 border-white/5'
+                      }`}>
+                        {status === 'narrator' ? (
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z"/><line x1="2" y1="19" x2="22" y2="19"/></svg>
+                        ) : (status === 'voted' || status === 'played' || status === 'readied') ? (
+                          <span className="text-[9px] font-bold">✓</span>
+                        ) : (
+                          <span className="opacity-30 text-[9px]">?</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+            {gameState.players.some(p => p.isSpectator) && (
+              <div className="mt-4 pt-4 border-t border-white/5">
+                <p className="text-white/25 text-[10px] uppercase tracking-widest font-sans font-bold mb-2 flex items-center gap-2">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Espectadores
+                </p>
+                <div className="space-y-1">
+                  {gameState.players.filter(p => p.isSpectator).map(p => (
+                    <div key={p.id} className="flex items-center gap-2 px-2 py-1.5 rounded-xl">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center border border-white/10 grayscale-[50%]" style={{ backgroundColor: p.color }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </div>
+                      <span className="text-white/30 font-cinzel font-bold text-xs">{p.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };

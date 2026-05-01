@@ -10,6 +10,7 @@ interface GameCardProps {
   disabled?: boolean;
   onClick?: () => void;
   className?: string;
+  loading?: 'lazy' | 'eager';
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -22,6 +23,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   disabled = false,
   onClick,
   className = '',
+  loading = 'lazy',
 }) => {
   // Tamanhos responsivos
   const sizeClasses = {
@@ -68,6 +70,7 @@ export const GameCard: React.FC<GameCardProps> = ({
           src="/cards/new/back_001.avif"
           alt="Card back"
           className="w-full h-full object-cover"
+          loading={loading}
         />
       ) : (
         // Carta visível (frente)
@@ -76,7 +79,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             src={card.imageUrl}
             alt={`Card ${card.id}`}
             className="w-full h-full object-cover"
-            loading="lazy"
+            loading={loading}
             onError={(e) => { (e.target as HTMLImageElement).src = '/cards/new/back_001.avif'; }}
           />
           {/* Overlay sutil no topo e base */}
