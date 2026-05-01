@@ -185,13 +185,24 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     )}
                   </div>
                 </div>
+
+                {/* Kick button — host only, not on self */}
+                {isHost && player.id !== playerId && onKickPlayer && (
+                  <button
+                    onClick={() => onKickPlayer(player.id)}
+                    className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-lg text-white/10 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0 mr-2"
+                    title="Remover jogador"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
                 
                 <div className={`font-sans font-black text-2xl tracking-tighter shrink-0 ${index === 0 ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/80'}`}>
                   {player.score}
                 </div>
 
                 {/* Ready Indicator */}
-                <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-xs ml-1 shrink-0 border transition-all duration-300 ${
+                <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-xs ml-3 shrink-0 border transition-all duration-300 ${
                   (gameState.playersWhoReadied ?? []).includes(player.id)
                     ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.15)]'
                     : 'bg-black/40 text-white/15 border-white/5'
@@ -202,17 +213,6 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     <span className="leading-none opacity-30 text-[10px]">•</span>
                   )}
                 </div>
-
-                {/* Kick button — host only, not on self */}
-                {isHost && player.id !== playerId && onKickPlayer && (
-                  <button
-                    onClick={() => onKickPlayer(player.id)}
-                    className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0 ml-1"
-                    title="Remover jogador"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                )}
               </div>
 
             ))}
