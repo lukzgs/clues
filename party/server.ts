@@ -267,6 +267,9 @@ export default class GameServer implements Party.Server {
         player.isConnected = true;
         this.connections.set(conn.id, player.id);
 
+        // Remove from readied list so they can re-confirm if disconnected during RESULTS
+        this.state.playersWhoReadied = this.state.playersWhoReadied.filter(id => id !== player.id);
+
         this.broadcast({
           type: ServerMessageType.PLAYER_JOINED,
           player: { ...player, hand: [] },
@@ -743,18 +746,24 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleToggleSpectator(hostId: string, targetId: string) {
+  private handleToggleSpectator(requesterId: string, targetId: string) {
     // Only in lobby
     if (this.state.phase !== GamePhase.LOBBY) return;
 
-    const host = this.state.players.find(p => p.id === hostId);
-    if (!host?.isHost) return;
+    const requester = this.state.players.find(p => p.id === requesterId);
+    if (!requester) return;
 
     const target = this.state.players.find(p => p.id === targetId);
     if (!target) return;
 
-    // Cannot toggle yourself
-    if (hostId === targetId) return;
+    // Permission check:
+    // - Host can toggle anyone except themselves
+    // - Any player can toggle themselves
+    const isSelf = requesterId === targetId;
+    const isHost = requester.isHost;
+
+    if (!isSelf && !isHost) return; // Not allowed
+    if (isSelf && isHost) return;   // Host cannot toggle themselves
 
     if (target.isSpectator) {
       // Spectator → Player: check max active players
@@ -763,12 +772,16 @@ export default class GameServer implements Party.Server {
       if (activePlayers.length >= maxPlayers) return;
       target.isSpectator = false;
     } else {
-      // Player → Spectator: check min players would still be met
+      // Player → Spectator
+      // Cannot make themselves spectator if it would drop below min players
+      const activePlayers = this.state.players.filter(p => !p.isSpectator);
+      if (activePlayers.length <= GAME_CONFIG.MIN_PLAYERS) return;
       target.isSpectator = true;
     }
 
     this.broadcastState();
   }
+
 
   private handleRequestPlay(playerId: string) {
     // Only in lobby

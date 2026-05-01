@@ -569,6 +569,21 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         </div>
                       )}
 
+                      {/* Self-toggle spectator for non-host players on their own card */}
+                      {!isHost && player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
+                        <button
+                          onClick={() => onToggleSpectator(player.id)}
+                          className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-300 shrink-0 ${
+                            player.isSpectator
+                              ? 'text-blue-400 bg-blue-500/10 hover:text-blue-300 hover:bg-blue-500/20'
+                              : 'text-white/20 hover:text-blue-400 hover:bg-blue-500/10'
+                          }`}
+                          title={player.isSpectator ? 'Entrar como jogador' : 'Ser espectador'}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                      )}
+
                       {/* Bot remove (legacy) */}
                       {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && !onKickPlayer && (
                         <button
@@ -583,6 +598,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         </button>
                       )}
                     </div>
+
                   ))}
 
 

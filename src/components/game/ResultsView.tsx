@@ -7,6 +7,8 @@ interface ResultsViewProps {
   playerId: string;
   onNextRound: () => void;
   onLeaveRoom: () => void;
+  onKickPlayer?: (targetId: string) => void;
+  isHost?: boolean;
 }
 
 export const ResultsView: React.FC<ResultsViewProps> = ({
@@ -14,12 +16,13 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   playerId,
   onNextRound,
   onLeaveRoom,
+  onKickPlayer,
+  isHost = false,
 }) => {
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
   
   const narrator = gameState.players[gameState.narratorIndex];
   const currentPlayer = gameState.players.find(p => p.id === playerId);
-  const isHost = currentPlayer?.isHost ?? false;
 
   return (
     <div className="flex flex-col items-center gap-10 md:gap-12 py-6 md:py-8 animate-fade-in w-full max-w-6xl mx-auto">
@@ -199,7 +202,19 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     <span className="leading-none opacity-30 text-[10px]">•</span>
                   )}
                 </div>
+
+                {/* Kick button — host only, not on self */}
+                {isHost && player.id !== playerId && onKickPlayer && (
+                  <button
+                    onClick={() => onKickPlayer(player.id)}
+                    className="w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0 ml-1"
+                    title="Remover jogador"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
               </div>
+
             ))}
         </div>
       </div>
