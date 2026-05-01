@@ -100,8 +100,17 @@ export function calculateScores(
     pointsEarned[p.id] = 0;
   }
 
+  // Filter out spectator votes (defensive — server should already block these)
+  const activeVotes: Record<string, number> = {};
+  for (const [voterId, orderId] of Object.entries(votes)) {
+    const voter = players.find(p => p.id === voterId);
+    if (voter && !voter.isSpectator) {
+      activeVotes[voterId] = orderId;
+    }
+  }
+
   // Count votes for narrator's card
-  const votesForNarrator = Object.values(votes)
+  const votesForNarrator = Object.values(activeVotes)
     .filter(orderId => orderId === narratorCard.orderId).length;
 
   const activePlayers = players.filter(p => !p.isSpectator);
@@ -119,7 +128,7 @@ export function calculateScores(
     pointsEarned[narrator.id] += 3;
 
     // Voters who guessed correctly get 3 points
-    for (const [voterId, orderId] of Object.entries(votes)) {
+    for (const [voterId, orderId] of Object.entries(activeVotes)) {
       if (orderId === narratorCard.orderId) {
         pointsEarned[voterId] += 3;
       }
@@ -128,8 +137,9 @@ export function calculateScores(
 
   // Bonus: +1 point per vote received (non-narrator cards only)
   for (const tc of tableCards) {
-    if (tc.playerId !== narrator.id) {
-      const votesReceived = Object.values(votes)
+    const cardOwner = players.find(p => p.id === tc.playerId);
+    if (tc.playerId !== narrator.id && !cardOwner?.isSpectator) {
+      const votesReceived = Object.values(activeVotes)
         .filter(orderId => orderId === tc.orderId).length;
       pointsEarned[tc.playerId] += votesReceived;
     }
@@ -160,11 +170,12 @@ export function checkVictoryCondition(
 
   // Check narrator-rounds-based victory
   if (victoryCondition.narratorRoundsEnabled) {
-    const totalRounds = players.length * victoryCondition.narratorRounds;
+    const activePlayers = players.filter(p => !p.isSpectator);
+    const totalRounds = activePlayers.length * victoryCondition.narratorRounds;
     const completedRounds = currentRound + 1;
 
     if (completedRounds >= totalRounds) {
-      const sorted = [...players].sort((a, b) => b.score - a.score);
+      const sorted = [...activePlayers].sort((a, b) => b.score - a.score);
       return sorted[0].id;
     }
   }
@@ -232,5 +243,6 @@ export function getPublicState(
     afkKickVotes: state.afkKickVotes,
     deckOption: state.deckOption,
     playersWhoReadied: state.playersWhoReadied,
+    phaseTimeouts: state.phaseTimeouts,
   };
 }

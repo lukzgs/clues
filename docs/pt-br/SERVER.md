@@ -123,6 +123,7 @@ interface ServerGameState {
   deckOption: DeckOption; // Opção de baralho selecionada
   currentRound: number; // Contador de rodadas (base 0)
   playersWhoReadied: string[]; // IDs dos jogadores que clicaram em "Próxima Rodada"
+  phaseTimeouts: PhaseTimeouts; // Configuração de timeout para cada fase
 }
 ```
 

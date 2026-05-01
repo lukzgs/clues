@@ -123,6 +123,7 @@ interface ServerGameState {
   deckOption: DeckOption; // Selected deck option
   currentRound: number; // 0-based round counter
   playersWhoReadied: string[]; // IDs of players who clicked "Next Round"
+  phaseTimeouts: PhaseTimeouts; // Timeout configuration for each phase
 }
 ```
 
