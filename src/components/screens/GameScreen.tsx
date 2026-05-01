@@ -322,7 +322,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <div className="flex flex-1 overflow-hidden w-full relative">
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
-        <aside className="hidden lg:flex flex-col w-[260px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
+        <aside className="hidden lg:flex flex-col w-[280px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-4 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
           <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-6 font-sans font-bold text-center">
             Pontuação Atual
           </h2>
@@ -338,11 +338,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               return (
                 <div
                   key={player.id}
-                  className={`flex items-center gap-4 p-4 rounded-3xl transition-colors border shadow-lg ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/10'
+                  className={`flex items-center gap-3 p-3 rounded-2xl transition-colors border shadow-lg ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/10'
                     }`}
                 >
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 shadow-lg border border-white/10 ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg border border-white/10 ${
                       status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1A1A1A]' : ''
                     }`}
                     style={{ backgroundColor: player.color }}
@@ -350,17 +350,17 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     {player.name.charAt(0).toUpperCase()}
                   </div>
 
-                  <div className="flex-1 min-w-0 pr-2">
-                    <div className="text-white font-cinzel font-bold text-lg md:text-xl truncate">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white font-cinzel font-bold text-base truncate">
                       {player.name}
                     </div>
-                    <div className="text-white/60 font-sans text-sm mt-0.5 flex items-baseline gap-1">
-                      {player.score} <span className="text-[10px] uppercase tracking-widest text-white/30">Pts</span>
+                    <div className="text-white/60 font-sans text-xs mt-0.5 flex items-baseline gap-1">
+                      {player.score} <span className="text-[9px] uppercase tracking-widest text-white/30">Pts</span>
                     </div>
                   </div>
 
                   {/* Status indicator */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md border shrink-0 transition-all duration-300 ${
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border shrink-0 transition-all duration-300 ${
                     status === 'voted' || status === 'played'
                       ? 'bg-green-500/20 text-green-400 border-green-500/30'
                       : status === 'readied' || status === 'narrator'
@@ -373,7 +373,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                       <span className="leading-none mt-[-2px]">✓</span>
                     ) : status === 'narrator' ? (
                       <div className="flex items-center justify-center w-full h-full pb-0.5">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-300">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-300">
                           <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
                           <line x1="2" y1="19" x2="22" y2="19" />
                         </svg>
@@ -429,7 +429,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* ===== CENTER CONTENT ===== */}
         <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-6">
-          <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+          <div className={`flex-1 flex flex-col items-center p-4 md:p-8 ${gameState.phase === GamePhase.LOBBY ? 'justify-center' : 'justify-start pt-6 md:pt-10'}`}>
 
             {/* Fase: Narrador escolhendo */}
             {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
@@ -471,11 +471,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Outros escolhendo */}
             {gameState.phase === GamePhase.OTHERS_CHOOSING && (
-              <div className="flex flex-col items-center gap-8 md:gap-12 animate-fade-in w-full max-w-4xl">
+              <div className="flex flex-col items-center gap-6 md:gap-8 animate-fade-in w-full max-w-4xl">
                 {/* Clue Card */}
-                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-10 py-8 md:py-10 rounded-2xl md:rounded-[2rem] text-center w-full max-w-lg flex flex-col items-center justify-center">
-                  <p className="text-amber-200/50 text-[9px] md:text-xs uppercase tracking-[0.4em] mb-3 md:mb-4 font-sans font-bold opacity-60">The clue is</p>
-                  <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider leading-tight">
+                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-8 py-5 md:py-7 rounded-2xl md:rounded-[2rem] text-center w-full max-w-lg flex flex-col items-center justify-center">
+                  <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 md:mb-3 font-sans font-bold opacity-60">The clue is</p>
+                  <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider leading-tight">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
@@ -519,10 +519,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Votação */}
             {gameState.phase === GamePhase.VOTING && (
-              <div className="flex flex-col items-center gap-10 animate-fade-in w-full max-w-7xl">
+              <div className="flex flex-col items-center gap-6 animate-fade-in w-full max-w-7xl">
                 {/* Clue Card */}
-                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-12 py-8 rounded-3xl md:rounded-full text-center max-w-4xl mx-auto flex items-center justify-center">
-                  <h2 className="text-3xl md:text-5xl font-cinzel font-bold tracking-wider px-8 leading-tight">
+                <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-10 py-5 rounded-3xl md:rounded-full text-center max-w-4xl mx-auto flex items-center justify-center">
+                  <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider px-6 leading-tight">
                     "{gameState.currentClue}"
                   </h2>
                 </div>
