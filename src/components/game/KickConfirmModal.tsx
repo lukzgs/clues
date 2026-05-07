@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface KickConfirmModalProps {
   playerName: string;
@@ -11,6 +12,7 @@ export const KickConfirmModal: React.FC<KickConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-4"
@@ -37,14 +39,12 @@ export const KickConfirmModal: React.FC<KickConfirmModalProps> = ({
 
         {/* Title */}
         <h3 className="text-white font-cinzel font-bold text-lg md:text-xl text-center mb-2 tracking-wide">
-          Remove Player
+          {t.modals.kick.title}
         </h3>
 
         {/* Message */}
         <p className="text-white/50 text-sm md:text-base text-center font-sans mb-6 leading-relaxed">
-          Are you sure you want to remove{' '}
-          <span className="text-amber-300 font-bold">{playerName}</span>{' '}
-          from the game?
+          {t.modals.kick.message(playerName)}
         </p>
 
         {/* Buttons */}
@@ -53,13 +53,13 @@ export const KickConfirmModal: React.FC<KickConfirmModalProps> = ({
             onClick={onCancel}
             className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10"
           >
-            Cancel
+            {t.modals.kick.cancel}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-red-300"
           >
-            Remove
+            {t.modals.kick.remove}
           </button>
         </div>
       </div>

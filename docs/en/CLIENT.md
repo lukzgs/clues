@@ -2,7 +2,7 @@
 
 ## Overview
 
-The frontend is a React 19 application using TypeScript. It connects to the PartyKit server via WebSocket and manages the game UI.
+The frontend is a React 19 application using TypeScript. It connects to the PartyKit server via WebSocket and manages the game UI. It includes a custom, lightweight Internationalization (i18n) system supporting English and Portuguese.
 
 ## Entry Point
 
@@ -62,6 +62,17 @@ interface UseGameRoomOptions {
   requestPlay: () => void;
 }
 ```
+
+---
+
+## Internationalization (i18n)
+
+The application features a custom lightweight i18n system located in `src/i18n/`.
+
+- **Translations:** Stored in `src/i18n/translations.ts` containing `en` and `pt` dictionaries.
+- **Provider:** `LanguageProvider` in `src/i18n/index.tsx` wraps the app. It auto-detects the browser language (`navigator.language`) and persists the user's preference in `localStorage` under `story-weaver:lang`.
+- **Hook:** Components use the `useTranslation()` hook to access the current language (`lang`), a `setLang` function, and the translation dictionary (`t`).
+- **Toggle:** A global `<LanguageToggle />` component is rendered at the root level, allowing users to seamlessly switch between languages at any point.
 
 ---
 

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
+import { useTranslation } from './i18n/index.tsx';
 
 // Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
@@ -33,6 +34,7 @@ const getInitialState = (): AppState => {
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(getInitialState());
+  const { t } = useTranslation();
 
   // Hook do jogo - só conecta quando temos roomCode e playerName
   const {
@@ -140,7 +142,7 @@ const App: React.FC = () => {
 
             {/* Text */}
             <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">
-              Connecting
+              {t.connecting.label}
             </p>
             <div className="bg-[#1A1A1A]/50 rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border border-white/10 mb-2">
               <span className="text-lg md:text-xl font-cinzel font-bold text-amber-300 tracking-wider">
@@ -148,7 +150,7 @@ const App: React.FC = () => {
               </span>
             </div>
             <p className="text-white/15 text-[10px] font-sans tracking-wide">
-              Joining room...
+              {t.connecting.joiningRoom}
             </p>
 
             {/* Error Display */}
@@ -160,7 +162,7 @@ const App: React.FC = () => {
                 onClick={() => setAppState({ screen: 'join' })}
                 className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
               >
-                ← Back
+                {t.connecting.back}
               </button>
             </div>
           </div>
@@ -169,7 +171,7 @@ const App: React.FC = () => {
         {/* Footer */}
         <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none">
           <p className="text-white/20 text-[10px] font-sans tracking-wide">
-            &copy; 2026 Story Weaver. Crafted for imagination.
+            {t.common.copyright}
           </p>
         </div>
       </div>

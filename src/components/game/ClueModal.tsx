@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card } from '../../types';
 import { GameCard } from './GameCard';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface ClueModalProps {
   card: Card;
@@ -22,6 +23,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
   onPrevCard,
 }) => {
   const [clue, setClue] = useState('');
+  const { t } = useTranslation();
 
   const handleSubmit = () => {
     if (mode === 'narrator') {
@@ -83,15 +85,15 @@ export const ClueModal: React.FC<ClueModalProps> = ({
               <div className="flex-1 flex justify-center">
                 {mode === 'narrator' ? (
                   <label className="text-amber-400/80 text-[10px] uppercase tracking-[0.3em] font-sans font-bold">
-                    Create Clue
+                    {t.modals.clue.createClue}
                   </label>
                 ) : clueText ? (
                   <p className="text-amber-400/40 text-[9px] uppercase tracking-[0.4em] font-sans font-bold">
-                    The clue is
+                    {t.modals.clue.theClueIs}
                   </p>
                 ) : (
                   <p className="text-amber-400/40 text-[9px] uppercase tracking-[0.4em] font-sans font-bold">
-                    Card Selection
+                    {t.modals.clue.cardSelection}
                   </p>
                 )}
               </div>
@@ -115,14 +117,14 @@ export const ClueModal: React.FC<ClueModalProps> = ({
                     type="text"
                     value={clue}
                     onChange={(e) => setClue(e.target.value)}
-                    placeholder="Write a mysterious clue..."
+                    placeholder={t.modals.clue.cluePlaceholder}
                     className="w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3 sm:py-3.5 text-white text-center text-base sm:text-lg italic placeholder-white/20 placeholder:not-italic focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all font-cinzel"
                     autoFocus
                     maxLength={100}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                   />
                   <p className="text-white/25 text-[8px] sm:text-[9px] text-center uppercase tracking-[0.2em] font-sans font-medium">
-                    Tip: Don't be too obvious or too abstract!
+                    {t.modals.clue.tip}
                   </p>
                 </div>
 
@@ -135,7 +137,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
                       : 'bg-white/5 text-white/10 border border-white/5 cursor-not-allowed'
                   }`}
                 >
-                  Submit Card & Clue
+                  {t.modals.clue.submitCardAndClue}
                   {clue.trim() && (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
                       <line x1="5" y1="12" x2="19" y2="12" />
@@ -156,7 +158,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
                   onClick={handleSubmit}
                   className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3 sm:py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300 text-sm"
                 >
-                  {mode === 'voter' ? 'Confirm Vote' : 'Confirm Card'}
+                  {mode === 'voter' ? t.modals.clue.confirmVote : t.modals.clue.confirmCard}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />

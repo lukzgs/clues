@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface LeaveConfirmModalProps {
   onConfirm: () => void;
@@ -9,6 +10,7 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-4"
@@ -35,12 +37,12 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
 
         {/* Title */}
         <h3 className="text-white font-cinzel font-bold text-lg md:text-xl text-center mb-2 tracking-wide uppercase">
-          Sair da Partida
+          {t.modals.leave.title}
         </h3>
 
         {/* Message */}
         <p className="text-white/50 text-sm md:text-base text-center font-sans mb-6 leading-relaxed">
-          Tem certeza que deseja sair? Todo o seu progresso nesta partida será perdido.
+          {t.modals.leave.message}
         </p>
 
         {/* Buttons */}
@@ -49,13 +51,13 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
             onClick={onCancel}
             className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 order-2 sm:order-1"
           >
-            Cancelar
+            {t.modals.leave.cancel}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-red-300 order-1 sm:order-2 shadow-[0_0_15px_rgba(239,68,68,0.1)]"
           >
-            Sair
+            {t.modals.leave.leave}
           </button>
         </div>
       </div>

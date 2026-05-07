@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface JoinScreenProps {
   onCreateRoom: (playerName: string) => void;
@@ -12,6 +13,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
   onJoinRoom,
   prefillRoomCode,
 }) => {
+  const { t } = useTranslation();
   const isInviteMode = !!prefillRoomCode;
 
   const [playerName, setPlayerName] = useState('');
@@ -20,7 +22,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
   const handleCreateRoom = () => {
     if (!playerName.trim()) {
-      setError('Choose your name first');
+      setError(t.join.errorNameRequired);
       return;
     }
     onCreateRoom(playerName.trim());
@@ -28,12 +30,12 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
   const handleJoinRoom = () => {
     if (!playerName.trim()) {
-      setError('Choose your name first');
+      setError(t.join.errorNameRequired);
       return;
     }
     const code = isInviteMode ? prefillRoomCode : roomCode;
     if (!code.trim() || code.length !== 6) {
-      setError('Room code must be 6 characters');
+      setError(t.join.errorRoomCode);
       return;
     }
     onJoinRoom(code.toUpperCase(), playerName.trim());
@@ -49,7 +51,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
       <div
         className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
       />
-
+      
       <div className="w-full max-w-[420px] z-10">
         <div
           className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center"
@@ -69,7 +71,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               {/* Room code display */}
               <div className="text-center mb-6 md:mb-8 w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 font-sans font-medium">
-                  Joining Room
+                  {t.join.joiningRoom}
                 </p>
                 <div className="bg-[#1A1A1A]/50 rounded-xl px-5 md:px-6 py-3 md:py-4 inline-block border border-white/10">
                   <span className="text-2xl md:text-3xl font-cinzel font-bold text-amber-300 tracking-wider">
@@ -81,14 +83,14 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               {/* Name input */}
               <div className="w-full mb-6 md:mb-7 relative" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
                 <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
-                  Identity
+                  {t.join.identity}
                 </label>
                 <input
                   type="text"
                   value={playerName}
                   onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleJoinRoom(); }}
-                  placeholder="Enter your name"
+                  placeholder={t.join.namePlaceholder}
                   className="w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all font-cinzel text-lg"
                   maxLength={20}
                   autoFocus
@@ -106,7 +108,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   onClick={handleJoinRoom}
                   className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300"
                 >
-                  JOIN ROOM
+                  {t.join.joinRoom}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
@@ -120,24 +122,24 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               {/* Title */}
               <div className="text-center mb-8 md:mb-10 w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
                 <h1 className="text-4xl md:text-5xl tracking-tight text-white mb-3 font-cinzel">
-                  Story Weaver
+                  {t.join.title}
                 </h1>
                 <p className="text-[10px] font-sans text-white/40 uppercase tracking-[0.2em]">
-                  The art of storytelling
+                  {t.join.subtitle}
                 </p>
               </div>
 
               {/* Username field */}
               <div className="w-full mb-6 md:mb-7 relative" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
                 <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
-                  Identity
+                  {t.join.identity}
                 </label>
                 <input
                   type="text"
                   value={playerName}
                   onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleCreateRoom(); }}
-                  placeholder="Enter your name"
+                  placeholder={t.join.namePlaceholder}
                   className="w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all font-cinzel text-lg"
                   maxLength={20}
                   autoFocus
@@ -156,7 +158,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300"
                 >
                   <span className="text-lg leading-none mr-2 font-sans font-light">+</span>
-                  NEW ROOM
+                  {t.join.newRoom}
                 </button>
               </div>
 
@@ -164,7 +166,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               <div className="w-full flex items-center gap-4 mb-6 md:mb-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
                 <div className="flex-1 h-px bg-white/5" />
                 <span className="text-[10px] text-white/30 uppercase tracking-[0.2em] whitespace-nowrap font-sans font-medium">
-                  Or join existing
+                  {t.join.orJoinExisting}
                 </span>
                 <div className="flex-1 h-px bg-white/5" />
               </div>
@@ -176,7 +178,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   value={roomCode}
                   onChange={(e) => { setRoomCode(e.target.value.toUpperCase()); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleJoinRoom(); }}
-                  placeholder="ROOM ID"
+                  placeholder={t.join.roomIdPlaceholder}
                   className="flex-1 bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white text-lg font-cinzel uppercase placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all min-w-0"
                   maxLength={6}
                 />
@@ -184,7 +186,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   onClick={handleJoinRoom}
                   className="shrink-0 bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest rounded-xl px-6 py-3.5 flex items-center justify-center gap-2 hover:bg-white/10 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300"
                 >
-                  JOIN
+                  {t.join.joinButton}
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
@@ -198,7 +200,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
       <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' }}>
         <p className="text-white/20 text-[10px] font-sans tracking-wide">
-          &copy; 2026 Story Weaver. Crafted for imagination.
+          {t.common.copyright}
         </p>
       </div>
     </div>
