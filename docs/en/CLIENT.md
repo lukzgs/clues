@@ -72,7 +72,7 @@ The application features a custom lightweight i18n system located in `src/i18n/`
 - **Translations:** Stored in `src/i18n/translations.ts` containing `en` and `pt` dictionaries.
 - **Provider:** `LanguageProvider` in `src/i18n/index.tsx` wraps the app. It auto-detects the browser language (`navigator.language`) and persists the user's preference in `localStorage` under `story-weaver:lang`.
 - **Hook:** Components use the `useTranslation()` hook to access the current language (`lang`), a `setLang` function, and the translation dictionary (`t`).
-- **Toggle:** A global `<LanguageToggle />` component is rendered at the root level, allowing users to seamlessly switch between languages at any point.
+- **Toggle:** The `<LanguageToggle />` component allows users to switch between languages. It is integrated into the headers or top corners of all major screens.
 
 ---
 
@@ -101,8 +101,16 @@ Game settings, player list, and deck selection. Optimized for mobile with a dedi
 | `onAddBot` | `() => void` | Adds bot player (host) |
 | `onRemoveBot` | `(botId: string) => void` | Removes bot (host) |
 | `onKickPlayer` | `(playerId: string) => void` | Kicks player (host) |
-| `onToggleSpectator` | `(playerId: string) => void` | Toggles spectator role (host) |
-| `onRequestPlay` | `() => void` | Requests to join as player (spectator) |
+| `onToggleSpectator` | `(playerId: string) => void` | Toggles spectator status for self (any player) or others (host) |
+| `onRequestPlay` | `() => void` | Requests to join as an active player from spectator mode |
+
+**Spectator Mode Selection:**
+Players can toggle their spectator status in the Lobby via:
+1. An explicit **"BECOME SPECTATOR"** button in the main actions panel.
+2. An eye icon on their own player card in the list.
+3. Hosts can also toggle other players' status via an eye icon on their cards.
+
+Spectators can rejoin the game using the **"JOIN AS PLAYER"** button in the actions panel (subject to player limits).
 
 ### `GameScreen.tsx`
 Main game interface with phase-based rendering. Now features a floating sidebar scoreboard, a responsive linear hand layout with hover aura effects, and a remade header using a 3-column grid system. The table cards grid has been optimized to accommodate up to 5 cards per row on large screens to minimize scrolling.

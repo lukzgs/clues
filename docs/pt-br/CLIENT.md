@@ -72,7 +72,7 @@ A aplicação possui um sistema de i18n customizado e leve, localizado em `src/i
 - **Traduções:** Armazenadas em `src/i18n/translations.ts`, contendo os dicionários `en` e `pt`.
 - **Provider:** `LanguageProvider` em `src/i18n/index.tsx` envolve o app. Ele auto-detecta o idioma do navegador (`navigator.language`) e persiste a preferência do usuário no `localStorage` sob a chave `story-weaver:lang`.
 - **Hook:** Os componentes utilizam o hook `useTranslation()` para acessar o idioma atual (`lang`), a função `setLang`, e o dicionário de tradução (`t`).
-- **Toggle:** Um componente global `<LanguageToggle />` é renderizado no nível raiz, permitindo aos usuários alternar facilmente entre os idiomas a qualquer momento.
+- **Toggle:** O componente `<LanguageToggle />` permite aos usuários alternar entre idiomas. Ele está integrado aos cabeçalhos (headers) ou cantos superiores de todas as telas principais.
 
 ---
 
@@ -102,8 +102,17 @@ Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada pa
 | `onAddBot` | `() => void` | Adiciona jogador bot (host) |
 | `onRemoveBot` | `(botId: string) => void` | Remove bot (host) |
 | `onKickPlayer` | `(playerId: string) => void` | Expulsa jogador (host) |
-| `onToggleSpectator` | `(playerId: string) => void` | Alterna papel de espectador (host) |
-| `onRequestPlay` | `() => void` | Solicita entrar como jogador (espectador) |
+| `onToggleSpectator` | `(playerId: string) => void` | Alterna status de espectador para si mesmo (qualquer jogador) ou outros (host) |
+| `onRequestPlay` | `() => void` | Solicita entrar como jogador ativo estando no modo espectador |
+
+**Seleção do Modo Espectador:**
+Os jogadores podem alternar seu status de espectador no Lobby através de:
+1. Um botão explícito **"TORNAR-SE ESPECTADOR"** no painel principal de ações.
+2. Um ícone de olho em seu próprio card de jogador na lista.
+3. Hosts também podem alternar o status de outros jogadores via o ícone de olho nos cards deles.
+
+Espectadores podem voltar ao jogo usando o botão **"ENTRAR COMO JOGADOR"** no painel de ações (sujeito ao limite de jogadores).
+
 
 ### `GameScreen.tsx`
 Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem.
