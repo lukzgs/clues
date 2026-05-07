@@ -29,6 +29,7 @@ class GameServer implements Party.Server {
 | `onConnect(conn)` | Trata novas conexões WebSocket |
 | `onClose(conn)` | Trata desconexões |
 | `onMessage(message, sender)` | Roteia mensagens para handlers |
+| `handleJoinRoom` | Implementa limpeza de ghost sockets para reconexão estável |
 
 ## Handlers de Mensagens
 
@@ -36,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Gatilho | Descrição |
 |---------|---------|-----------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor |
+| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor. Gerencia reconexão via expurgo de conexões fantasmagóricas. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Remove jogador da sala |
 | `handleStartGame` | `START_GAME` | Valida e inicia jogo (apenas host) |
 | `handleAddBot` | `ADD_BOT` | Adiciona jogador IA (apenas host) |

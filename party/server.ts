@@ -259,10 +259,21 @@ export default class GameServer implements Party.Server {
       return;
     }
 
-    // Reconnection: try to reclaim a disconnected player by ID
+    // Reconnection: try to reclaim a player by ID (even if they still appear connected due to ghost socket)
     if (reconnectId) {
-      const player = this.state.players.find(p => p.id === reconnectId && !p.isConnected && !p.isBot);
+      const player = this.state.players.find(p => p.id === reconnectId && !p.isBot);
       if (player) {
+        // Disconnect old socket if it exists to prevent ghost connections
+        for (const [existingConnId, existingPlayerId] of this.connections.entries()) {
+          if (existingPlayerId === player.id) {
+            this.connections.delete(existingConnId); // Remove first to prevent onClose from marking as disconnected
+            const oldConn = this.room.getConnection(existingConnId);
+            if (oldConn) {
+              oldConn.close(1000, "Reconnected elsewhere");
+            }
+          }
+        }
+
         // Reclaim: map new connection to existing player
         player.isConnected = true;
         this.connections.set(conn.id, player.id);
@@ -278,7 +289,7 @@ export default class GameServer implements Party.Server {
         this.broadcastState();
         return;
       }
-      // reconnectId invalid or player already connected — fall through to normal join
+      // reconnectId invalid — fall through to normal join
     }
 
     // Verifica fase — allow mid-game join as spectator

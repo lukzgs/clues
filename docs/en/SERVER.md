@@ -29,6 +29,7 @@ class GameServer implements Party.Server {
 | `onConnect(conn)` | Handles new WebSocket connections |
 | `onClose(conn)` | Handles disconnections |
 | `onMessage(message, sender)` | Routes incoming messages to handlers |
+| `handleJoinRoom` | Implements ghost socket cleanup for seamless reconnection |
 
 ## Message Handlers
 
@@ -36,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Trigger | Description |
 |---------|---------|-------------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color |
+| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color. Handles session reclamation with ghost socket eviction. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Removes player from room |
 | `handleStartGame` | `START_GAME` | Validates and starts game (host only) |
 | `handleAddBot` | `ADD_BOT` | Adds AI player (host only) |
