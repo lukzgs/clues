@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameState, Player, VictoryCondition, DeckOption, PhaseTimeouts } from '../../types';
 import { GAME_CONFIG } from '../../constants';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface LobbyScreenProps {
   gameState: GameState;
@@ -29,6 +30,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const spectators = gameState.players.filter(p => p.isSpectator);
   const isHost = currentPlayer?.isHost ?? false;
   const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && onAddBot;
+  const { t } = useTranslation();
 
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -92,7 +94,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const renderGameOptions = () => (
     <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
       <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-5 font-sans font-bold shrink-0">
-        OPÇÕES DO JOGO
+        {t.lobby.gameOptions}
       </p>
 
       <div className="space-y-4">
@@ -104,7 +106,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 }`}>
                   <div className="flex items-center justify-between p-4 pb-3">
                     <span className={`text-sm md:text-lg font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
-                      POR PONTUAÇÃO
+                      {t.lobby.byScore}
                     </span>
                     {isHost ? (
                       <button
@@ -119,14 +121,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         }`} />
                       </button>
                     ) : (
-                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.scoreEnabled ? 'ON' : 'OFF'}</span>
+                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.scoreEnabled ? t.lobby.on : t.lobby.off}</span>
                     )}
                   </div>
 
                   {vc.scoreEnabled && (
                     <div className="px-4 pb-4 pt-1">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">PRIMEIRO A CHEGAR</span>
+                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.firstToReach}</span>
                         <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
@@ -146,7 +148,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           ) : (
                             <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.targetScore}</span>
                           )}
-                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">PONTOS</span>
+                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.points}</span>
                         </div>
                       </div>
                       {isHost && (
@@ -180,7 +182,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 }`}>
                   <div className="flex items-center justify-between p-4 pb-3">
                     <span className={`text-sm md:text-lg font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
-                      POR RODADAS
+                      {t.lobby.byRounds}
                     </span>
                     {isHost ? (
                       <button
@@ -195,14 +197,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         }`} />
                       </button>
                     ) : (
-                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.narratorRoundsEnabled ? 'ON' : 'OFF'}</span>
+                      <span className="text-white/30 text-[10px] md:text-xs font-sans font-bold uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg">{vc.narratorRoundsEnabled ? t.lobby.on : t.lobby.off}</span>
                     )}
                   </div>
 
                   {vc.narratorRoundsEnabled && (
                     <div className="px-4 pb-4 pt-1">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">CADA JOGADOR NARRA</span>
+                        <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.eachPlayerNarrates}</span>
                         <div className="flex items-center gap-2">
                           {isHost ? (
                             <input
@@ -222,7 +224,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           ) : (
                             <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-2 text-amber-300/90 font-cinzel font-bold text-lg md:text-xl tabular-nums">{vc.narratorRounds}</span>
                           )}
-                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">VEZES</span>
+                          <span className="text-white/30 text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.times}</span>
                         </div>
                       </div>
                       {isHost && (
@@ -251,7 +253,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 {/* Info when both enabled */}
                 {vc.scoreEnabled && vc.narratorRoundsEnabled && (
                   <p className="text-white/30 text-[10px] md:text-[11px] text-center px-4 font-sans font-bold uppercase tracking-[0.15em] mt-3">
-                    A primeira condição atingida encerra o jogo
+                    {t.lobby.bothConditions}
                   </p>
                 )}
               </div>
@@ -259,7 +261,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {/* Deck Selection */}
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
-                  PISCINA DE CARTAS
+                  {t.lobby.cardPool}
                 </p>
                 <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-[1.25rem] p-1.5 relative z-0">
                   <div
@@ -279,13 +281,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         ${!isHost && 'cursor-default'}
                       `}
                     >
-                      {option === 'original' ? 'Original' : option === 'new' ? 'Novo' : 'Misturado'}
+                      {option === 'original' ? t.lobby.original : option === 'new' ? t.lobby.new : t.lobby.mixed}
                     </button>
                   ))}
                 </div>
                 {!isHost && (
                   <p className="text-center mt-3 text-[10px] md:text-xs font-cinzel font-bold uppercase tracking-widest text-white/30">
-                    O anfitrião está escolhendo o baralho...
+                    {t.lobby.hostChoosingDeck}
                   </p>
                 )}
               </div>
@@ -293,14 +295,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {/* Phase Timeouts */}
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
-                  TEMPO DAS FASES (SEGUNDOS)
+                  {t.lobby.phaseTimeouts}
                 </p>
                 <div className="space-y-4">
                   {[
-                    { key: 'narrator' as keyof PhaseTimeouts, label: 'NARRADOR' },
-                    { key: 'othersChoosing' as keyof PhaseTimeouts, label: 'ESCOLHA DE CARTAS' },
-                    { key: 'voting' as keyof PhaseTimeouts, label: 'VOTAÇÃO' },
-                    { key: 'results' as keyof PhaseTimeouts, label: 'RANKING / RESULTADOS' },
+                    { key: 'narrator' as keyof PhaseTimeouts, label: t.lobby.phaseNarrator },
+                    { key: 'othersChoosing' as keyof PhaseTimeouts, label: t.lobby.phaseChoosing },
+                    { key: 'voting' as keyof PhaseTimeouts, label: t.lobby.phaseVoting },
+                    { key: 'results' as keyof PhaseTimeouts, label: t.lobby.phaseResults },
                   ].map(({ key, label }) => (
                     <div key={key} className="bg-[#1A1A1A]/30 border border-white/5 rounded-2xl p-4">
                       <div className="flex items-center justify-between mb-3">
@@ -323,7 +325,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           ) : (
                             <span className="text-amber-300 font-cinzel font-bold text-lg tabular-nums">{phaseTimeouts[key]}</span>
                           )}
-                          <span className="text-white/30 text-[10px] font-sans uppercase font-bold tracking-widest">SEG</span>
+                          <span className="text-white/30 text-[10px] font-sans uppercase font-bold tracking-widest">{t.lobby.sec}</span>
                         </div>
                       </div>
                       {isHost ? (
@@ -364,14 +366,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                       }`}
                     >
-                      {canStart ? 'INICIAR JOGO' : `Mínimo ${GAME_CONFIG.MIN_PLAYERS} jogadores`}
+                      {canStart ? t.lobby.startGame : t.lobby.minPlayers(GAME_CONFIG.MIN_PLAYERS)}
                     </button>
 
                     <button
                       onClick={() => setIsMobileOptionsOpen(true)}
                       className="lg:hidden w-full bg-[#1A1A1A]/80 border border-amber-500/30 text-amber-300 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:bg-amber-500/10 hover:border-amber-400"
                     >
-                      CONFIGURAÇÕES
+                      {t.lobby.settings}
                     </button>
 
                     {canAddBot && (
@@ -380,7 +382,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
                       >
                         <span className="text-xl leading-none mr-1 font-sans font-light">+</span>
-                        ADD BOT
+                        {t.lobby.addBot}
                       </button>
                     )}
                   </>
@@ -396,25 +398,25 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                             : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                         }`}
                       >
-                        {activePlayers.length < maxPlayersForDeck ? 'ENTRAR COMO JOGADOR' : 'Lobby Lotado'}
+                        {activePlayers.length < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull}
                       </button>
                     )}
                     <div className="text-center py-3 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                      Você é um espectador
+                      {t.lobby.watchingAsSpectator}
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
                     <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                    Aguardando o host iniciar...
+                    {t.lobby.waitingHost}
                   </div>
                 )}
                 <button
                   onClick={onLeaveRoom}
                   className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
                 >
-                  SAIR
+                  {t.lobby.leaveRoom}
                 </button>
               </div>
     </>
@@ -451,7 +453,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {/* Room code */}
               <div className="text-center mb-10 w-full">
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-4 font-sans font-bold">
-                  CÓDIGO DA SALA
+                  {t.lobby.roomCode}
                 </p>
                 <div className="relative inline-flex items-center justify-center max-w-full">
                   <div className="bg-[#1A1A1A]/60 rounded-2xl px-5 sm:px-8 md:px-12 py-3.5 md:py-5 inline-flex items-center justify-center border border-white/10 shadow-inner">
@@ -489,7 +491,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               {/* Player list */}
               <div className="w-full flex-1 min-h-0 flex flex-col">
                 <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold shrink-0">
-                  JOGADORES ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} {spectators.length !== 1 ? 'espectadores' : 'espectador'}</span>}
+                  {t.lobby.players} ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} {spectators.length !== 1 ? t.lobby.spectators : t.lobby.spectator_one}</span>}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
                   {gameState.players.map((player) => (
@@ -516,21 +518,21 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         </span>
                         <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
                           {player.id === currentPlayer?.id && (
-                            <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium shrink-0">(you)</span>
+                            <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium shrink-0">({t.common.you})</span>
                           )}
                           {player.isHost && (
                             <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)] shrink-0">
-                              ANFITRIÃO
+                              {t.lobby.host}
                             </span>
                           )}
                           {player.isSpectator && (
                             <span className="text-blue-400/70 text-[10px] font-sans font-bold uppercase tracking-widest shrink-0">
-                              ESPECTADOR
+                              {t.common.spectator}
                             </span>
                           )}
                           {!player.isConnected && !player.isBot && (
                             <span className="text-red-400 text-[10px] font-sans uppercase tracking-widest shrink-0">
-                              DESCONECTADO
+                              {t.common.disconnected}
                             </span>
                           )}
                         </div>
@@ -569,8 +571,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         </div>
                       )}
 
-                      {/* Self-toggle spectator for non-host players on their own card */}
-                      {!isHost && player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
+                      {/* Self-toggle spectator for players on their own card */}
+                      {player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
                         <button
                           onClick={() => onToggleSpectator(player.id)}
                           className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-300 shrink-0 ${
@@ -618,7 +620,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
       {/* Footer */}
       <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
         <p className="text-white/20 text-[10px] font-sans tracking-wide">
-          &copy; 2026 Story Weaver. Crafted for imagination.
+          {t.common.copyright}
         </p>
       </div>
 
@@ -628,7 +630,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsMobileOptionsOpen(false)}></div>
           <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6 sticky top-0 bg-transparent backdrop-blur-xl z-20 pb-2 border-b border-white/10">
-              <h3 className="text-amber-300 font-cinzel font-bold text-lg tracking-widest">CONFIGURAÇÕES</h3>
+              <h3 className="text-amber-300 font-cinzel font-bold text-lg tracking-widest">{t.lobby.settings}</h3>
               <button 
                 onClick={() => setIsMobileOptionsOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"

@@ -763,7 +763,6 @@ export default class GameServer implements Party.Server {
     const isHost = requester.isHost;
 
     if (!isSelf && !isHost) return; // Not allowed
-    if (isSelf && isHost) return;   // Host cannot toggle themselves
 
     if (target.isSpectator) {
       // Spectator → Player: check max active players
@@ -773,9 +772,6 @@ export default class GameServer implements Party.Server {
       target.isSpectator = false;
     } else {
       // Player → Spectator
-      // Cannot make themselves spectator if it would drop below min players
-      const activePlayers = this.state.players.filter(p => !p.isSpectator);
-      if (activePlayers.length <= GAME_CONFIG.MIN_PLAYERS) return;
       target.isSpectator = true;
     }
 
