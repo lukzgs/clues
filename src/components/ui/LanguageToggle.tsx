@@ -1,7 +1,11 @@
 import React from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
 
-export const LanguageToggle: React.FC = () => {
+interface LanguageToggleProps {
+  className?: string;
+}
+
+export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "fixed top-4 right-4 z-[300]" }) => {
   const { lang, setLang } = useTranslation();
 
   const toggle = () => setLang(lang === 'pt' ? 'en' : 'pt');
@@ -10,8 +14,7 @@ export const LanguageToggle: React.FC = () => {
     <button
       onClick={toggle}
       aria-label={lang === 'pt' ? 'Switch to English' : 'Mudar para Português'}
-      className="
-        fixed top-4 right-4 z-[300]
+      className={`
         flex items-center gap-0 overflow-hidden
         bg-black/40 backdrop-blur-xl
         border border-white/15 rounded-xl
@@ -19,7 +22,8 @@ export const LanguageToggle: React.FC = () => {
         transition-all duration-300
         hover:border-amber-500/40 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]
         group
-      "
+        ${className}
+      `}
     >
       <LangPill label="PT" active={lang === 'pt'} onClick={() => setLang('pt')} />
       <div className="w-px h-5 bg-white/10" />

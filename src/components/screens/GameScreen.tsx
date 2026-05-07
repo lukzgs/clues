@@ -10,6 +10,7 @@ import {
   LeaveConfirmModal
 } from '../game';
 import { useTranslation } from '../../i18n/index.tsx';
+import { LanguageToggle } from '../ui/LanguageToggle';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -294,8 +295,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
         </div>
 
-        {/* Right: Exit Icon */}
-        <div className="justify-self-end">
+        {/* Right: Language Toggle & Exit Icon */}
+        <div className="justify-self-end flex items-center gap-3 md:gap-4">
+          <LanguageToggle className="" />
           <button
             onClick={() => setShowLeaveConfirm(true)}
             aria-label="Sair da sala"

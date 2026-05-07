@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { LanguageToggle } from '../ui/LanguageToggle';
 
 interface JoinScreenProps {
   onCreateRoom: (playerName: string) => void;
@@ -43,6 +44,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
+      <LanguageToggle />
       {/* Ambient Lighting */}
       <div
         className="fixed inset-0 pointer-events-none z-[-1]"
