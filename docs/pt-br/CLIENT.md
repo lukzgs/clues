@@ -95,7 +95,7 @@ Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada pa
 | `onRequestPlay` | `() => void` | Solicita entrar como jogador (espectador) |
 
 ### `GameScreen.tsx`
-Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita do código da sala, funcionalidade de cópia integrada e ícone de logout estilizado com modal de confirmação.
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem.
 
 ## Armazenamento de Sessão e Reconexão (F5)
 O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
@@ -124,7 +124,7 @@ Localizados em `src/components/game/`:
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK. Apresenta um design refinado com brilho de borda e glassmorfismo. |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
-| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". Agora apresenta um indicador de status pulsante para estados de espera. |
+| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". O layout foi otimizado com botões de ação posicionados diretamente abaixo das cartas, seguidos pelo placar. |
 | `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
 | `LeaveConfirmModal.tsx` | Modal de confirmação para que os jogadores saiam da sessão de jogo com segurança |
 | `GameOverView.tsx` | Pontuações finais e vencedor |

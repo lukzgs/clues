@@ -9,6 +9,7 @@ import {
   KickConfirmModal,
   LeaveConfirmModal
 } from '../game';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -43,6 +44,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('row');
   const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
+  const { t } = useTranslation();
 
   const handleCopyLink = async () => {
     const url = `${window.location.origin}?room=${gameState.roomCode}`;
@@ -70,8 +72,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   const phaseLabels: Record<GamePhase, string> = {
     [GamePhase.LOBBY]: 'LOBBY',
-    [GamePhase.NARRATOR_CHOOSING]: 'NARRATOR CHOOSING',
-    [GamePhase.OTHERS_CHOOSING]: 'CHOOSING CARDS',
+    [GamePhase.NARRATOR_CHOOSING]: t.game.youAreNarrator,
+    [GamePhase.OTHERS_CHOOSING]: t.game.theClueIs,
     [GamePhase.VOTING]: 'VOTING PHASE',
     [GamePhase.RESULTS]: 'RESULTS',
     [GamePhase.GAME_OVER]: 'GAME OVER',
@@ -438,31 +440,31 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   <>
                     {/* Announcement Card */}
                     <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-[0_0_50px_rgba(245,158,11,0.15)] flex flex-col items-center justify-center">
-                      <h2 className="text-4xl md:text-5xl text-amber-300 font-cinzel font-bold mb-4 tracking-[0.1em] leading-tight">
-                        You are the Narrator
+          <h2 className="text-4xl md:text-5xl text-amber-300 font-cinzel font-bold mb-4 tracking-[0.1em] leading-tight">
+                        {t.game.youAreNarrator}
                       </h2>
                       <p className="text-white/60 font-sans text-sm md:text-base uppercase tracking-[0.25em] mt-5 font-medium">
-                        Choose a card and write a clue
+                        {t.game.narratorSubtitle}
                       </p>
                     </div>
 
                     {/* Input placeholder */}
                     <div className="w-full max-w-2xl">
                       <input
-                        type="text"
-                        placeholder="Write a creative clue..."
-                        className="w-full bg-[#1A1A1A]/50 border border-white/20 p-6 md:p-8 rounded-[2rem] text-white text-center placeholder:text-white/30 outline-none transition-colors font-cinzel italic text-xl md:text-2xl shadow-lg opacity-50"
-                        disabled
-                      />
+                         type="text"
+                         placeholder={t.game.cluePlaceholder}
+                         className="w-full bg-[#1A1A1A]/50 border border-white/20 p-6 md:p-8 rounded-[2rem] text-white text-center placeholder:text-white/30 outline-none transition-colors font-cinzel italic text-xl md:text-2xl shadow-lg opacity-50"
+                         disabled
+                       />
                     </div>
                   </>
                 ) : (
                   <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-2xl">
                     <h2 className="text-2xl md:text-3xl text-white mb-4 font-cinzel font-bold tracking-[0.2em] uppercase text-amber-100/90">
-                      Waiting...
+                      {t.game.waitingNarrator}
                     </h2>
                     <p className="text-white/60 font-sans text-base md:text-lg tracking-wider mt-6">
-                      <span style={{ color: narrator?.color }} className="font-cinzel font-bold uppercase tracking-wider text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5 shadow-inner">{narrator?.name}</span> <span className="uppercase tracking-[0.1em] font-sans text-xs md:text-sm font-medium ml-2">is choosing a card</span>
+                      <span style={{ color: narrator?.color }} className="font-cinzel font-bold uppercase tracking-wider text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5 shadow-inner">{narrator?.name}</span> <span className="uppercase tracking-[0.1em] font-sans text-xs md:text-sm font-medium ml-2">{t.game.narratorChoosingCard}</span>
                     </p>
                   </div>
                 )}
@@ -471,10 +473,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
             {/* Fase: Outros escolhendo */}
             {gameState.phase === GamePhase.OTHERS_CHOOSING && (
-              <div className="flex flex-col items-center gap-6 md:gap-8 animate-fade-in w-full max-w-4xl">
+              <div className="flex flex-col items-center gap-6 md:gap-8 animate-fade-in w-full max-w-7xl">
                 {/* Clue Card */}
                 <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-8 py-5 md:py-7 rounded-2xl md:rounded-[2rem] text-center w-full max-w-lg flex flex-col items-center justify-center">
-                  <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 md:mb-3 font-sans font-bold opacity-60">The clue is</p>
+                  <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 md:mb-3 font-sans font-bold opacity-60">{t.game.theClueIs}</p>
                   <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider leading-tight">
                     "{gameState.currentClue}"
                   </h2>
@@ -482,7 +484,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
                 {/* Cards on table (face down) — only played cards, growing from center */}
                 {gameState.tableCards.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-2 max-w-[1000px] mx-auto">
+                  <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-2 max-w-7xl mx-auto">
                     {gameState.tableCards.map((tc, i) => (
                       <div 
                         key={tc.orderId} 
@@ -504,14 +506,14 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 <div className="text-center pt-2">
                   {!isNarrator && hasPlayed && (
                     <p className="text-amber-400/80 font-sans text-xs md:text-sm flex items-center gap-3 justify-center tracking-[0.2em] uppercase font-bold">
-                      <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
-                      Card sent! Waiting for others...
-                    </p>
+                         <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(251,191,36,0.9)]"></span>
+                         {t.game.cardSent}
+                       </p>
                   )}
                   {isNarrator && (
                     <p className="text-white/40 font-sans text-xs md:text-sm tracking-[0.2em] uppercase font-medium">
-                      Players are choosing their cards...
-                    </p>
+                         {t.game.playersChoosing}
+                       </p>
                   )}
                 </div>
               </div>
@@ -529,7 +531,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
                 {/* Table Cards Header with View Toggles (Mobile Only) */}
                 <div className="w-full md:hidden flex justify-between items-center px-4 mt-2 mb-[-1rem]">
-                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">Cartas na Mesa</span>
+                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">{t.game.tableCards}</span>
                   <div className="flex bg-black/40 rounded-xl border border-white/10 p-1 backdrop-blur-sm">
                     <button
                       onClick={() => setTableMobileView('row')}
@@ -561,7 +563,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                   ${tableMobileView === 'row' ? 'flex overflow-x-auto snap-x snap-mandatory pb-4 gap-4 hide-scrollbar -mx-4 px-4' : ''}
                   ${tableMobileView === 'grid-2' ? 'grid grid-cols-2 gap-3 pb-4' : ''}
                   ${tableMobileView === 'grid-1' ? 'flex flex-col gap-4 pb-4' : ''}
-                  md:flex md:flex-wrap md:justify-center md:gap-6 md:max-w-[1000px] md:mx-auto md:overflow-visible
+                  md:flex md:flex-wrap md:justify-center md:gap-6 md:max-w-7xl md:mx-auto md:overflow-visible
                 `}>
                   {gameState.tableCards.map((tableCard) => {
                     const isMine = tableCard.isMine === true;
@@ -603,7 +605,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-white/10 md:border-none relative z-10 px-4 md:px-0">
               <div className="max-w-screen-2xl w-full mx-auto">
                 <div className="md:hidden flex justify-between items-center mb-4 pt-2 px-2">
-                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">Sua Mão</span>
+                  <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">{t.game.hand}</span>
                   <div className="flex bg-black/40 rounded-xl border border-white/10 p-1 backdrop-blur-sm">
                     <button
                       onClick={() => setMobileView('row')}
@@ -713,7 +715,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowScoreModal(false)} />
           <div className="relative bg-black/90 backdrop-blur-2xl border border-white/20 rounded-t-3xl w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-amber-300 font-cinzel font-bold text-base tracking-widest uppercase">Pontuação Atual</h3>
+              <h3 className="text-amber-300 font-cinzel font-bold text-base tracking-widest uppercase">{t.game.currentScore}</h3>
               <button
                 onClick={() => setShowScoreModal(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
@@ -741,7 +743,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                         {player.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-white font-cinzel font-bold text-sm truncate">{player.name}{isMe && <span className="text-white/30 font-sans text-[10px] ml-1">(você)</span>}</div>
+                        <div className="text-white font-cinzel font-bold text-sm truncate">{player.name}{isMe && <span className="text-white/30 font-sans text-[10px] ml-1">({t.common.you})</span>}</div>
                       </div>
                       <div className={`font-sans font-black text-xl shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/80'}`}>{player.score}</div>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border ${

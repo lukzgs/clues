@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameState } from '../../types';
 import { GameCard } from './GameCard';
+import { useTranslation } from '../../i18n/index.tsx';
 
 interface ResultsViewProps {
   gameState: GameState;
@@ -20,16 +21,17 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   isHost = false,
 }) => {
   const [mobileView, setMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
+  const { t } = useTranslation();
   
   const narrator = gameState.players[gameState.narratorIndex];
   const currentPlayer = gameState.players.find(p => p.id === playerId);
 
   return (
-    <div className="flex flex-col items-center gap-10 md:gap-12 py-6 md:py-8 animate-fade-in w-full max-w-6xl mx-auto">
+    <div className="flex flex-col items-center gap-10 md:gap-12 py-6 md:py-8 animate-fade-in w-full max-w-7xl mx-auto">
       {/* Pista */}
       <div className="text-center bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.1)] px-10 py-6 rounded-2xl md:rounded-full max-w-xl">
         <p className="text-amber-200/50 text-[10px] uppercase tracking-[0.25em] mb-2 font-sans font-bold">
-          A pista era
+          {t.results.theClueWas}
         </p>
         <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider text-amber-300">
           "{gameState.currentClue}"
@@ -40,7 +42,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       <div className="w-full">
         {/* Toggle de visualização Mobile */}
         <div className="md:hidden flex justify-between items-center px-4 mb-4">
-          <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">Resultados da Mesa</span>
+          <span className="text-white/50 text-[10px] uppercase font-sans font-bold tracking-[0.2em]">{t.results.tableResults}</span>
           <div className="flex bg-black/40 rounded-xl border border-white/10 p-1 backdrop-blur-sm">
             <button
               onClick={() => setMobileView('row')}
@@ -150,9 +152,42 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
       </div>
 
+      {/* Actions */}
+      <div className="w-full max-w-lg space-y-3 mt-4 mb-4">
+        {!(gameState.playersWhoReadied ?? []).includes(playerId) && !currentPlayer?.isSpectator ? (
+          <button
+            onClick={onNextRound}
+            className="w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]"
+          >
+            {t.results.nextRound}
+          </button>
+        ) : currentPlayer?.isSpectator ? (
+          <div className="text-center py-4 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            {t.results.watchingSpectator}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-4 px-6 text-white/60 bg-[#1A1A1A]/40 rounded-xl border border-white/10 shadow-inner">
+            <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)] shrink-0" />
+            <span className="font-cinzel text-xs md:text-sm uppercase tracking-[0.1em] font-bold mt-0.5 truncate">
+              {t.results.waitingPlayers}
+            </span>
+            <span className="text-amber-500/80 text-[10px] md:text-xs uppercase tracking-widest ml-3 font-black shrink-0 border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 rounded-full">
+              {(gameState.playersWhoReadied ?? []).length}/{gameState.players.filter(p => !p.isSpectator).length}
+            </span>
+          </div>
+        )}
+        <button
+          onClick={onLeaveRoom}
+          className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
+        >
+          {t.results.leaveRoom}
+        </button>
+      </div>
+
       {/* Placar atualizado */}
       <div className="bg-black/50 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-lg shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col items-center">
-        <h3 className="text-white/40 font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6">Pontuação Atual</h3>
+        <h3 className="text-white/40 font-sans text-xs uppercase tracking-[0.3em] font-bold mb-6">{t.results.currentScore}</h3>
         <div className="space-y-3 w-full">
           {[...gameState.players]
             .filter(p => !p.isSpectator)
@@ -181,7 +216,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   <div className={`font-cinzel font-bold tracking-wider truncate ${index === 0 ? 'text-amber-100' : 'text-white'}`}>
                     {player.name}
                     {player.id === playerId && (
-                      <span className="text-white/30 font-sans text-[10px] uppercase tracking-widest ml-2 inline-block relative -top-[1px]">(Você)</span>
+                      <span className="text-white/30 font-sans text-[10px] uppercase tracking-widest ml-2 inline-block relative -top-[1px]">({t.common.you})</span>
                     )}
                   </div>
                 </div>
@@ -219,38 +254,6 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="w-full max-w-lg space-y-3">
-        {!(gameState.playersWhoReadied ?? []).includes(playerId) && !currentPlayer?.isSpectator ? (
-          <button
-            onClick={onNextRound}
-            className="w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]"
-          >
-            Next Round →
-          </button>
-        ) : currentPlayer?.isSpectator ? (
-          <div className="text-center py-4 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Watching as spectator
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-4 px-6 text-white/60 bg-[#1A1A1A]/40 rounded-xl border border-white/10 shadow-inner">
-            <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)] shrink-0" />
-            <span className="font-cinzel text-xs md:text-sm uppercase tracking-[0.1em] font-bold mt-0.5 truncate">
-              Waiting for players...
-            </span>
-            <span className="text-amber-500/80 text-[10px] md:text-xs uppercase tracking-widest ml-3 font-black shrink-0 border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 rounded-full">
-              {(gameState.playersWhoReadied ?? []).length}/{gameState.players.filter(p => !p.isSpectator).length}
-            </span>
-          </div>
-        )}
-        <button
-          onClick={onLeaveRoom}
-          className="w-full bg-transparent border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/5 hover:border-white/20 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200"
-        >
-          Leave Room
-        </button>
-      </div>
     </div>
   );
 };
