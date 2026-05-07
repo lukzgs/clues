@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { GameState, Player, VictoryCondition, DeckOption, PhaseTimeouts } from '../../types';
 import { GAME_CONFIG } from '../../constants';
 import { useTranslation } from '../../i18n/index.tsx';
+import { LanguageToggle } from '../ui/LanguageToggle';
 
 interface LobbyScreenProps {
   gameState: GameState;
@@ -385,6 +386,16 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                         {t.lobby.addBot}
                       </button>
                     )}
+
+                    {onToggleSpectator && currentPlayer && (
+                      <button
+                        onClick={() => onToggleSpectator(currentPlayer.id)}
+                        className="w-full bg-white/5 border border-white/10 text-blue-300/80 hover:text-blue-300 hover:bg-blue-500/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        {t.lobby.becomeSpectator}
+                      </button>
+                    )}
                   </>
                 ) : currentPlayer?.isSpectator ? (
                   <div className="space-y-3">
@@ -407,9 +418,20 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
-                    <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                    {t.lobby.waitingHost}
+                  <div className="space-y-3">
+                    <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
+                      <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                      {t.lobby.waitingHost}
+                    </div>
+                    {onToggleSpectator && currentPlayer && (
+                      <button
+                        onClick={() => onToggleSpectator(currentPlayer.id)}
+                        className="w-full bg-white/5 border border-white/10 text-blue-300/80 hover:text-blue-300 hover:bg-blue-500/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        {t.lobby.becomeSpectator}
+                      </button>
+                    )}
                   </div>
                 )}
                 <button
@@ -424,6 +446,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
   return (
     <div className="relative h-[100dvh] overflow-hidden flex items-center justify-center p-3 md:p-4">
+      <LanguageToggle />
       {/* Ambient Lighting — same as JoinScreen */}
       <div
         className="fixed inset-0 pointer-events-none z-[-1]"
