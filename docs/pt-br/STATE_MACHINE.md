@@ -137,6 +137,12 @@ stateDiagram-v2
 
 ---
 
+## Terminação do Jogo
+
+- **Jogadores Insuficientes**: Se a qualquer momento durante um jogo ativo (qualquer fase exceto LOBBY e GAME_OVER) o número de jogadores ativos (não espectadores) cair abaixo do mínimo necessário (3), o jogo transita imediatamente para `GAME_OVER`. O jogador com a maior pontuação naquele momento é declarado o vencedor.
+
+---
+
 ## Interface GameState
 
 ```typescript

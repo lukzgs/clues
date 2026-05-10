@@ -137,6 +137,12 @@ stateDiagram-v2
 
 ---
 
+## Game Termination
+
+- **Insufficient Players**: If at any point during an active game (any phase except LOBBY and GAME_OVER) the number of active players (non-spectators) drops below the minimum required (3), the game transitions immediately to `GAME_OVER`. The player with the highest score at that moment is declared the winner.
+
+---
+
 ## GameState Interface
 
 ```typescript
