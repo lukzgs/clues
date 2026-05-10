@@ -22,8 +22,8 @@ function getInitialLang(): Language {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [lang, setLangState] = useState<Language>(getInitialLang);
+export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLang?: Language }> = ({ children, initialLang }) => {
+  const [lang, setLangState] = useState<Language>(initialLang ?? getInitialLang);
 
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);

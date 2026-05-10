@@ -71,7 +71,7 @@ interface UseGameRoomOptions {
 The application features a custom lightweight i18n system located in `src/i18n/`.
 
 - **Translations:** Stored in `src/i18n/translations.ts` containing `en` and `pt` dictionaries.
-- **Provider:** `LanguageProvider` in `src/i18n/index.tsx` wraps the app. It auto-detects the browser language (`navigator.language`) and persists the user's preference in `localStorage` under `story-weaver:lang`.
+- **Provider:** `LanguageProvider` in `src/i18n/index.tsx` wraps the app. It auto-detects the browser language (`navigator.language`) and persists the user's preference in `localStorage` under `story-weaver:lang`. It accepts an optional `initialLang` prop to force a specific language (useful for testing).
 - **Hook:** Components use the `useTranslation()` hook to access the current language (`lang`), a `setLang` function, and the translation dictionary (`t`).
 - **Toggle:** The `<LanguageToggle />` component allows users to switch between languages. It is integrated into the headers or top corners of all major screens.
 
