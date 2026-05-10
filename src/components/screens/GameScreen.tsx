@@ -143,6 +143,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   // Handler para iniciar o fluxo de votar
   const handleVoteSelect = (tableCard: TableCard) => {
+    if (currentPlayer?.isSpectator) return;
     if (!tableCard.isMine && !hasVoted && !isNarrator) {
       setSelectedCard(tableCard.card);
       setShowClueModal(true);
@@ -235,7 +236,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       {currentPlayer?.isSpectator && (
         <div className="bg-blue-900/30 border-b border-blue-500/20 text-blue-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          Spectator Mode
+          {t.game.spectatorMode}
         </div>
       )}
 
@@ -326,9 +327,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <div className="flex flex-1 overflow-hidden w-full relative">
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
-        <aside className="hidden lg:flex flex-col w-[280px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-4 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
+        <aside className="hidden lg:flex flex-col w-[300px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-4 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
           <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-6 font-sans font-bold text-center">
-            Pontuação Atual
+            {t.game.currentScore}
           </h2>
           <div className="space-y-3">
             {[...gameState.players]
@@ -363,40 +364,47 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     </div>
                   </div>
 
-                  {/* Status indicator */}
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border shrink-0 transition-all duration-300 ${
-                    status === 'voted' || status === 'played'
-                      ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                      : status === 'readied' || status === 'narrator'
-                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]'
-                        : 'bg-black/40 text-white/30 border-white/5'
-                    }`}>
-                    {status === 'voted' || status === 'played' ? (
-                      <span className="leading-none mt-[-2px]">✓</span>
-                    ) : status === 'readied' ? (
-                      <span className="leading-none mt-[-2px]">✓</span>
-                    ) : status === 'narrator' ? (
-                      <div className="flex items-center justify-center w-full h-full pb-0.5">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-300">
-                          <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
-                          <line x1="2" y1="19" x2="22" y2="19" />
-                        </svg>
-                      </div>
-                    ) : (
-                      <span className="leading-none opacity-40">?</span>
-                    )}
-                  </div>
+                  {/* Right Actions Area - Fixed width to prevent misalignment when kick button is missing */}
+                  <div className="flex items-center gap-2 w-[64px] justify-end shrink-0">
+                    {/* Status indicator */}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border shrink-0 transition-all duration-300 ${
+                      status === 'voted' || status === 'played'
+                        ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                        : status === 'readied' || status === 'narrator'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(251,191,36,0.1)]'
+                          : 'bg-black/40 text-white/30 border-white/5'
+                      }`}>
+                      {status === 'voted' || status === 'played' ? (
+                        <span className="leading-none mt-[-2px]">✓</span>
+                      ) : status === 'readied' ? (
+                        <span className="leading-none mt-[-2px]">✓</span>
+                      ) : status === 'narrator' ? (
+                        <div className="flex items-center justify-center w-full h-full pb-0.5">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-300">
+                            <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+                            <line x1="2" y1="19" x2="22" y2="19" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <span className="leading-none opacity-40">?</span>
+                      )}
+                    </div>
 
-                  {/* Kick button (host only, not self) */}
-                  {isHost && !isMe && onKickPlayer && (
-                    <button
-                      onClick={() => setKickTarget({ id: player.id, name: player.name })}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
-                      title="Remove player"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                  )}
+                    {/* Kick button (host only, not self) */}
+                    {isHost && onKickPlayer ? (
+                      !isMe ? (
+                        <button
+                          onClick={() => setKickTarget({ id: player.id, name: player.name })}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
+                          title="Remove player"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                      ) : (
+                        <div className="w-7 h-7 shrink-0" /> // Placeholder to maintain alignment
+                      )
+                    ) : null}
+                  </div>
                 </div>
               );
             })}
@@ -584,11 +592,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                         <GameCard
                           card={tableCard.card}
                           size="full"
-                          disabled={isNarrator || hasVoted || isMine}
+                          disabled={isNarrator || hasVoted || isMine || (currentPlayer?.isSpectator ?? false)}
                           onClick={() => handleVoteSelect(tableCard)}
                           className={`
                             ${isMine ? 'opacity-50' : ''} 
-                            ${!isMine && !hasVoted && !isNarrator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''}
+                            ${!isMine && !hasVoted && !isNarrator && !currentPlayer?.isSpectator ? 'ring-2 ring-transparent hover:ring-amber-400' : ''}
                             md:!w-48 md:!h-72 lg:!w-56 lg:!h-84 md:!aspect-auto
                           `}
                           isHighlighted={hasVoted && gameState.votes[playerId] === tableCard.orderId}
@@ -771,7 +779,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               <div className="mt-4 pt-4 border-t border-white/5">
                 <p className="text-white/25 text-[10px] uppercase tracking-widest font-sans font-bold mb-2 flex items-center gap-2">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Espectadores
+                  {t.game.spectators}
                 </p>
                 <div className="space-y-1">
                   {gameState.players.filter(p => p.isSpectator).map(p => (

@@ -73,8 +73,9 @@ export function AfkAlertBar({ gameState, voteKickAfk, currentPlayerId }: AfkAler
       );
       break;
     case GamePhase.RESULTS:
-      const host = activePlayers.find(p => p.isHost);
-      if (host) afkPlayers = [host];
+      afkPlayers = activePlayers.filter(p =>
+        !(gameState.playersWhoReadied ?? []).includes(p.id)
+      );
       break;
   }
 
