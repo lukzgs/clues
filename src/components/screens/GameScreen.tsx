@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameState, GamePhase, Card, TableCard } from '../../types';
 import {
   GameCard,
@@ -15,6 +15,7 @@ import { LanguageToggle } from '../ui/LanguageToggle';
 interface GameScreenProps {
   gameState: GameState;
   playerId: string;
+  roomCloseTime?: number | null;
   onSubmitClue: (cardId: number, clue: string) => void;
   onPlayCard: (cardId: number) => void;
   onVote: (orderId: number) => void;
@@ -25,9 +26,37 @@ interface GameScreenProps {
   onKickPlayer?: (targetId: string) => void;
 }
 
+const RoomTimeoutBar: React.FC<{ closeTime: number }> = ({ closeTime }) => {
+  const [timeLeft, setTimeLeft] = useState(Math.max(0, Math.floor((closeTime - Date.now()) / 1000)));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const newTime = Math.max(0, Math.floor((closeTime - Date.now()) / 1000));
+      setTimeLeft(newTime);
+      if (newTime === 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [closeTime]);
+
+  if (timeLeft === 0) return null;
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  return (
+    <div className="bg-red-900/50 border-b border-red-500/30 text-red-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2 z-50">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      A sala fechará por inatividade em {minutes}:{seconds.toString().padStart(2, '0')}
+    </div>
+  );
+};
+
 export const GameScreen: React.FC<GameScreenProps> = ({
   gameState,
   playerId,
+  roomCloseTime,
   onSubmitClue,
   onPlayCard,
   onVote,
@@ -160,7 +189,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     }
 
     if (gameState.phase === GamePhase.VOTING) {
-      return gameState.votes[player.id] !== undefined ? 'voted' : 'waiting';
+      return (gameState.playersWhoVoted ?? []).includes(player.id) ? 'voted' : 'waiting';
     }
     if (gameState.phase === GamePhase.OTHERS_CHOOSING) {
       return (gameState.playersWhoPlayed ?? []).includes(player.id) ? 'played' : 'waiting';
@@ -232,6 +261,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         voteKickAfk={voteKickAfk} 
         currentPlayerId={playerId} 
       />
+
+      {roomCloseTime && (
+        <RoomTimeoutBar closeTime={roomCloseTime} />
+      )}
 
       {currentPlayer?.isSpectator && (
         <div className="bg-blue-900/30 border-b border-blue-500/20 text-blue-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2">
@@ -647,10 +680,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     ${mobileView === 'grid-2' ? 'grid grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto pb-4 hide-scrollbar' : ''}
                     ${mobileView === 'grid-1' ? 'flex flex-col gap-4 max-h-[50vh] overflow-y-auto pb-4 hide-scrollbar' : ''}
                     md:flex md:flex-row md:justify-center md:gap-6 md:flex-nowrap md:overflow-visible md:pb-6 md:pt-10 md:px-6
-                    ${gameState.phase === GamePhase.VOTING || (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) || (gameState.phase === GamePhase.NARRATOR_CHOOSING && !isNarrator)
-                      ? 'opacity-40 grayscale-[30%] md:scale-[0.98]'
-                      : ''
-                    }
                   `}>
                   {currentPlayer.hand.map((card) => (
                     <div 
