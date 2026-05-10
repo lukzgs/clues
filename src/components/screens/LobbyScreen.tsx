@@ -30,7 +30,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const activePlayers = gameState.players.filter(p => !p.isSpectator);
   const spectators = gameState.players.filter(p => p.isSpectator);
   const isHost = currentPlayer?.isHost ?? false;
-  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && onAddBot;
+
   const { t } = useTranslation();
 
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
@@ -75,7 +75,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const [deckOption, setDeckOption] = useState<DeckOption>('mixed');
 
   const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
-  const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS;
+  const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS && activePlayers.length <= maxPlayersForDeck;
+  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && activePlayers.length < maxPlayersForDeck && onAddBot;
 
   const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>({
     narrator: 60,
@@ -367,7 +368,9 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
                       }`}
                     >
-                      {canStart ? t.lobby.startGame : t.lobby.minPlayers(GAME_CONFIG.MIN_PLAYERS)}
+                      {activePlayers.length > maxPlayersForDeck 
+                        ? t.lobby.lobbyFull 
+                        : canStart ? t.lobby.startGame : t.lobby.minPlayers(GAME_CONFIG.MIN_PLAYERS)}
                     </button>
 
                     <button
@@ -390,10 +393,15 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     {onToggleSpectator && currentPlayer && (
                       <button
                         onClick={() => onToggleSpectator(currentPlayer.id)}
-                        className="w-full bg-white/5 border border-white/10 text-blue-300/80 hover:text-blue-300 hover:bg-blue-500/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
+                        disabled={currentPlayer.isSpectator && activePlayers.length >= maxPlayersForDeck}
+                        className={`w-full bg-white/5 border border-white/10 text-blue-300/80 hover:text-blue-300 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 ${
+                          currentPlayer.isSpectator && activePlayers.length >= maxPlayersForDeck
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'hover:bg-blue-500/10 hover:scale-[1.01]'
+                        }`}
                       >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        {t.lobby.becomeSpectator}
+                        {currentPlayer.isSpectator ? (activePlayers.length < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull) : t.lobby.becomeSpectator}
                       </button>
                     )}
                   </>

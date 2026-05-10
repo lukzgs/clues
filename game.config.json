@@ -1,7 +1,7 @@
 {
     "MIN_PLAYERS": 3,
     "MAX_PLAYERS": 8,
-    "MAX_PLAYERS_MIXED": 10,
+    "MAX_PLAYERS_MIXED": 12,
     "MAX_CONNECTIONS": 20,
     "HAND_SIZE": 6,
     "WINNING_SCORE": 30,
