@@ -7,9 +7,10 @@
  * @vitest-environment jsdom
  */
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { JoinScreen } from '../../src/components/screens/JoinScreen';
+import { renderWithProviders } from '../helpers/render-with-providers';
 
 // ============================================
 // HELPERS
@@ -22,7 +23,7 @@ function renderJoinScreen(overrides = {}) {
     ...overrides,
   };
 
-  const result = render(<JoinScreen {...props} />);
+  const result = renderWithProviders(<JoinScreen {...props} />);
   return { ...result, ...props };
 }
 
@@ -48,7 +49,7 @@ describe('JoinScreen — rendering', () => {
 
   it('renders the NEW ROOM button', () => {
     renderJoinScreen();
-    expect(screen.getByText('NEW ROOM')).toBeInTheDocument();
+    expect(screen.getByText('New Room')).toBeInTheDocument();
   });
 
   it('renders the room code input with placeholder', () => {
@@ -58,7 +59,7 @@ describe('JoinScreen — rendering', () => {
 
   it('renders the JOIN button', () => {
     renderJoinScreen();
-    expect(screen.getByText('JOIN')).toBeInTheDocument();
+    expect(screen.getByText('Join')).toBeInTheDocument();
   });
 
   it('does not show error message initially', () => {
@@ -78,7 +79,7 @@ describe('JoinScreen — create room', () => {
     const { onCreateRoom } = renderJoinScreen();
 
     await user.type(screen.getByPlaceholderText('Enter your name'), '  Alice  ');
-    await user.click(screen.getByText('NEW ROOM'));
+    await user.click(screen.getByText('New Room'));
 
     expect(onCreateRoom).toHaveBeenCalledWith('Alice');
     expect(onCreateRoom).toHaveBeenCalledTimes(1);
@@ -99,7 +100,7 @@ describe('JoinScreen — create room', () => {
     const user = userEvent.setup();
     const { onCreateRoom } = renderJoinScreen();
 
-    await user.click(screen.getByText('NEW ROOM'));
+    await user.click(screen.getByText('New Room'));
 
     expect(screen.getByText('Choose your name first')).toBeInTheDocument();
     expect(onCreateRoom).not.toHaveBeenCalled();
@@ -110,7 +111,7 @@ describe('JoinScreen — create room', () => {
     const { onCreateRoom } = renderJoinScreen();
 
     await user.type(screen.getByPlaceholderText('Enter your name'), '   ');
-    await user.click(screen.getByText('NEW ROOM'));
+    await user.click(screen.getByText('New Room'));
 
     expect(screen.getByText('Choose your name first')).toBeInTheDocument();
     expect(onCreateRoom).not.toHaveBeenCalled();
@@ -128,7 +129,7 @@ describe('JoinScreen — join room', () => {
 
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
     await user.type(screen.getByPlaceholderText('ROOM ID'), 'abc123');
-    await user.click(screen.getByText('JOIN'));
+    await user.click(screen.getByText('Join'));
 
     expect(onJoinRoom).toHaveBeenCalledWith('ABC123', 'Bob');
     expect(onJoinRoom).toHaveBeenCalledTimes(1);
@@ -151,7 +152,7 @@ describe('JoinScreen — join room', () => {
     const { onJoinRoom } = renderJoinScreen();
 
     await user.type(screen.getByPlaceholderText('ROOM ID'), 'ABC123');
-    await user.click(screen.getByText('JOIN'));
+    await user.click(screen.getByText('Join'));
 
     expect(screen.getByText('Choose your name first')).toBeInTheDocument();
     expect(onJoinRoom).not.toHaveBeenCalled();
@@ -162,7 +163,7 @@ describe('JoinScreen — join room', () => {
     const { onJoinRoom } = renderJoinScreen();
 
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
-    await user.click(screen.getByText('JOIN'));
+    await user.click(screen.getByText('Join'));
 
     expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
     expect(onJoinRoom).not.toHaveBeenCalled();
@@ -174,7 +175,7 @@ describe('JoinScreen — join room', () => {
 
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
     await user.type(screen.getByPlaceholderText('ROOM ID'), 'ABC');
-    await user.click(screen.getByText('JOIN'));
+    await user.click(screen.getByText('Join'));
 
     expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
     expect(onJoinRoom).not.toHaveBeenCalled();
@@ -197,7 +198,7 @@ describe('JoinScreen — error clearing', () => {
     renderJoinScreen();
 
     // Trigger error
-    await user.click(screen.getByText('NEW ROOM'));
+    await user.click(screen.getByText('New Room'));
     expect(screen.getByText('Choose your name first')).toBeInTheDocument();
 
     // Type in name — error should disappear
@@ -211,7 +212,7 @@ describe('JoinScreen — error clearing', () => {
 
     // Trigger error: name present but code missing
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
-    await user.click(screen.getByText('JOIN'));
+    await user.click(screen.getByText('Join'));
     expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
 
     // Type in room code — error should disappear

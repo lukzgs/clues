@@ -7,11 +7,12 @@
  * @vitest-environment jsdom
  */
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ResultsView } from '../../../src/components/game/ResultsView';
 import { GameState, Player, GamePhase } from '../../../src/types';
+import { renderWithProviders } from '../../helpers/render-with-providers';
 
 const mockCard1 = {
   id: 1,
@@ -62,7 +63,7 @@ const createMockGameState = (): GameState => ({
 describe('ResultsView', () => {
   it('does not display "Nenhum voto" for cards with zero votes', () => {
     const gameState = createMockGameState();
-    render(<ResultsView gameState={gameState} playerId="p2" onNextRound={vi.fn()} onLeaveRoom={vi.fn()} />);
+    renderWithProviders(<ResultsView gameState={gameState} playerId="p2" onNextRound={vi.fn()} onLeaveRoom={vi.fn()} />);
 
     // In previous versions, "Nenhum voto" would show for mockCard2 (which has 0 votes)
     // The test ensures this text is nowhere in the document
@@ -71,7 +72,7 @@ describe('ResultsView', () => {
 
   it('renders voters for cards that received votes', () => {
     const gameState = createMockGameState();
-    render(<ResultsView gameState={gameState} playerId="p1" onNextRound={vi.fn()} onLeaveRoom={vi.fn()} />);
+    renderWithProviders(<ResultsView gameState={gameState} playerId="p1" onNextRound={vi.fn()} onLeaveRoom={vi.fn()} />);
 
     // p2 (Player2) and p3 (Player3) voted for the first card.
     // They are rendered as circles with their first initial 'P'.
@@ -86,7 +87,7 @@ describe('ResultsView', () => {
   it('calls onNextRound when clicking the next round button', async () => {
     const gameState = createMockGameState();
     const onNextRound = vi.fn();
-    render(<ResultsView gameState={gameState} playerId="p1" onNextRound={onNextRound} onLeaveRoom={vi.fn()} />);
+    renderWithProviders(<ResultsView gameState={gameState} playerId="p1" onNextRound={onNextRound} onLeaveRoom={vi.fn()} />);
 
     const nextBtn = screen.getByRole('button', { name: /Next Round/i });
     await userEvent.click(nextBtn);

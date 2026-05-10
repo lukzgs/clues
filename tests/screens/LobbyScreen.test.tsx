@@ -7,12 +7,13 @@
  * @vitest-environment jsdom
  */
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { LobbyScreen } from '../../src/components/screens/LobbyScreen';
 import { GameState, Player, GamePhase } from '../../src/types';
 import { GAME_CONFIG } from '../../src/constants';
+import { renderWithProviders } from '../helpers/render-with-providers';
 
 vi.mock('../../src/constants', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../src/constants')>();
@@ -80,7 +81,7 @@ function renderLobbyScreen(gameState: GameState, currentPlayer: Player, override
   };
 
   return {
-    ...render(<LobbyScreen {...props} />),
+    ...renderWithProviders(<LobbyScreen {...props} />),
     props,
   };
 }
@@ -106,7 +107,7 @@ describe('LobbyScreen', () => {
       renderLobbyScreen(defaultGameState, hostPlayer);
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
-      expect(screen.getByText(/JOGADORES \(2\/\d+\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/PLAYERS \(2\/\d+\)/i)).toBeInTheDocument();
     });
 
     it('adds (you) indicator for the current player', () => {
@@ -170,7 +171,7 @@ describe('LobbyScreen', () => {
       const gameState = createMockGameState(minPlayers);
       const { props } = renderLobbyScreen(gameState, minPlayers[0]);
       
-      const startBtn = screen.getAllByRole('button', { name: /INICIAR JOGO/i })[0];
+      const startBtn = screen.getAllByRole('button', { name: /START GAME/i })[0];
       expect(startBtn).not.toBeDisabled();
       
       await userEvent.click(startBtn);
@@ -181,7 +182,7 @@ describe('LobbyScreen', () => {
       const gameState = createMockGameState([hostPlayer]); // only 1 player
       renderLobbyScreen(gameState, hostPlayer);
       
-      const startBtn = screen.getAllByRole('button', { name: /Mínimo \d+ jogadores/i })[0];
+      const startBtn = screen.getAllByRole('button', { name: /Minimum \d+ players/i })[0];
       expect(startBtn).toBeDisabled();
     });
   });
@@ -194,7 +195,7 @@ describe('LobbyScreen', () => {
       expect(screen.queryByRole('button', { name: /Toggle rounds condition/i })).not.toBeInTheDocument();
       expect(screen.queryAllByRole('button', { name: /ADD BOT/i }).length).toBe(0);
       
-      expect(screen.getAllByText('Aguardando o host iniciar...')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('Waiting for host to start...')[0]).toBeInTheDocument();
     });
 
     it('does not show bot removal buttons', () => {
@@ -209,7 +210,7 @@ describe('LobbyScreen', () => {
   describe('Actions', () => {
     it('calls onLeaveRoom when leave button clicked', async () => {
       const { props } = renderLobbyScreen(defaultGameState, guestPlayer);
-      const leaveBtn = screen.getAllByRole('button', { name: /SAIR/i })[0];
+      const leaveBtn = screen.getAllByRole('button', { name: /LEAVE/i })[0];
       await userEvent.click(leaveBtn);
       expect(props.onLeaveRoom).toHaveBeenCalled();
     });
