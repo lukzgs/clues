@@ -19,7 +19,7 @@ type AppState =
 
 const getInitialState = (): AppState => {
   try {
-    const sessionStr = sessionStorage.getItem('story-weaver:active_session');
+    const sessionStr = localStorage.getItem('story-weaver:active_session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr);
       if (session.roomCode && session.playerName) {
@@ -72,7 +72,7 @@ const App: React.FC = () => {
 
   const handleLeaveRoom = useCallback(() => {
     leaveRoom();
-    sessionStorage.removeItem('story-weaver:active_session');
+    localStorage.removeItem('story-weaver:active_session');
     setAppState({ screen: 'join' });
   }, [leaveRoom]);
 

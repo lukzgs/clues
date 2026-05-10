@@ -71,7 +71,7 @@ export function useGameRoom({
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
 
-  // sessionStorage key for reconnection
+  // localStorage key for reconnection (survives tab/browser close)
   const storageKey = 'story-weaver:active_session';
 
   // Conecta ao servidor
@@ -93,7 +93,7 @@ export function useGameRoom({
       if (!hasJoinedRef.current) {
         let savedPlayerId: string | undefined = undefined;
         try {
-          const sessionStr = sessionStorage.getItem(storageKey);
+          const sessionStr = localStorage.getItem(storageKey);
           if (sessionStr) {
             const session = JSON.parse(sessionStr);
             if (session.roomCode === roomCode) {
@@ -126,7 +126,7 @@ export function useGameRoom({
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
               // Persist session for reconnection
-              sessionStorage.setItem(storageKey, JSON.stringify({
+              localStorage.setItem(storageKey, JSON.stringify({
                 roomCode,
                 playerName,
                 playerId: msg.yourPlayerId,
@@ -149,7 +149,8 @@ export function useGameRoom({
           // [SPECTATOR] Handle kick notification
           case ServerMessageType.PLAYER_KICKED:
             if ((msg as any).playerId === playerId) {
-              // We were kicked — close connection
+              // We were kicked — clean up session and close connection
+              localStorage.removeItem(storageKey);
               setError('Você foi removido da sala');
               socket.close();
             }

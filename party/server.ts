@@ -111,6 +111,22 @@ export default class GameServer implements Party.Server {
     const playerId = this.connections.get(conn.id);
     if (!playerId) return;
 
+    // Check if the player already reconnected via a different connection (ghost socket guard)
+    let hasOtherConnection = false;
+    for (const [existingConnId, existingPlayerId] of this.connections.entries()) {
+      if (existingPlayerId === playerId && existingConnId !== conn.id) {
+        hasOtherConnection = true;
+        break;
+      }
+    }
+
+    // Always clean up THIS connection's mapping
+    this.connections.delete(conn.id);
+    this.rateLimitData.delete(conn.id);
+
+    // If player has another active connection, don't mark as disconnected
+    if (hasOtherConnection) return;
+
     const player = this.state.players.find(p => p.id === playerId);
     if (player) {
       player.isConnected = false;
@@ -134,9 +150,6 @@ export default class GameServer implements Party.Server {
 
       this.broadcastState();
     }
-
-    this.connections.delete(conn.id);
-    this.rateLimitData.delete(conn.id);
   }  // ============================================
   // RATE LIMITING
   // ============================================
