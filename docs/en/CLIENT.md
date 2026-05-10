@@ -46,6 +46,7 @@ interface UseGameRoomOptions {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  roomCloseTime: number | null;
   
   // Actions
   startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
@@ -123,6 +124,7 @@ When the app reloads, it automatically bypasses the `JoinScreen`, injects the `r
 |------|------|-------------|
 | `gameState` | `GameState` | Current game state |
 | `playerId` | `string` | Current player ID |
+| `roomCloseTime` | `number \| null` | Time when room will close |
 | `onSubmitClue` | `(cardId, clue) => void` | Submit narrator clue |
 | `onPlayCard` | `(cardId) => void` | Play matching card |
 | `onVote` | `(orderId) => void` | Vote for card |
@@ -140,6 +142,7 @@ Located in `src/components/game/`:
 | Component | Description |
 |-----------|-------------|
 | `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK. Features a refined design with border-glow and glassmorphism effects. |
+| `RoomTimeoutBar` | Component inside GameScreen that shows a countdown when the room is about to close due to inactivity. |
 | `LobbyScreen.tsx` | Game settings, player list, and deck selection. Features a standardized "Mythic" design system with polished typography and full Portuguese localization for the interface. |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |

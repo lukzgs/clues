@@ -46,6 +46,7 @@ interface UseGameRoomOptions {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  roomCloseTime: number | null;
   
   // Ações
   startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
@@ -125,6 +126,7 @@ Em caso de recarregamento ou reabertura, se este dado for encontrado na iniciali
 |------|------|-----------|
 | `gameState` | `GameState` | Estado atual do jogo |
 | `playerId` | `string` | ID do jogador atual |
+| `roomCloseTime` | `number \| null` | Tempo para o fechamento da sala |
 | `onSubmitClue` | `(cardId, clue) => void` | Enviar dica do narrador |
 | `onPlayCard` | `(cardId) => void` | Jogar carta |
 | `onVote` | `(orderId) => void` | Votar em carta |
@@ -142,6 +144,7 @@ Localizados em `src/components/game/`:
 | Componente | Descrição |
 |------------|-----------|
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK. Apresenta um design refinado com brilho de borda e glassmorfismo. |
+| `RoomTimeoutBar` | Componente interno da GameScreen que mostra uma contagem regressiva quando a sala está prestes a fechar por inatividade. |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
 | `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". O layout foi otimizado com botões de ação posicionados diretamente abaixo das cartas, seguidos pelo placar. |

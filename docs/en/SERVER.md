@@ -29,7 +29,7 @@ class GameServer implements Party.Server {
 | `onConnect(conn)` | Handles new WebSocket connections |
 | `onClose(conn)` | Handles disconnections |
 | `onMessage(message, sender)` | Routes incoming messages to handlers |
-| `handleJoinRoom` | Implements ghost socket cleanup for seamless reconnection |
+| `onAlarm()` | Handles inactivity timeouts (9m warning, 10m close) |
 
 ## Message Handlers
 
@@ -37,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Trigger | Description |
 |---------|---------|-------------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color. Handles session reclamation with ghost socket eviction. |
+| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color. Handles session reclamation with ghost socket eviction and phase validation. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Removes player from room |
 | `handleStartGame` | `START_GAME` | Validates and starts game (host only) |
 | `handleAddBot` | `ADD_BOT` | Adds AI player (host only) |
@@ -64,6 +64,8 @@ class GameServer implements Party.Server {
 | `shuffle(array)` | Fisher-Yates shuffle |
 | `generatePlayerId()` | Creates unique player ID |
 | `createInitialState()` | Returns fresh game state |
+| `checkResponsiveness(conn)` | Pings connection to verify if active |
+| `resetInactivityTimer()` | Resets the 9-minute inactivity alarm |
 | `getPublicState(playerId)` | Filters state for specific player |
 | `calculateScores()` | Computes round scores |
 

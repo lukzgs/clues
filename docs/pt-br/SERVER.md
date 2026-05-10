@@ -29,7 +29,7 @@ class GameServer implements Party.Server {
 | `onConnect(conn)` | Trata novas conexões WebSocket |
 | `onClose(conn)` | Trata desconexões |
 | `onMessage(message, sender)` | Roteia mensagens para handlers |
-| `handleJoinRoom` | Implementa limpeza de ghost sockets para reconexão estável |
+| `onAlarm()` | Trata timeouts de inatividade (aviso de 9 min, fechamento aos 10 min) |
 
 ## Handlers de Mensagens
 
@@ -37,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Gatilho | Descrição |
 |---------|---------|-----------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor. Gerencia reconexão via expurgo de conexões fantasmagóricas. |
+| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor. Gerencia reconexão via expurgo de conexões fantasmagóricas e validação de fase. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Remove jogador da sala |
 | `handleStartGame` | `START_GAME` | Valida e inicia jogo (apenas host) |
 | `handleAddBot` | `ADD_BOT` | Adiciona jogador IA (apenas host) |
@@ -64,6 +64,8 @@ class GameServer implements Party.Server {
 | `shuffle(array)` | Embaralhamento Fisher-Yates |
 | `generatePlayerId()` | Cria ID único de jogador |
 | `createInitialState()` | Retorna estado inicial do jogo |
+| `checkResponsiveness(conn)` | Envia ping para verificar se a conexão está ativa |
+| `resetInactivityTimer()` | Reseta o alarme de inatividade de 9 minutos |
 | `getPublicState(playerId)` | Filtra estado para jogador específico |
 | `calculateScores()` | Calcula pontuações da rodada |
 

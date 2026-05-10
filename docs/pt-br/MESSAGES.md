@@ -45,6 +45,7 @@ enum ClientMessageType {
 | `KICK_PLAYER` | `playerId: string` | Qualquer (apenas host) |
 | `TOGGLE_SPECTATOR` | `playerId: string` | LOBBY (apenas host) |
 | `REQUEST_PLAY` | (nenhum) | LOBBY (apenas espectadores) |
+| `PONG_CHECK` | (nenhum) | Qualquer |
 
 ### Exemplos de Mensagens
 
@@ -92,6 +93,10 @@ enum ServerMessageType {
 | `PLAYER_LEFT` | `playerId: string, playerName: string` | Notificação de jogador saiu |
 | `PLAYER_KICKED` | `playerId: string` | Notificação de jogador expulso |
 | `ERROR` | `message: string, code?: string` | Notificação de erro |
+| `PING_CHECK` | (nenhum) | Servidor verifica se o cliente está responsivo |
+| `SERVER_CLOSING_WARNING` | `closeTime: number` | Aviso de que a sala fechará por inatividade |
+| `SERVER_CLOSING_CANCELLED` | (nenhum) | Aviso de fechamento cancelado |
+| `SERVER_CLOSED` | (nenhum) | Sala fechada por inatividade |
 
 ### Exemplos de Mensagens
 
