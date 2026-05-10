@@ -191,3 +191,66 @@ describe('BUG #7 — Non-host AFK players unkickable during RESULTS', () => {
     expect(p4State?.isSpectator).toBe(true);
   });
 });
+
+// ============================================
+// BUG #9 — Kicking players mid-game to below
+// MIN_PLAYERS should end the game gracefully
+// instead of leaving it in a broken state.
+// ============================================
+
+describe('BUG #9 — Kicking players below MIN_PLAYERS ends the game', () => {
+  it('game goes to GAME_OVER when active players drop below minimum', () => {
+    const room = createMockRoom('KICK-MIN');
+    const server = new GameServer(room as any);
+
+    const conn1 = simulateJoinRoom(server, room, 'Host');
+    const conn2 = simulateJoinRoom(server, room, 'P2');
+    const conn3 = simulateJoinRoom(server, room, 'P3');
+
+    const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
+
+    startGame(server, conn1);
+
+    // Host kicks P2
+    server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[1] }), conn1);
+
+    // Host kicks P3 — only 1 active player remains
+    server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[2] }), conn1);
+
+    const state = getLastSyncState(conn1);
+    expect(state.gameState.phase).toBe('GAME_OVER');
+  });
+});
+
+// ============================================
+// BUG #10 — handleRestartGame resets state cleanly.
+// playersWhoReadied and currentRound must be zeroed.
+// ============================================
+
+describe('BUG #10 — Restart game resets state properly', () => {
+  it('playersWhoReadied and currentRound are reset after restart', () => {
+    const room = createMockRoom('RESTART');
+    const server = new GameServer(room as any);
+
+    const conn1 = simulateJoinRoom(server, room, 'Host');
+    const conn2 = simulateJoinRoom(server, room, 'P2');
+    const conn3 = simulateJoinRoom(server, room, 'P3');
+
+    const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
+
+    startGame(server, conn1);
+    playFullRound(server, [conn1, conn2, conn3], playerIds, 0);
+    readyAll(server, [conn1, conn2, conn3]);
+
+    // Force game over and restart
+    (server as any).state.phase = 'GAME_OVER';
+    (server as any).state.winner = playerIds[0];
+
+    server.onMessage(JSON.stringify({ type: 'RESTART_GAME' }), conn1);
+
+    const state = getLastSyncState(conn1);
+    expect(state.gameState.phase).toBe('LOBBY');
+    expect(state.gameState.playersWhoReadied).toEqual([]);
+    expect(state.gameState.currentRound).toBe(0);
+  });
+});

@@ -221,3 +221,46 @@ describe('BUG #5 — getPublicState omits phaseTimeouts (client crash)', () => {
     }).not.toThrow();
   });
 });
+
+// ============================================
+// BUG #8 — checkVictoryCondition lets spectators win
+// via score-based victory even though they are not playing.
+// ============================================
+
+describe('BUG #8 — Spectator with high score excluded from victory', () => {
+  it('should not let a spectator win even if their score exceeds the target', () => {
+    const condition: VictoryCondition = {
+      scoreEnabled: true,
+      targetScore: 30,
+      narratorRoundsEnabled: false,
+      narratorRounds: 2,
+    };
+
+    const players = [
+      createPlayer({ id: 'p1', score: 25 }),
+      createPlayer({ id: 'p2', score: 20 }),
+      createPlayer({ id: 'ex', score: 35, isSpectator: true }),
+    ];
+
+    const result = checkVictoryCondition(players, condition, 5);
+    expect(result).not.toBe('ex');
+  });
+
+  it('returns null when only spectators exceed the target score', () => {
+    const condition: VictoryCondition = {
+      scoreEnabled: true,
+      targetScore: 30,
+      narratorRoundsEnabled: false,
+      narratorRounds: 2,
+    };
+
+    const players = [
+      createPlayer({ id: 'p1', score: 10 }),
+      createPlayer({ id: 'p2', score: 15 }),
+      createPlayer({ id: 'ex', score: 50, isSpectator: true }),
+    ];
+
+    const result = checkVictoryCondition(players, condition, 5);
+    expect(result).toBeNull();
+  });
+});
