@@ -51,10 +51,12 @@ const createMockGameState = (): GameState => ({
   deckOption: 'original',
   deckCount: 50,
   playersWhoPlayed: [],
+  playersWhoVoted: [],
+  playersWhoReadied: [],
+  phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
   victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
   phaseStartTime: Date.now(),
   afkKickVotes: [],
-  playersWhoReadied: [],
 });
 
 describe('ResultsView', () => {

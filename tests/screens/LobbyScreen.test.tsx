@@ -63,6 +63,9 @@ const createMockGameState = (players: Player[]): GameState => ({
   },
   phaseStartTime: Date.now(),
   afkKickVotes: [],
+  playersWhoVoted: [],
+  playersWhoReadied: [],
+  phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
 });
 
 function renderLobbyScreen(gameState: GameState, currentPlayer: Player, overrides = {}) {

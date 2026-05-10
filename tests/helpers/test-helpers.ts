@@ -109,18 +109,18 @@ export function createMockRoom(roomId: string = 'TEST01'): MockRoom {
  * Simulates a player connecting and joining a room.
  * Returns the mock connection used.
  */
-export function simulateJoinRoom(
+export async function simulateJoinRoom(
   server: any,
   room: MockRoom,
   playerName: string,
   connId?: string,
   reconnectId?: string,
-): MockConnection {
+): Promise<MockConnection> {
   const conn = createMockConnection(connId);
   room.connections.set(conn.id, conn);
 
   // Trigger onConnect
-  server.onConnect(conn);
+  await server.onConnect(conn);
 
   // Send JOIN_ROOM message
   const joinMsg = JSON.stringify({
@@ -128,7 +128,7 @@ export function simulateJoinRoom(
     playerName,
     ...(reconnectId ? { reconnectId } : {}),
   });
-  server.onMessage(joinMsg, conn);
+  await server.onMessage(joinMsg, conn);
 
   return conn;
 }

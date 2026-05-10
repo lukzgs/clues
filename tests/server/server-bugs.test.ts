@@ -21,8 +21,8 @@ import {
 // ============================================
 
 /** Start a game with the given connections and return the last sync state */
-function startGame(server: any, hostConn: any) {
-  server.onMessage(JSON.stringify({
+async function startGame(server: any, hostConn: any) {
+  await server.onMessage(JSON.stringify({
     type: 'START_GAME',
     victoryCondition: {
       scoreEnabled: true,
@@ -36,7 +36,7 @@ function startGame(server: any, hostConn: any) {
 }
 
 /** Play a full round: narrator submits clue, others play cards, everyone votes, all ready up */
-function playFullRound(
+async function playFullRound(
   server: any,
   connections: any[],
   playerIds: string[],
@@ -48,7 +48,7 @@ function playFullRound(
   // Narrator submits clue
   let state = getLastSyncState(narratorConn);
   const narratorHand = state.gameState.players.find((p: any) => p.id === narratorId)?.hand;
-  server.onMessage(JSON.stringify({
+  await server.onMessage(JSON.stringify({
     type: 'SUBMIT_CLUE',
     cardId: narratorHand[0].id,
     clue: `Clue from round`,
@@ -59,7 +59,7 @@ function playFullRound(
     if (i === narratorIndex) continue;
     state = getLastSyncState(connections[i]);
     const hand = state.gameState.players.find((p: any) => p.id === playerIds[i])?.hand;
-    server.onMessage(JSON.stringify({
+    await server.onMessage(JSON.stringify({
       type: 'PLAY_CARD',
       cardId: hand[0].id,
     }), connections[i]);
@@ -70,7 +70,7 @@ function playFullRound(
     if (i === narratorIndex) continue;
     state = getLastSyncState(connections[i]);
     const votable = state.gameState.tableCards.find((tc: any) => !tc.isMine);
-    server.onMessage(JSON.stringify({
+    await server.onMessage(JSON.stringify({
       type: 'VOTE',
       orderId: votable.orderId,
     }), connections[i]);
@@ -78,9 +78,9 @@ function playFullRound(
 }
 
 /** All players ready up to advance to next round */
-function readyAll(server: any, connections: any[]) {
+async function readyAll(server: any, connections: any[]) {
   for (const conn of connections) {
-    server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn);
+    await server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn);
   }
 }
 
@@ -95,29 +95,29 @@ function readyAll(server: any, connections: any[]) {
 // ============================================
 
 describe('BUG #6 — Kicking player before narrator corrupts narratorIndex', () => {
-  it('narrator should remain the same player after kicking someone before them', () => {
+  it('narrator should remain the same player after kicking someone before them', async () => {
     const room = createMockRoom('KICK-TEST');
     const server = new GameServer(room as any);
 
     // Join 4 players
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    const conn2 = simulateJoinRoom(server, room, 'Player2');
-    const conn3 = simulateJoinRoom(server, room, 'Player3');
-    const conn4 = simulateJoinRoom(server, room, 'Player4');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'Player2');
+    const conn3 = await simulateJoinRoom(server, room, 'Player3');
+    const conn4 = await simulateJoinRoom(server, room, 'Player4');
 
     const connections = [conn1, conn2, conn3, conn4];
     const playerIds = connections.map(c => getLastSyncState(c).yourPlayerId);
 
     // Start game — narrator = index 0 (Host)
-    startGame(server, conn1);
+    await startGame(server, conn1);
 
     // Round 1: narrator = Host (idx 0) → advance to narrator = P2 (idx 1)
-    playFullRound(server, connections, playerIds, 0);
-    readyAll(server, connections);
+    await playFullRound(server, connections, playerIds, 0);
+    await readyAll(server, connections);
 
     // Round 2: narrator = P2 (idx 1) → advance to narrator = P3 (idx 2)
-    playFullRound(server, connections, playerIds, 1);
-    readyAll(server, connections);
+    await playFullRound(server, connections, playerIds, 1);
+    await readyAll(server, connections);
 
     // Now narrator = P3 (index 2)
     let state = getLastSyncState(conn1);
@@ -149,40 +149,40 @@ describe('BUG #6 — Kicking player before narrator corrupts narratorIndex', () 
 // ============================================
 
 describe('BUG #7 — Non-host AFK players unkickable during RESULTS', () => {
-  it('should identify non-host AFK player and kick them via vote', () => {
+  it('should identify non-host AFK player and kick them via vote', async () => {
     const room = createMockRoom('AFK-TEST');
     const server = new GameServer(room as any);
 
     // Join 4 players
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    const conn2 = simulateJoinRoom(server, room, 'Player2');
-    const conn3 = simulateJoinRoom(server, room, 'Player3');
-    const conn4 = simulateJoinRoom(server, room, 'Player4');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'Player2');
+    const conn3 = await simulateJoinRoom(server, room, 'Player3');
+    const conn4 = await simulateJoinRoom(server, room, 'Player4');
 
     const connections = [conn1, conn2, conn3, conn4];
     const playerIds = connections.map(c => getLastSyncState(c).yourPlayerId);
 
     // Start game and play 1 full round
-    startGame(server, conn1);
-    playFullRound(server, connections, playerIds, 0);
+    await startGame(server, conn1);
+    await playFullRound(server, connections, playerIds, 0);
 
     // Should be in RESULTS
     let state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('RESULTS');
 
     // Host, P2, P3 ready up — P4 is AFK
-    server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn1);
-    server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn2);
-    server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn3);
+    await server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn2);
+    await server.onMessage(JSON.stringify({ type: 'NEXT_ROUND' }), conn3);
 
     // Still in RESULTS (waiting for P4)
     state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('RESULTS');
 
     // Vote to kick AFK — majority = floor(4/2) + 1 = 3
-    server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn1);
-    server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn2);
-    server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn3);
+    await server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn2);
+    await server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn3);
 
     // P4 should be identified as AFK and made spectator
     state = getLastSyncState(conn1);
@@ -199,23 +199,23 @@ describe('BUG #7 — Non-host AFK players unkickable during RESULTS', () => {
 // ============================================
 
 describe('BUG #9 — Kicking players below MIN_PLAYERS ends the game', () => {
-  it('game goes to GAME_OVER when active players drop below minimum', () => {
+  it('game goes to GAME_OVER when active players drop below minimum', async () => {
     const room = createMockRoom('KICK-MIN');
     const server = new GameServer(room as any);
 
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    const conn2 = simulateJoinRoom(server, room, 'P2');
-    const conn3 = simulateJoinRoom(server, room, 'P3');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'P2');
+    const conn3 = await simulateJoinRoom(server, room, 'P3');
 
     const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
 
-    startGame(server, conn1);
+    await startGame(server, conn1);
 
     // Host kicks P2
-    server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[1] }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[1] }), conn1);
 
     // Host kicks P3 — only 1 active player remains
-    server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[2] }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[2] }), conn1);
 
     const state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('GAME_OVER');
@@ -228,25 +228,25 @@ describe('BUG #9 — Kicking players below MIN_PLAYERS ends the game', () => {
 // ============================================
 
 describe('BUG #10 — Restart game resets state properly', () => {
-  it('playersWhoReadied and currentRound are reset after restart', () => {
+  it('playersWhoReadied and currentRound are reset after restart', async () => {
     const room = createMockRoom('RESTART');
     const server = new GameServer(room as any);
 
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    const conn2 = simulateJoinRoom(server, room, 'P2');
-    const conn3 = simulateJoinRoom(server, room, 'P3');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'P2');
+    const conn3 = await simulateJoinRoom(server, room, 'P3');
 
     const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
 
-    startGame(server, conn1);
-    playFullRound(server, [conn1, conn2, conn3], playerIds, 0);
-    readyAll(server, [conn1, conn2, conn3]);
+    await startGame(server, conn1);
+    await playFullRound(server, [conn1, conn2, conn3], playerIds, 0);
+    await readyAll(server, [conn1, conn2, conn3]);
 
     // Force game over and restart
     (server as any).state.phase = 'GAME_OVER';
     (server as any).state.winner = playerIds[0];
 
-    server.onMessage(JSON.stringify({ type: 'RESTART_GAME' }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'RESTART_GAME' }), conn1);
 
     const state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('LOBBY');

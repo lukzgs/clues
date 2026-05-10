@@ -19,16 +19,23 @@ describe('Spectator logic', () => {
       broadcast: broadcastMock,
       getConnections: () => [],
       getConnection: () => null,
+      storage: {
+        get: vi.fn().mockResolvedValue(undefined),
+        put: vi.fn().mockResolvedValue(undefined),
+        delete: vi.fn().mockResolvedValue(undefined),
+        setAlarm: vi.fn().mockResolvedValue(undefined),
+        deleteAll: vi.fn().mockResolvedValue(undefined),
+      },
     };
     server = new GameServer(mockRoom);
   });
 
-  it('allows a non-host player to toggle their own spectator status', () => {
+  it('allows a non-host player to toggle their own spectator status', async () => {
     // Join Host
-    server.onMessage(JSON.stringify({ type: 'JOIN_ROOM', playerName: 'Host' }), { id: 'conn1' });
+    await server.onMessage(JSON.stringify({ type: 'JOIN_ROOM', playerName: 'Host' }), { id: 'conn1' });
     
     // Join Player 2
-    server.onMessage(JSON.stringify({ type: 'JOIN_ROOM', playerName: 'P2' }), { id: 'conn2' });
+    await server.onMessage(JSON.stringify({ type: 'JOIN_ROOM', playerName: 'P2' }), { id: 'conn2' });
     
     const p2Id = server.connections.get('conn2');
     const p2 = server.state.players.find((p: any) => p.id === p2Id);
@@ -37,12 +44,12 @@ describe('Spectator logic', () => {
     expect(p2.isSpectator).toBeFalsy(); // undefined or false
 
     // Player 2 toggles themselves
-    server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p2Id }), { id: 'conn2' });
+    await server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p2Id }), { id: 'conn2' });
     
     expect(p2.isSpectator).toBe(true);
 
     // Player 2 toggles back
-    server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p2Id }), { id: 'conn2' });
+    await server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p2Id }), { id: 'conn2' });
     
     expect(p2.isSpectator).toBe(false);
   });
@@ -53,19 +60,19 @@ describe('Spectator logic', () => {
 // ============================================
 
 describe('Spectator cannot play cards', () => {
-  it('blocks spectator from placing a card during OTHERS_CHOOSING', () => {
+  it('blocks spectator from placing a card during OTHERS_CHOOSING', async () => {
     const room = createMockRoom('SPEC-PLAY');
     const server = new GameServer(room as any);
 
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    const conn2 = simulateJoinRoom(server, room, 'P2');
-    const conn3 = simulateJoinRoom(server, room, 'P3');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'P2');
+    const conn3 = await simulateJoinRoom(server, room, 'P3');
 
     const p1Id = getLastSyncState(conn1).yourPlayerId;
     const p2Id = getLastSyncState(conn2).yourPlayerId;
 
     // Start game
-    server.onMessage(JSON.stringify({
+    await server.onMessage(JSON.stringify({
       type: 'START_GAME',
       victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
       deckOption: 'mixed',
@@ -75,7 +82,7 @@ describe('Spectator cannot play cards', () => {
     // Narrator submits clue
     let state = getLastSyncState(conn1);
     const narratorHand = state.gameState.players.find((p: any) => p.id === p1Id)?.hand;
-    server.onMessage(JSON.stringify({ type: 'SUBMIT_CLUE', cardId: narratorHand[0].id, clue: 'test' }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'SUBMIT_CLUE', cardId: narratorHand[0].id, clue: 'test' }), conn1);
 
     // Mark P2 as spectator mid-round (simulating AFK kick)
     const p2Internal = (server as any).state.players.find((p: any) => p.id === p2Id);
@@ -86,7 +93,7 @@ describe('Spectator cannot play cards', () => {
     const p2Hand = state.gameState.players.find((p: any) => p.id === p2Id)?.hand;
     const tableCardsBefore = (server as any).state.tableCards.length;
 
-    server.onMessage(JSON.stringify({ type: 'PLAY_CARD', cardId: p2Hand[0].id }), conn2);
+    await server.onMessage(JSON.stringify({ type: 'PLAY_CARD', cardId: p2Hand[0].id }), conn2);
 
     const tableCardsAfter = (server as any).state.tableCards.length;
     expect(tableCardsAfter).toBe(tableCardsBefore);
@@ -98,18 +105,18 @@ describe('Spectator cannot play cards', () => {
 // ============================================
 
 describe('Host spectator self-toggle', () => {
-  it('host can toggle themselves to spectator while retaining host status', () => {
+  it('host can toggle themselves to spectator while retaining host status', async () => {
     const room = createMockRoom('TOGGLE-SELF');
     const server = new GameServer(room as any);
 
-    const conn1 = simulateJoinRoom(server, room, 'Host');
-    simulateJoinRoom(server, room, 'P2');
-    simulateJoinRoom(server, room, 'P3');
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    await simulateJoinRoom(server, room, 'P2');
+    await simulateJoinRoom(server, room, 'P3');
 
     const p1Id = getLastSyncState(conn1).yourPlayerId;
 
     // Host toggles themselves to spectator
-    server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p1Id }), conn1);
+    await server.onMessage(JSON.stringify({ type: 'TOGGLE_SPECTATOR', targetPlayerId: p1Id }), conn1);
 
     const state = getLastSyncState(conn1);
     const host = state.gameState.players.find((p: any) => p.id === p1Id);

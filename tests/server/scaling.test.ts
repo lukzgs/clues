@@ -8,16 +8,24 @@ const mockRoom = {
   id: 'test-room',
   broadcast: vi.fn(),
   getConnection: vi.fn(),
+  getConnections: vi.fn().mockReturnValue([]),
+  storage: {
+    get: vi.fn().mockResolvedValue(undefined),
+    put: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn().mockResolvedValue(undefined),
+    setAlarm: vi.fn().mockResolvedValue(undefined),
+    deleteAll: vi.fn().mockResolvedValue(undefined),
+  },
 };
 
 describe('Scaling Test - 10 Players', () => {
-  it('should allow starting a game with 10 players in mixed deck mode', () => {
+  it('should allow starting a game with 10 players in mixed deck mode', async () => {
     const server = new GameServer(mockRoom as any);
     
     // Add 10 players
     for (let i = 0; i < 10; i++) {
       const conn = { id: `conn-${i}`, send: vi.fn() };
-      server.onMessage(JSON.stringify({
+      await server.onMessage(JSON.stringify({
         type: ClientMessageType.JOIN_ROOM,
         playerName: `Player ${i}`,
       }), conn as any);
@@ -28,7 +36,7 @@ describe('Scaling Test - 10 Players', () => {
     
     // Host (first player) tries to start game in mixed mode
     const hostConn = { id: 'conn-0', send: vi.fn() };
-    server.onMessage(JSON.stringify({
+    await server.onMessage(JSON.stringify({
       type: ClientMessageType.START_GAME,
       victoryCondition: {
         scoreEnabled: true,
@@ -50,13 +58,13 @@ describe('Scaling Test - 10 Players', () => {
     expect(server['state'].players[0].hand.length).toBe(6); // HAND_SIZE is 6
   });
 
-  it('should NOT allow starting a game with 10 players in original deck mode', () => {
+  it('should NOT allow starting a game with 10 players in original deck mode', async () => {
     const server = new GameServer(mockRoom as any);
     
     // Add 10 players
     for (let i = 0; i < 10; i++) {
       const conn = { id: `conn-${i}`, send: vi.fn() };
-      server.onMessage(JSON.stringify({
+      await server.onMessage(JSON.stringify({
         type: ClientMessageType.JOIN_ROOM,
         playerName: `Player ${i}`,
       }), conn as any);
@@ -64,7 +72,7 @@ describe('Scaling Test - 10 Players', () => {
     
     // Host (first player) tries to start game in original mode (max 8)
     const hostConn = { id: 'conn-0', send: vi.fn() };
-    server.onMessage(JSON.stringify({
+    await server.onMessage(JSON.stringify({
       type: ClientMessageType.START_GAME,
       victoryCondition: {
         scoreEnabled: true,

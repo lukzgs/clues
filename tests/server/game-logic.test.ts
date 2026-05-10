@@ -64,6 +64,8 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
     phaseStartTime: Date.now(),
     afkKickVotes: [],
     deckOption: 'mixed',
+    playersWhoReadied: [],
+    phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
     ...overrides,
   };
 }
