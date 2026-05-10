@@ -117,9 +117,9 @@ Espectadores podem voltar ao jogo usando o botão **"ENTRAR COMO JOGADOR"** no p
 ### `GameScreen.tsx`
 Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem.
 
-## Armazenamento de Sessão e Reconexão (F5)
-O frontend salva os dados essenciais providos pelo backend no `sessionStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`).
-Em caso de "F5", se este dado for avistado na inicialização via AppState, a tela de Pular é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
+## Armazenamento Local e Reconexão
+O frontend salva os dados essenciais providos pelo backend no `localStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`). Isso garante que os dados da sessão sobrevivam não apenas a atualizações de página (F5), mas também ao fechamento da aba ou do navegador.
+Em caso de recarregamento ou reabertura, se este dado for encontrado na inicialização via AppState, a tela de entrada é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
