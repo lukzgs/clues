@@ -221,6 +221,9 @@ export function getPublicState(
 
   // playersWhoPlayed: safe list of IDs who already placed a card (no card association)
   const playersWhoPlayed = state.tableCards.map(tc => tc.playerId);
+  
+  // playersWhoVoted: safe list of IDs who already voted (no choice association)
+  const playersWhoVoted = Object.keys(state.votes);
 
   return {
     roomCode: state.roomCode,
@@ -237,6 +240,7 @@ export function getPublicState(
     winner: state.winner,
     deckCount: state.deck.length,
     playersWhoPlayed,
+    playersWhoVoted,
     victoryCondition: state.victoryCondition,
     currentRound: state.currentRound,
     phaseStartTime: state.phaseStartTime,

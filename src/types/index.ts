@@ -67,6 +67,7 @@ export interface GameState {
   winner: string | null;
   deckCount: number; // Não enviamos o deck inteiro para o cliente
   playersWhoPlayed: string[]; // IDs of players who already placed a card on the table
+  playersWhoVoted: string[]; // IDs of players who already voted
   victoryCondition: VictoryCondition;
   currentRound: number; // Current round number (0-based)
   phaseStartTime: number; // Timestamp de quando a fase atual começou
@@ -77,7 +78,7 @@ export interface GameState {
 }
 
 // Estado completo do servidor (não exposto ao cliente)
-export interface ServerGameState extends Omit<GameState, 'deckCount' | 'playersWhoPlayed'> {
+export interface ServerGameState extends Omit<GameState, 'deckCount' | 'playersWhoPlayed' | 'playersWhoVoted'> {
   deck: Card[];
 }
 
