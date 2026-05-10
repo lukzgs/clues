@@ -160,7 +160,7 @@ export function checkVictoryCondition(
 ): string | null {
   // Check score-based victory
   if (victoryCondition.scoreEnabled) {
-    const winners = players.filter(p => p.score >= victoryCondition.targetScore);
+    const winners = players.filter(p => !p.isSpectator && p.score >= victoryCondition.targetScore);
     if (winners.length > 0) {
       // If multiple players cross the target score in the same round, the one with highest score wins
       winners.sort((a, b) => b.score - a.score);

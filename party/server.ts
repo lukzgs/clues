@@ -502,6 +502,9 @@ export default class GameServer implements Party.Server {
     const player = this.state.players.find(p => p.id === playerId);
     if (!player) return;
 
+    // Spectators cannot play cards
+    if (player.isSpectator) return;
+
     const cardIndex = player.hand.findIndex(c => c.id === cardId);
     if (cardIndex === -1) return;
 
@@ -625,6 +628,15 @@ export default class GameServer implements Party.Server {
     }
 
     // All players are ready — advance to next round
+    
+    // Check if deck has enough cards for the next round
+    if (this.state.deck.length < activePlayers.length) {
+      this.changePhase(GamePhase.GAME_OVER);
+      const winner = activePlayers.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+      this.state.winner = winner.id;
+      this.broadcastState();
+      return;
+    }
 
     // Increment round counter
     this.state.currentRound++;
@@ -733,6 +745,16 @@ export default class GameServer implements Party.Server {
 
     // If during game, check if narrator was kicked or phase needs progression
     if (this.state.phase !== GamePhase.LOBBY) {
+      // If active players dropped below minimum, end the game
+      const remainingActive = this.state.players.filter(p => !p.isSpectator);
+      if (remainingActive.length < GAME_CONFIG.MIN_PLAYERS) {
+        this.changePhase(GamePhase.GAME_OVER);
+        const winner = remainingActive.reduce((prev, curr) => prev.score > curr.score ? prev : curr, remainingActive[0]);
+        this.state.winner = winner?.id ?? null;
+        this.broadcastState();
+        return;
+      }
+
       // Re-locate narrator by ID after array shift
       const newNarratorIdx = this.state.players.findIndex(p => p.id === currentNarratorId);
       this.state.narratorIndex = newNarratorIdx >= 0
