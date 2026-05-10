@@ -107,6 +107,10 @@ export const RequestPlaySchema = z.object({
     type: z.literal('REQUEST_PLAY'),
 });
 
+export const PongCheckSchema = z.object({
+    type: z.literal('PONG_CHECK'),
+});
+
 // ============================================
 // UNION DE TODAS AS MENSAGENS
 // ============================================
@@ -126,6 +130,7 @@ export const ClientMessageSchema = z.discriminatedUnion('type', [
     KickPlayerSchema,
     ToggleSpectatorSchema,
     RequestPlaySchema,
+    PongCheckSchema,
 ]);
 
 // ============================================

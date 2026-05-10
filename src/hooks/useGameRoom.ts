@@ -34,6 +34,7 @@ interface UseGameRoomReturn {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  roomCloseTime: number | null;
 
   // Acoes
   startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
@@ -67,6 +68,7 @@ export function useGameRoom({
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [roomCloseTime, setRoomCloseTime] = useState<number | null>(null);
 
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
@@ -118,9 +120,30 @@ export function useGameRoom({
 
     socket.addEventListener('message', (event) => {
       try {
-        const msg: ServerMessage = JSON.parse(event.data);
+        const rawMsg = JSON.parse(event.data);
+        
+        // Respond to responsiveness checks
+        if (rawMsg.type === 'PING_CHECK') {
+          socket.send(JSON.stringify({ type: 'PONG_CHECK' }));
+          return;
+        }
+
+        const msg: any = rawMsg;
 
         switch (msg.type) {
+          case 'SERVER_CLOSING_WARNING':
+            setRoomCloseTime((msg as any).closeTime);
+            break;
+
+          case 'SERVER_CLOSING_CANCELLED':
+            setRoomCloseTime(null);
+            break;
+
+          case 'SERVER_CLOSED':
+            setError('A sala foi fechada por inatividade');
+            setGameState(null);
+            break;
+
           case ServerMessageType.SYNC_STATE:
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
@@ -283,6 +306,7 @@ export function useGameRoom({
     playerId,
     isConnected,
     error,
+    roomCloseTime,
     startGame,
     submitClue,
     playCard,

@@ -42,6 +42,7 @@ const App: React.FC = () => {
     playerId,
     isConnected,
     error,
+    roomCloseTime,
     startGame,
     submitClue,
     playCard,
@@ -200,6 +201,7 @@ const App: React.FC = () => {
     <GameScreen
       gameState={gameState}
       playerId={playerId}
+      roomCloseTime={roomCloseTime}
       onSubmitClue={submitClue}
       onPlayCard={playCard}
       onVote={vote}

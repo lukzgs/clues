@@ -49,6 +49,12 @@ export default class GameServer implements Party.Server {
   // Mapeamento: connectionId -> playerId
   private connections: Map<string, string> = new Map();
 
+  // Mapeamento: playerId -> GamePhase (fase em que o jogador se desconectou)
+  private playerDisconnectPhases: Map<string, GamePhase> = new Map();
+
+  // Mapeamento: connectionId -> resolve function (para checagem de ping/pong)
+  private pendingPongs: Map<string, () => void> = new Map();
+
   // [BOT] Gerenciador de bots (opcional)
   private botManager: any = null;
 
@@ -98,7 +104,9 @@ export default class GameServer implements Party.Server {
   // EVENTOS DE CONEXÃO
   // ============================================
 
-  onConnect(conn: Party.Connection) {
+  async onConnect(conn: Party.Connection) {
+    await this.resetInactivityTimer();
+
     // Apenas envia estado atual - jogador precisa enviar JOIN_ROOM
     this.sendToConnection(conn, {
       type: ServerMessageType.SYNC_STATE,
@@ -130,6 +138,7 @@ export default class GameServer implements Party.Server {
     const player = this.state.players.find(p => p.id === playerId);
     if (player) {
       player.isConnected = false;
+      this.playerDisconnectPhases.set(playerId, this.state.phase);
 
       // Se estava no lobby, remove o jogador
       if (this.state.phase === GamePhase.LOBBY) {
@@ -180,7 +189,7 @@ export default class GameServer implements Party.Server {
   // PROCESSAMENTO DE MENSAGENS
   // ============================================
 
-  onMessage(message: string, sender: Party.Connection) {
+  async onMessage(message: string, sender: Party.Connection) {
     // Rate limiting
     if (!this.checkRateLimit(sender.id)) {
       console.warn('Rate limit excedido:', sender.id);
@@ -197,9 +206,23 @@ export default class GameServer implements Party.Server {
       const msg = parsed.data;
       const playerId = this.connections.get(sender.id);
 
+      // PONG_CHECK does not reset inactivity timer (it is not a user action)
+      if (msg.type !== 'PONG_CHECK') {
+        await this.resetInactivityTimer();
+      }
+
       switch (msg.type) {
+        case 'PONG_CHECK': {
+          const resolve = this.pendingPongs.get(sender.id);
+          if (resolve) {
+            resolve();
+            this.pendingPongs.delete(sender.id);
+          }
+          break;
+        }
+
         case 'JOIN_ROOM':
-          this.handleJoinRoom(msg.playerName, sender, msg.reconnectId);
+          await this.handleJoinRoom(msg.playerName, sender, msg.reconnectId);
           break;
 
         case 'LEAVE_ROOM':
@@ -261,11 +284,58 @@ export default class GameServer implements Party.Server {
     }
   }
 
+  private async checkResponsiveness(conn: Party.Connection): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.pendingPongs.set(conn.id, () => resolve(true));
+      this.sendToConnection(conn, { type: 'PING_CHECK' });
+      setTimeout(() => {
+        if (this.pendingPongs.has(conn.id)) {
+          this.pendingPongs.delete(conn.id);
+          resolve(false); // Não respondeu
+        }
+      }, 4000);
+    });
+  }
+
+  private async resetInactivityTimer() {
+    const isClosing = await this.room.storage.get<boolean>('isClosing');
+    if (isClosing) {
+      await this.room.storage.delete('isClosing');
+      this.room.broadcast(JSON.stringify({ type: 'SERVER_CLOSING_CANCELLED' }));
+    }
+    await this.room.storage.setAlarm(Date.now() + 9 * 60 * 1000);
+  }
+
+  async onAlarm() {
+    const isClosing = await this.room.storage.get<boolean>('isClosing');
+    
+    if (!isClosing) {
+      // Alarme de 9 minutos!
+      await this.room.storage.put('isClosing', true);
+      this.room.broadcast(JSON.stringify({ 
+        type: 'SERVER_CLOSING_WARNING', 
+        closeTime: Date.now() + 60 * 1000 
+      }));
+      await this.room.storage.setAlarm(Date.now() + 60 * 1000);
+    } else {
+      // Alarme de 10 minutos!
+      this.room.broadcast(JSON.stringify({ type: 'SERVER_CLOSED' }));
+      
+      // Desconecta todos
+      for (const conn of this.room.getConnections()) {
+        conn.close(1000, "Room closed due to inactivity");
+      }
+      
+      // Limpa storage
+      await this.room.storage.deleteAll();
+    }
+  }
+
   // ============================================
   // HANDLERS DE AÇÕES
   // ============================================
 
-  private handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
+  private async handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
     // Verifica se já está conectado
     if (this.connections.has(conn.id)) {
       this.sendError(conn, 'Você já está na sala');
@@ -276,19 +346,43 @@ export default class GameServer implements Party.Server {
     if (reconnectId) {
       const player = this.state.players.find(p => p.id === reconnectId && !p.isBot);
       if (player) {
-        // Disconnect old socket if it exists to prevent ghost connections
+        // Verifica se já existe uma conexão ativa para este jogador
+        let existingConn: Party.Connection | undefined;
+        let existingConnIdSaved: string | undefined;
         for (const [existingConnId, existingPlayerId] of this.connections.entries()) {
           if (existingPlayerId === player.id) {
-            this.connections.delete(existingConnId); // Remove first to prevent onClose from marking as disconnected
-            const oldConn = this.room.getConnection(existingConnId);
-            if (oldConn) {
-              oldConn.close(1000, "Reconnected elsewhere");
-            }
+            existingConn = this.room.getConnection(existingConnId);
+            existingConnIdSaved = existingConnId;
+            break;
+          }
+        }
+
+        if (existingConn) {
+          // Testa a responsividade da conexão antiga
+          const isResponsive = await this.checkResponsiveness(existingConn);
+          if (isResponsive) {
+            // Se a conexão antiga respondeu, rejeitamos a nova tentativa
+            this.sendError(conn, 'Você já está conectado');
+            return;
+          } else {
+            // Se não respondeu, derrubamos a antiga
+            if (existingConnIdSaved) this.connections.delete(existingConnIdSaved);
+            existingConn.close(1000, "Reconnected elsewhere (unresponsive)");
           }
         }
 
         // Reclaim: map new connection to existing player
         player.isConnected = true;
+        
+        // Verifica se a fase mudou desde a desconexão
+        const lastPhase = this.playerDisconnectPhases.get(player.id);
+        if (lastPhase !== undefined && lastPhase !== this.state.phase) {
+          player.isSpectator = true;
+        }
+        
+        // Limpa a fase de desconexão — não precisamos mais dela
+        this.playerDisconnectPhases.delete(player.id);
+
         this.connections.set(conn.id, player.id);
 
         // Remove from readied list so they can re-confirm if disconnected during RESULTS
