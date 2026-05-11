@@ -45,7 +45,6 @@ enum ClientMessageType {
 | `KICK_PLAYER` | `playerId: string` | Any (host only) |
 | `TOGGLE_SPECTATOR` | `playerId: string` | LOBBY (host only) |
 | `REQUEST_PLAY` | (none) | LOBBY (spectators only) |
-| `PONG_CHECK` | (none) | Any |
 
 ### Example Messages
 
@@ -93,7 +92,6 @@ enum ServerMessageType {
 | `PLAYER_LEFT` | `playerId: string, playerName: string` | Player left notification |
 | `PLAYER_KICKED` | `playerId: string` | Player kicked notification |
 | `ERROR` | `message: string, code?: string` | Error notification |
-| `PING_CHECK` | (none) | Server checks if client is responsive |
 | `SERVER_CLOSING_WARNING` | `closeTime: number` | Warning that room will close due to inactivity |
 | `SERVER_CLOSING_CANCELLED` | (none) | Inactivity warning cancelled |
 | `SERVER_CLOSED` | (none) | Room closed due to inactivity |
