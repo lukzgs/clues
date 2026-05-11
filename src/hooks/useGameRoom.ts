@@ -121,13 +121,6 @@ export function useGameRoom({
     socket.addEventListener('message', (event) => {
       try {
         const rawMsg = JSON.parse(event.data);
-        
-        // Respond to responsiveness checks
-        if (rawMsg.type === 'PING_CHECK') {
-          socket.send(JSON.stringify({ type: 'PONG_CHECK' }));
-          return;
-        }
-
         const msg: any = rawMsg;
 
         switch (msg.type) {
@@ -159,6 +152,7 @@ export function useGameRoom({
 
           case ServerMessageType.ERROR:
             setError(msg.message);
+            hasJoinedRef.current = false;
             break;
 
           case ServerMessageType.PLAYER_JOINED:
