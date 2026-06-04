@@ -91,6 +91,7 @@ Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo D
 | `onCreateRoom` | `(playerName: string) => void` | Cria nova sala |
 | `onJoinRoom` | `(roomCode: string, playerName: string) => void` | Entra em sala existente |
 | `prefillRoomCode` | `string \| undefined` | Código da sala opcional proveniente dos parâmetros da URL (`?room=ABC123`). Quando fornecido, a tela é renderizada no "Modo Convite" (Invite Mode), escondendo as opções de criação e pré-preenchendo automaticamente o código. |
+| `onCancelInvite` | `(() => void) \| undefined` | Callback opcional para cancelar o modo de convite e retornar ao fluxo normal de Criação/Entrada de sala. |
 
 ### `LobbyScreen.tsx`
 Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada para mobile com um modal dedicado para configurações do host, interface localizada e lista de jogadores com rolagem interna para manter a consistência do layout em todos os dispositivos. Apresenta o sistema de design "Mythic" padronizado.
@@ -117,11 +118,12 @@ Espectadores podem voltar ao jogo usando o botão **"ENTRAR COMO JOGADOR"** no p
 
 
 ### `GameScreen.tsx`
-Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem.
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem. A pílula de código da sala é posicionada ao lado do seletor de idioma no desktop para manter alturas alinhadas, e no mobile permanece centralizada.
 
 ## Armazenamento Local e Reconexão
 O frontend salva os dados essenciais providos pelo backend no `localStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`). Isso garante que os dados da sessão sobrevivam não apenas a atualizações de página (F5), mas também ao fechamento da aba ou do navegador.
 Em caso de recarregamento ou reabertura, se este dado for encontrado na inicialização via AppState, a tela de entrada é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
+Se um jogador acessar a página com o parâmetro de convite (`?room=XXXX`) diferente da sessão salva no `localStorage`, a sessão antiga é ignorada e limpa para evitar conflitos.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
@@ -146,9 +148,9 @@ Localizados em `src/components/game/`:
 |------------|-----------|
 | `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK. Apresenta um design refinado com brilho de borda e glassmorfismo. |
 | `RoomTimeoutBar` | Componente interno da GameScreen que mostra uma contagem regressiva quando a sala está prestes a fechar por inatividade. |
-| `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso |
+| `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso. Inclui a prop `dimWhenDisabled` (padrão true) que pode ser configurada como false para reter a visibilidade/opacidade total quando a carta está desabilitada. |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
-| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada". O layout foi otimizado com botões de ação posicionados diretamente abaixo das cartas, seguidos pelo placar. |
+| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada" (que muda o texto para "Finalizar Jogo" na última rodada). O layout foi otimizado com botões de ação posicionados diretamente abaixo das cartas, seguidos pelo placar. |
 | `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
 | `LeaveConfirmModal.tsx` | Modal de confirmação para que os jogadores saiam da sessão de jogo com segurança |
 | `GameOverView.tsx` | Pontuações finais e vencedor |

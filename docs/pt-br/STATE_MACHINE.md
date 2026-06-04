@@ -20,8 +20,8 @@ stateDiagram-v2
     
     VOTING --> RESULTS: Todos votaram
     
-    RESULTS --> NARRATOR_CHOOSING: NEXT_ROUND (cartas restantes)
-    RESULTS --> GAME_OVER: NEXT_ROUND (baralho vazio)
+    RESULTS --> NARRATOR_CHOOSING: NEXT_ROUND (sem vencedor && cartas restantes)
+    RESULTS --> GAME_OVER: NEXT_ROUND (vencedor detectado || baralho vazio)
     
     GAME_OVER --> LOBBY: RESTART_GAME
     GAME_OVER --> [*]: Jogadores saem
@@ -62,7 +62,7 @@ stateDiagram-v2
 **Dados do Estado**:
 - `narratorIndex` - Índice do narrador atual no array de jogadores
 - `currentClue` - Vazio até ser enviada
-
+ 
 **Transição**: `SUBMIT_CLUE` → `OTHERS_CHOOSING`
 
 ---
@@ -105,7 +105,7 @@ stateDiagram-v2
 
 ### RESULTS
 
-**Descrição**: Pontuações são calculadas e exibidas.
+**Descrição**: Pontuações são calculadas e exibidas. Mesmo se um vencedor for detectado durante o cálculo, o jogo transita primeiro para RESULTS para que os jogadores possam ver a última rodada e as pontuações finais antes de encerrar o jogo.
 
 | Ações Permitidas | Ator |
 |------------------|------|
@@ -117,8 +117,8 @@ stateDiagram-v2
 - Cada voto na sua carta: +1 ponto (exceto carta do narrador)
 
 **Transição**: 
-- `NEXT_ROUND` (baralho tem cartas) → `NARRATOR_CHOOSING`
-- `NEXT_ROUND` (baralho vazio) → `GAME_OVER`
+- `NEXT_ROUND` (sem vencedor e baralho tem cartas) → `NARRATOR_CHOOSING`
+- `NEXT_ROUND` (vencedor detectado ou baralho vazio) → `GAME_OVER`
 
 ---
 

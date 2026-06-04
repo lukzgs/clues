@@ -26,7 +26,7 @@ class GameServer implements Party.Server {
 | Method | Description |
 |--------|-------------|
 | `constructor(room)` | Initializes server with room reference |
-| `onConnect(conn)` | Handles new WebSocket connections |
+| `onConnect(conn)` | Handles new WebSocket connections. On reconnecting, sends an individual `SYNC_STATE` confirmation message directly to the connection to restore local state. |
 | `onClose(conn)` | Handles disconnections. Preserves players in lobby for reconnection (schedules 10s host migration), and immediately transfers host role if host disconnects mid-game. |
 | `onMessage(message, sender)` | Routes incoming messages to handlers |
 | `onAlarm()` | Handles inactivity timeouts (9m warning, 10m close) |

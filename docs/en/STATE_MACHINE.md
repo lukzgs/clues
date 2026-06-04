@@ -20,8 +20,8 @@ stateDiagram-v2
     
     VOTING --> RESULTS: All players voted
     
-    RESULTS --> NARRATOR_CHOOSING: NEXT_ROUND (cards remaining)
-    RESULTS --> GAME_OVER: NEXT_ROUND (deck empty)
+    RESULTS --> NARRATOR_CHOOSING: NEXT_ROUND (no winner && cards remaining)
+    RESULTS --> GAME_OVER: NEXT_ROUND (winner detected || deck empty)
     
     GAME_OVER --> LOBBY: RESTART_GAME
     GAME_OVER --> [*]: Players leave
@@ -105,7 +105,7 @@ stateDiagram-v2
 
 ### RESULTS
 
-**Description**: Scores are calculated and displayed.
+**Description**: Scores are calculated and displayed. Even if a winner is detected during scoring, the game transitions to RESULTS first so players can view the final round and final scores before the game ends.
 
 | Allowed Actions | Actor |
 |-----------------|-------|
@@ -117,8 +117,8 @@ stateDiagram-v2
 - Each vote on your card: +1 point (except narrator's card)
 
 **Transition**: 
-- `NEXT_ROUND` (deck has cards) → `NARRATOR_CHOOSING`
-- `NEXT_ROUND` (deck empty) → `GAME_OVER`
+- `NEXT_ROUND` (no winner and deck has cards) → `NARRATOR_CHOOSING`
+- `NEXT_ROUND` (winner detected or deck empty) → `GAME_OVER`
 
 ---
 
