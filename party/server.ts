@@ -133,13 +133,28 @@ export default class GameServer implements Party.Server {
     if (player) {
       player.isConnected = false;
 
-      // Se estava no lobby, remove o jogador
       if (this.state.phase === GamePhase.LOBBY) {
-        this.state.players = this.state.players.filter(p => p.id !== playerId);
-
-        // Reatribui host se necessário
-        if (player.isHost && this.state.players.length > 0) {
-          this.state.players[0].isHost = true;
+        // Lobby: keep player in state for reconnection, but schedule host migration
+        if (player.isHost) {
+          setTimeout(() => {
+            if (this.state.phase === GamePhase.LOBBY && player.isHost && !player.isConnected) {
+              const nextHost = this.state.players.find(p => p.isConnected && !p.isSpectator && !p.isBot);
+              if (nextHost) {
+                player.isHost = false;
+                nextHost.isHost = true;
+                this.broadcastState();
+              }
+            }
+          }, 10000);
+        }
+      } else {
+        // Mid-game: reassign host immediately if disconnected host
+        if (player.isHost) {
+          const nextHost = this.state.players.find(p => p.isConnected && !p.isSpectator && p.id !== playerId);
+          if (nextHost) {
+            player.isHost = false;
+            nextHost.isHost = true;
+          }
         }
       }
 
@@ -450,6 +465,9 @@ export default class GameServer implements Party.Server {
     if (!player?.isHost) {
       return;
     }
+
+    // Remove disconnected players before starting (lobby cleanup)
+    this.state.players = this.state.players.filter(p => p.isConnected || p.isBot);
 
     // [SPECTATOR] Verifica minimo de jogadores ATIVOS (não spectators)
     const activePlayers = this.state.players.filter(p => !p.isSpectator);
