@@ -254,3 +254,159 @@ describe('BUG #10 — Restart game resets state properly', () => {
     expect(state.gameState.currentRound).toBe(0);
   });
 });
+
+// ============================================
+// Connectivity Fix — Lobby reconnection preserves
+// player ID and host status instead of creating
+// a new player.
+// ============================================
+
+describe('Connectivity — Lobby reconnection preserves session', () => {
+  it('player reconnects in lobby and keeps their ID and host status', async () => {
+    const room = createMockRoom('RECONN-1');
+    const server = new GameServer(room as any);
+
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    await simulateJoinRoom(server, room, 'Player2');
+
+    const hostId = getLastSyncState(conn1).yourPlayerId;
+
+    // Simulate host disconnect
+    room.connections.delete(conn1.id);
+    server.onClose(conn1);
+
+    // Player should still be in state, just marked disconnected
+    let state = getLastSyncState(conn1);
+    // Verify via a second player's state
+    const conn2Msgs = room.connections.values().next();
+
+    // Reconnect with new connection but same reconnectId
+    const conn1b = await simulateJoinRoom(server, room, 'Host', undefined, hostId);
+    state = getLastSyncState(conn1b);
+
+    // Should have same player ID and still be host
+    expect(state.yourPlayerId).toBe(hostId);
+    const hostPlayer = state.gameState.players.find((p: any) => p.id === hostId);
+    expect(hostPlayer).toBeDefined();
+    expect(hostPlayer.isHost).toBe(true);
+    expect(hostPlayer.isConnected).toBe(true);
+  });
+});
+
+// ============================================
+// Connectivity Fix — Host timeout migration in
+// lobby after 10s. Uses fake timers.
+// ============================================
+
+describe('Connectivity — Host timeout migration in lobby', () => {
+  it('host role transfers to another player after 10s disconnect', async () => {
+    vi.useFakeTimers();
+
+    const room = createMockRoom('TIMEOUT-1');
+    const server = new GameServer(room as any);
+
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'Player2');
+
+    const hostId = getLastSyncState(conn1).yourPlayerId;
+    const p2Id = getLastSyncState(conn2).yourPlayerId;
+
+    // Simulate host disconnect
+    room.connections.delete(conn1.id);
+    server.onClose(conn1);
+
+    // Before timeout, host should still have isHost
+    let state = getLastSyncState(conn2);
+    let hostPlayer = state.gameState.players.find((p: any) => p.id === hostId);
+    expect(hostPlayer.isHost).toBe(true);
+
+    // Advance past timeout
+    vi.advanceTimersByTime(11000);
+
+    // Now P2 should be host
+    state = getLastSyncState(conn2);
+    hostPlayer = state.gameState.players.find((p: any) => p.id === hostId);
+    const p2Player = state.gameState.players.find((p: any) => p.id === p2Id);
+    expect(hostPlayer.isHost).toBe(false);
+    expect(p2Player.isHost).toBe(true);
+
+    vi.useRealTimers();
+  });
+});
+
+// ============================================
+// Connectivity Fix — Disconnected players are
+// cleaned up when game starts.
+// ============================================
+
+describe('Connectivity — Disconnected players cleaned on game start', () => {
+  it('removes offline players when host starts the game', async () => {
+    const room = createMockRoom('CLEAN-1');
+    const server = new GameServer(room as any);
+
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'Player2');
+    const conn3 = await simulateJoinRoom(server, room, 'Player3');
+    await simulateJoinRoom(server, room, 'Player4');
+
+    // Disconnect Player4
+    const conn4 = [...room.connections.values()].pop()!;
+    const p4Id = getLastSyncState(conn4).yourPlayerId;
+    room.connections.delete(conn4.id);
+    server.onClose(conn4);
+
+    // Start game
+    await server.onMessage(JSON.stringify({
+      type: 'START_GAME',
+      victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
+      deckOption: 'mixed',
+      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    }), conn1);
+
+    const state = getLastSyncState(conn1);
+    expect(state.gameState.phase).toBe('NARRATOR_CHOOSING');
+    // Player4 should be removed
+    const p4 = state.gameState.players.find((p: any) => p.id === p4Id);
+    expect(p4).toBeUndefined();
+    // 3 players remain
+    expect(state.gameState.players.length).toBe(3);
+  });
+});
+
+// ============================================
+// Connectivity Fix — Host disconnecting mid-game
+// transfers isHost to another active player.
+// ============================================
+
+describe('Connectivity — Mid-game host reassignment', () => {
+  it('reassigns host when host disconnects during game', async () => {
+    const room = createMockRoom('MIDHOST-1');
+    const server = new GameServer(room as any);
+
+    const conn1 = await simulateJoinRoom(server, room, 'Host');
+    const conn2 = await simulateJoinRoom(server, room, 'Player2');
+    const conn3 = await simulateJoinRoom(server, room, 'Player3');
+
+    const hostId = getLastSyncState(conn1).yourPlayerId;
+    const p2Id = getLastSyncState(conn2).yourPlayerId;
+
+    // Start game
+    await server.onMessage(JSON.stringify({
+      type: 'START_GAME',
+      victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
+      deckOption: 'mixed',
+      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    }), conn1);
+
+    // Disconnect host mid-game
+    room.connections.delete(conn1.id);
+    server.onClose(conn1);
+
+    // P2 should now be host
+    const state = getLastSyncState(conn2);
+    const oldHost = state.gameState.players.find((p: any) => p.id === hostId);
+    const newHost = state.gameState.players.find((p: any) => p.id === p2Id);
+    expect(oldHost.isHost).toBe(false);
+    expect(newHost.isHost).toBe(true);
+  });
+});
