@@ -19,11 +19,20 @@ type AppState =
 
 const getInitialState = (): AppState => {
   try {
+    const params = new URLSearchParams(window.location.search);
+    const urlRoomCode = params.get('room');
+
     const sessionStr = localStorage.getItem('story-weaver:active_session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr);
       if (session.roomCode && session.playerName) {
-        return { screen: 'connecting', roomCode: session.roomCode, playerName: session.playerName };
+        // If joining via link to a different room, ignore the old session
+        if (!urlRoomCode || urlRoomCode === session.roomCode) {
+          return { screen: 'connecting', roomCode: session.roomCode, playerName: session.playerName };
+        } else {
+          // Clear old session so it doesn't conflict later
+          localStorage.removeItem('story-weaver:active_session');
+        }
       }
     }
   } catch (e) {
@@ -98,7 +107,7 @@ const App: React.FC = () => {
   }, [error, appState.screen, clearError]);
 
   // Extract ?room= from URL (invite link)
-  const prefillRoomCode = useMemo(() => {
+  const [prefillRoomCode, setPrefillRoomCode] = useState<string | undefined>(() => {
     const params = new URLSearchParams(window.location.search);
     const room = params.get('room')?.toUpperCase();
     if (room && room.length === 6) {
@@ -107,7 +116,7 @@ const App: React.FC = () => {
       return room;
     }
     return undefined;
-  }, []);
+  });
 
   // Tela de join
   if (appState.screen === 'join') {
@@ -116,6 +125,7 @@ const App: React.FC = () => {
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
         prefillRoomCode={prefillRoomCode}
+        onCancelInvite={() => setPrefillRoomCode(undefined)}
       />
     );
   }

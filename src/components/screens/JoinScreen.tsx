@@ -7,12 +7,14 @@ interface JoinScreenProps {
   onJoinRoom: (roomCode: string, playerName: string) => void;
   /** When set, renders the simplified invite mode instead of the full screen */
   prefillRoomCode?: string;
+  onCancelInvite?: () => void;
 }
 
 export const JoinScreen: React.FC<JoinScreenProps> = ({
   onCreateRoom,
   onJoinRoom,
   prefillRoomCode,
+  onCancelInvite,
 }) => {
   const { t } = useTranslation();
   const isInviteMode = !!prefillRoomCode;
@@ -117,6 +119,18 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   </svg>
                 </button>
               </div>
+
+              {/* Back button */}
+              {onCancelInvite && (
+                <div className="w-full mt-4 text-center" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
+                  <button
+                    onClick={onCancelInvite}
+                    className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
+                  >
+                    {t.connecting.back}
+                  </button>
+                </div>
+              )}
             </>
           ) : (
             /* ========== NORMAL MODE ========== */
