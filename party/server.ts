@@ -360,6 +360,14 @@ export default class GameServer implements Party.Server {
         });
 
         this.broadcastState();
+        
+        // Send confirmation with player ID so client can restore local state
+        conn.send(JSON.stringify({
+          type: ServerMessageType.SYNC_STATE,
+          gameState: getPublicState(this.state, player.id),
+          yourPlayerId: player.id
+        }));
+        
         return;
       }
       // reconnectId invalid — fall through to normal join

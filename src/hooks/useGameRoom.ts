@@ -89,6 +89,7 @@ export function useGameRoom({
     socketRef.current = socket;
 
     socket.addEventListener('open', () => {
+      if (socketRef.current !== socket) return;
       setIsConnected(true);
       setError(null);
 
@@ -120,6 +121,7 @@ export function useGameRoom({
     });
 
     socket.addEventListener('message', (event) => {
+      if (socketRef.current !== socket) return;
       try {
         const rawMsg = JSON.parse(event.data);
         const msg: any = rawMsg;
@@ -180,13 +182,17 @@ export function useGameRoom({
     });
 
     socket.addEventListener('close', () => {
-      setIsConnected(false);
-      hasJoinedRef.current = false;
+      if (socketRef.current === socket) {
+        setIsConnected(false);
+        hasJoinedRef.current = false;
+      }
     });
 
     socket.addEventListener('error', () => {
-      setError('Erro de conexão');
-      setIsConnected(false);
+      if (socketRef.current === socket) {
+        setError('Erro de conexão');
+        setIsConnected(false);
+      }
     });
 
     return () => {
