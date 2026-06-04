@@ -26,6 +26,8 @@ export const translations = {
       label: 'Connecting',
       joiningRoom: 'Joining room...',
       back: '← Back',
+      reconnecting: 'Reconnecting',
+      lostConnection: 'Connection lost. Trying to reconnect...',
     },
     lobby: {
       roomCode: 'ROOM CODE',
@@ -164,6 +166,8 @@ export const translations = {
       label: 'Conectando',
       joiningRoom: 'Entrando na sala...',
       back: '← Voltar',
+      reconnecting: 'Reconectando',
+      lostConnection: 'Conexão perdida. Tentando reconectar...',
     },
     lobby: {
       roomCode: 'CÓDIGO DA SALA',

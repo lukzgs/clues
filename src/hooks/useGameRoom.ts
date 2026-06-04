@@ -34,6 +34,7 @@ interface UseGameRoomReturn {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  clearError: () => void;
   roomCloseTime: number | null;
 
   // Acoes
@@ -300,6 +301,7 @@ export function useGameRoom({
     playerId,
     isConnected,
     error,
+    clearError: useCallback(() => setError(null), []),
     roomCloseTime,
     startGame,
     submitClue,

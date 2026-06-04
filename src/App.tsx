@@ -42,6 +42,7 @@ const App: React.FC = () => {
     playerId,
     isConnected,
     error,
+    clearError,
     roomCloseTime,
     startGame,
     submitClue,
@@ -87,6 +88,14 @@ const App: React.FC = () => {
       );
     }
   }, [appState.screen, isConnected, gameState]);
+
+  // Auto-dismiss error after 5 seconds
+  useEffect(() => {
+    if (error && appState.screen === 'game') {
+      const timer = setTimeout(() => clearError(), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, appState.screen, clearError]);
 
   // Extract ?room= from URL (invite link)
   const prefillRoomCode = useMemo(() => {
@@ -179,38 +188,87 @@ const App: React.FC = () => {
     );
   }
 
+  // Connection overlay (banner + error toast) for lobby and game screens
+  const connectionOverlay = (
+    <>
+      {/* Disconnection banner */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          !isConnected ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="bg-amber-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-2.5 flex items-center justify-center gap-3">
+          <div className="w-4 h-4 relative flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-300 animate-spin" />
+          </div>
+          <span className="text-amber-200 text-xs font-sans font-medium tracking-wide">
+            {t.connecting.lostConnection}
+          </span>
+        </div>
+      </div>
+
+      {/* Error toast */}
+      <div
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-400 ${
+          error && isConnected ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="bg-red-900/80 backdrop-blur-md border border-red-500/30 rounded-xl px-5 py-3 flex items-center gap-3 shadow-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-300 shrink-0">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          <span className="text-red-200 text-xs font-sans font-medium">{error}</span>
+          <button onClick={clearError} className="text-red-300/60 hover:text-red-200 transition-colors ml-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
   // Tela de lobby
   if (gameState.phase === GamePhase.LOBBY) {
     return (
-      <LobbyScreen
-        gameState={gameState}
-        currentPlayer={gameState.players.find(p => p.id === playerId)}
-        onStartGame={startGame}
-        onLeaveRoom={handleLeaveRoom}
-        onAddBot={addBot}
-        onRemoveBot={removeBot}
-        onKickPlayer={kickPlayer}
-        onToggleSpectator={toggleSpectator}
-        onRequestPlay={requestPlay}
-      />
+      <>
+        {connectionOverlay}
+        <LobbyScreen
+          gameState={gameState}
+          currentPlayer={gameState.players.find(p => p.id === playerId)}
+          onStartGame={startGame}
+          onLeaveRoom={handleLeaveRoom}
+          onAddBot={addBot}
+          onRemoveBot={removeBot}
+          onKickPlayer={kickPlayer}
+          onToggleSpectator={toggleSpectator}
+          onRequestPlay={requestPlay}
+        />
+      </>
     );
   }
 
   // Tela de jogo
   return (
-    <GameScreen
-      gameState={gameState}
-      playerId={playerId}
-      roomCloseTime={roomCloseTime}
-      onSubmitClue={submitClue}
-      onPlayCard={playCard}
-      onVote={vote}
-      onNextRound={nextRound}
-      onRestartGame={restartGame}
-      onLeaveRoom={handleLeaveRoom}
-      voteKickAfk={voteKickAfk}
-      onKickPlayer={kickPlayer}
-    />
+    <>
+      {connectionOverlay}
+      <GameScreen
+        gameState={gameState}
+        playerId={playerId}
+        roomCloseTime={roomCloseTime}
+        onSubmitClue={submitClue}
+        onPlayCard={playCard}
+        onVote={vote}
+        onNextRound={nextRound}
+        onRestartGame={restartGame}
+        onLeaveRoom={handleLeaveRoom}
+        voteKickAfk={voteKickAfk}
+        onKickPlayer={kickPlayer}
+      />
+    </>
   );
 };
 
