@@ -11,6 +11,7 @@ interface GameCardProps {
   onClick?: () => void;
   className?: string;
   loading?: 'lazy' | 'eager';
+  dimWhenDisabled?: boolean;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -24,6 +25,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   onClick,
   className = '',
   loading = 'lazy',
+  dimWhenDisabled = true,
 }) => {
   // Tamanhos responsivos
   const sizeClasses = {
@@ -55,8 +57,10 @@ export const GameCard: React.FC<GameCardProps> = ({
           ? 'ring-4 scale-105 shadow-xl'
           : ''
         }
-        ${disabled
+        ${disabled && dimWhenDisabled
           ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
+          : disabled && !dimWhenDisabled
+          ? 'cursor-not-allowed'
           : ''
         }
         ${className}

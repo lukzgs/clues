@@ -626,6 +626,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                           card={tableCard.card}
                           size="full"
                           disabled={isNarrator || hasVoted || isMine || (currentPlayer?.isSpectator ?? false)}
+                          dimWhenDisabled={false}
                           onClick={() => handleVoteSelect(tableCard)}
                           className={`
                             ${isMine ? 'opacity-50' : ''} 
