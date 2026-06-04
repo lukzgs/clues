@@ -27,7 +27,7 @@ class GameServer implements Party.Server {
 |--------|-------------|
 | `constructor(room)` | Initializes server with room reference |
 | `onConnect(conn)` | Handles new WebSocket connections |
-| `onClose(conn)` | Handles disconnections |
+| `onClose(conn)` | Handles disconnections. Preserves players in lobby for reconnection (schedules 10s host migration), and immediately transfers host role if host disconnects mid-game. |
 | `onMessage(message, sender)` | Routes incoming messages to handlers |
 | `onAlarm()` | Handles inactivity timeouts (9m warning, 10m close) |
 
@@ -37,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Trigger | Description |
 |---------|---------|-------------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color. Handles session reclamation with ghost socket eviction and phase validation. |
+| `handleJoinRoom` | `JOIN_ROOM` | Adds player to room, assigns color. Handles session reclamation with ghost socket eviction, preserves host status on reconnect, and phase validation. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Removes player from room |
 | `handleStartGame` | `START_GAME` | Validates and starts game (host only) |
 | `handleAddBot` | `ADD_BOT` | Adds AI player (host only) |

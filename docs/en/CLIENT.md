@@ -46,6 +46,7 @@ interface UseGameRoomOptions {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  clearError: () => void;
   roomCloseTime: number | null;
   
   // Actions
@@ -166,7 +167,9 @@ The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 - **Production**: Defaults to `story-weaver-party.lukzgs.partykit.dev` if the environment variable is not explicitly set.
 
 ### Error Handling
-The application features a unified error UI for connection issues and validation errors. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.
+The application features a unified error UI for connection issues and validation errors.
+- **Connection Loss**: A persistent disconnect banner overlays the game and lobby screens when the WebSocket connection drops, showing a "Trying to reconnect..." state.
+- **Server Errors**: Transient error toasts appear for server errors (e.g. rate limit, invalid actions) and auto-dismiss after 5 seconds. The connection error screen in `App.tsx` has been polished to match the subtle "floating" style of the `JoinScreen` validation errors.
 
 ---
 

@@ -27,7 +27,7 @@ class GameServer implements Party.Server {
 |--------|-----------|
 | `constructor(room)` | Inicializa servidor com referência à sala |
 | `onConnect(conn)` | Trata novas conexões WebSocket |
-| `onClose(conn)` | Trata desconexões |
+| `onClose(conn)` | Trata desconexões. Preserva jogadores no lobby para reconexão (agenda migração de host de 10s), e transfere o host imediatamente se desconectar durante o jogo. |
 | `onMessage(message, sender)` | Roteia mensagens para handlers |
 | `onAlarm()` | Trata timeouts de inatividade (aviso de 9 min, fechamento aos 10 min) |
 
@@ -37,7 +37,7 @@ class GameServer implements Party.Server {
 
 | Handler | Gatilho | Descrição |
 |---------|---------|-----------|
-| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor. Gerencia reconexão via expurgo de conexões fantasmagóricas e validação de fase. |
+| `handleJoinRoom` | `JOIN_ROOM` | Adiciona jogador à sala, atribui cor. Gerencia reconexão via expurgo de conexões fantasmagóricas, preserva status de host na reconexão e validação de fase. |
 | `handleLeaveRoom` | `LEAVE_ROOM` | Remove jogador da sala |
 | `handleStartGame` | `START_GAME` | Valida e inicia jogo (apenas host) |
 | `handleAddBot` | `ADD_BOT` | Adiciona jogador IA (apenas host) |

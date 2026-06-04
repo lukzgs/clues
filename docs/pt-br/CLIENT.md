@@ -46,6 +46,7 @@ interface UseGameRoomOptions {
   playerId: string | null;
   isConnected: boolean;
   error: string | null;
+  clearError: () => void;
   roomCloseTime: number | null;
   
   // Ações
@@ -167,7 +168,9 @@ O cliente utiliza `VITE_PARTYKIT_HOST` para determinar o endereço do servidor W
 - **Produção**: O padrão é `story-weaver-party.lukzgs.partykit.dev` caso a variável de ambiente não seja configurada explicitamente.
 
 ### Tratamento de Erros
-A aplicação possui uma interface de erro unificada para problemas de conexão e erros de validação. A tela de erro de conexão no `App.tsx` foi polida para corresponder ao estilo sutil "flutuante" dos erros de validação da `JoinScreen`.
+A aplicação possui uma interface de erro unificada para problemas de conexão e erros de validação.
+- **Queda de Conexão**: Um banner de desconexão persistente sobrepõe as telas de jogo e lobby quando a conexão WebSocket cai, mostrando o estado "Tentando reconectar...".
+- **Erros de Servidor**: Toasts de erro temporários aparecem para erros do servidor (ex: rate limit, ações inválidas) e desaparecem automaticamente após 5 segundos. A tela de erro de conexão no `App.tsx` foi polida para corresponder ao estilo sutil "flutuante" dos erros de validação da `JoinScreen`.
 
 ---
 
