@@ -274,13 +274,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       )}
 
       {/* ===== HEADER ===== */}
-      <header className="grid grid-cols-3 items-center px-4 md:px-8 py-3.5 md:py-5 border-b border-white/10 bg-black/40 backdrop-blur-2xl z-20">
+      <header className="flex md:grid md:grid-cols-3 items-center justify-between px-4 md:px-8 py-3.5 md:py-5 border-b border-white/10 bg-black/40 backdrop-blur-2xl z-20">
         {/* Left: Phase Title (Desktop) + Score Button (Mobile) */}
         <div className="flex items-center gap-3">
           {/* Mobile: Score button */}
           <button
             onClick={() => setShowScoreModal(true)}
-            className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-amber-300 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all duration-300"
+            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-amber-300 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all duration-300"
             title="Ver pontuação"
             aria-label="Ver pontuação"
           >
@@ -305,15 +305,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </h1>
         </div>
 
-        {/* Center: Room Code Pill (Always Centered) */}
-        <div className="justify-self-center">
-          <div className="flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 py-1.5 border border-white/10 shadow-inner">
-            <span className="text-sm md:text-base font-cinzel font-bold text-amber-300 tracking-widest mr-3">
+        {/* Center: Room Code Pill (Mobile Only) */}
+        <div className="justify-self-center md:hidden">
+          <div className="flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 h-10 border border-white/10 shadow-inner">
+            <span className="text-sm font-cinzel font-bold text-amber-300 tracking-widest mr-3">
               {gameState.roomCode}
             </span>
             <button
               onClick={handleCopyLink}
-              className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 border ${
+              className={`p-1.5 rounded-lg transition-all duration-300 border ${
                 copied
                   ? 'text-green-400 border-green-500/30 bg-green-500/10'
                   : 'text-white/40 border-white/10 bg-white/5 hover:text-amber-300'
@@ -329,9 +329,31 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
         </div>
 
-        {/* Right: Language Toggle & Exit Icon */}
+        {/* Right: Language Toggle, Room Code (Desktop) & Exit Icon */}
         <div className="justify-self-end flex items-center gap-3 md:gap-4">
-          <LanguageToggle className="" />
+          <LanguageToggle className="h-10 md:h-11" />
+          
+          <div className="hidden md:flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 h-11 border border-white/10 shadow-inner">
+            <span className="text-base font-cinzel font-bold text-amber-300 tracking-widest mr-3">
+              {gameState.roomCode}
+            </span>
+            <button
+              onClick={handleCopyLink}
+              className={`p-2 rounded-lg transition-all duration-300 border ${
+                copied
+                  ? 'text-green-400 border-green-500/30 bg-green-500/10'
+                  : 'text-white/40 border-white/10 bg-white/5 hover:text-amber-300'
+              }`}
+              title="Copiar link da sala"
+            >
+              {copied ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              )}
+            </button>
+          </div>
+
           <button
             onClick={() => setShowLeaveConfirm(true)}
             aria-label="Sair da sala"
