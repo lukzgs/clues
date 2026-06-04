@@ -159,7 +159,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
             onClick={onNextRound}
             className="w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]"
           >
-            {t.results.nextRound}
+            {gameState.winner ? t.results.finishGame : t.results.nextRound}
           </button>
         ) : currentPlayer?.isSpectator ? (
           <div className="text-center py-4 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">

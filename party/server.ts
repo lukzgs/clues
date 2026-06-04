@@ -667,17 +667,16 @@ export default class GameServer implements Party.Server {
     );
 
     if (winnerId) {
-      this.changePhase(GamePhase.GAME_OVER);
       this.state.winner = winnerId;
-    } else {
-      this.changePhase(GamePhase.RESULTS);
-      // [BOT] Auto-ready bots so they don't block round advancement
-      this.state.players.forEach(p => {
-        if (p.isBot && !p.isSpectator) {
-          this.state.playersWhoReadied.push(p.id);
-        }
-      });
     }
+
+    this.changePhase(GamePhase.RESULTS);
+    // [BOT] Auto-ready bots so they don't block round advancement
+    this.state.players.forEach(p => {
+      if (p.isBot && !p.isSpectator) {
+        this.state.playersWhoReadied.push(p.id);
+      }
+    });
   }
 
   private handleNextRound(playerId: string) {
@@ -705,6 +704,13 @@ export default class GameServer implements Party.Server {
 
     // All players are ready — advance to next round
     
+    // Check if game is already won from previous round
+    if (this.state.winner) {
+      this.changePhase(GamePhase.GAME_OVER);
+      this.broadcastState();
+      return;
+    }
+
     // Check if deck has enough cards for the next round
     if (this.state.deck.length < activePlayers.length) {
       this.changePhase(GamePhase.GAME_OVER);
