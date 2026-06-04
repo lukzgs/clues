@@ -1,0 +1,6 @@
+public
+dist
+.gemini
+node_modules
+docs
+tests
