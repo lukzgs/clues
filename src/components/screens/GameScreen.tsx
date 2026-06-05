@@ -306,8 +306,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
 
         {/* Center: Room Code Pill (Mobile Only) */}
-        <div className="justify-self-center md:hidden">
-          <div className="flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 h-10 border border-white/10 shadow-inner">
+        <div className="justify-self-center">
+          <div className="md:hidden flex items-center bg-[#1A1A1A]/60 rounded-xl pl-4 pr-1.5 h-10 border border-white/10 shadow-inner">
             <span className="text-sm font-cinzel font-bold text-amber-300 tracking-widest mr-3">
               {gameState.roomCode}
             </span>
@@ -403,7 +403,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 >
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg border border-white/10 ${
-                      status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1A1A1A]' : ''
+                      isMe ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#1A1A1A]' : ''
                     }`}
                     style={{ backgroundColor: player.color }}
                   >
@@ -667,7 +667,58 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
-          {currentPlayer && !currentPlayer.isSpectator && (
+          {/* During OTHERS_CHOOSING, if already played or narrator: show who-played scoreboard */}
+          {currentPlayer && !currentPlayer.isSpectator && gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed) && (
+            <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-[#1A1A1A]/60 backdrop-blur-md border-t border-white/10 relative z-10 px-4 md:px-8">
+              <div className="max-w-screen-md w-full mx-auto">
+                <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] font-sans font-bold text-center mb-4">
+                  {t.game.playersChoosing}
+                </p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {[...gameState.players]
+                    .filter(p => !p.isSpectator)
+                    .map(player => {
+                      const played = gameState.playersWhoPlayed?.includes(player.id) || player.id === narrator?.id;
+                      const isMe = player.id === playerId;
+                      return (
+                        <div
+                          key={player.id}
+                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all duration-300 ${
+                            played
+                              ? 'bg-green-500/10 border-green-500/20'
+                              : 'bg-white/[0.03] border-white/5'
+                          }`}
+                        >
+                          <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-white/10"
+                            style={{ backgroundColor: player.color }}
+                          >
+                            {player.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className={`font-cinzel font-bold text-xs ${isMe ? 'text-amber-300' : 'text-white/70'}`}>
+                            {player.name}{isMe && <span className="text-white/30 font-sans text-[9px] ml-1">({t.common.you})</span>}
+                          </span>
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
+                            played
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : 'bg-black/40 text-white/20 border-white/5'
+                          }`}>
+                            {played ? (
+                              <span className="text-[9px] font-bold leading-none">✓</span>
+                            ) : (
+                              <span className="text-[9px] opacity-40 leading-none">?</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  }
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentPlayer && !currentPlayer.isSpectator && !(gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) && (
             <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-white/10 md:border-none relative z-10 px-4 md:px-0">
               <div className="max-w-screen-2xl w-full mx-auto">
                 <div className="md:hidden flex justify-between items-center mb-4 pt-2 px-2">
@@ -799,7 +850,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     >
                       <span className={`w-6 text-center font-cinzel font-bold text-sm shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/30'}`}>{index + 1}°</span>
                       <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/10 ${status === 'narrator' ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black' : ''}`}
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/10 ${isMe ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black' : ''}`}
                         style={{ backgroundColor: player.color }}
                       >
                         {player.name.charAt(0).toUpperCase()}

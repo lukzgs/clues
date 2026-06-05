@@ -196,7 +196,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
               <div
                 key={player.id}
                 className={`flex items-center gap-3 p-3 md:px-5 rounded-2xl transition-colors border w-full overflow-hidden ${
-                  index === 0 
+                  player.id === playerId 
                     ? 'bg-amber-500/10 border-amber-500/30 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]' 
                     : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/5'
                 }`}

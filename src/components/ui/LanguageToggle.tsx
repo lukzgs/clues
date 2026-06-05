@@ -5,49 +5,50 @@ interface LanguageToggleProps {
   className?: string;
 }
 
-export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "fixed top-4 right-4 z-[300]" }) => {
+export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "" }) => {
   const { lang, setLang } = useTranslation();
 
   const toggle = () => setLang(lang === 'pt' ? 'en' : 'pt');
+
+  const isCustomPositioned = className.includes('fixed') || className.includes('absolute') || className.includes('top-') || className.includes('right-');
+  const basePosition = isCustomPositioned ? '' : 'fixed top-4 right-4 z-[300]';
 
   return (
     <button
       onClick={toggle}
       aria-label={lang === 'pt' ? 'Switch to English' : 'Mudar para Português'}
       className={`
-        flex items-center gap-0 overflow-hidden
-        bg-black/40 backdrop-blur-xl
-        border border-white/15 rounded-xl
-        shadow-lg
+        flex items-center justify-between gap-1 overflow-hidden
+        bg-[#1A1A1A]/60 backdrop-blur-xl
+        border border-white/10 rounded-xl
+        shadow-lg h-10 px-1
         transition-all duration-300
         hover:border-amber-500/40 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]
-        group
+        cursor-pointer select-none
+        ${basePosition}
         ${className}
       `}
     >
-      <LangPill label="PT" active={lang === 'pt'} onClick={() => setLang('pt')} />
-      <div className="w-px h-5 bg-white/10" />
-      <LangPill label="EN" active={lang === 'en'} onClick={() => setLang('en')} />
+      <LangPill label="PT" active={lang === 'pt'} />
+      <LangPill label="EN" active={lang === 'en'} />
     </button>
   );
 };
 
 
-const LangPill: React.FC<{ label: string; active: boolean; onClick: () => void }> = ({
+const LangPill: React.FC<{ label: string; active: boolean }> = ({
   label,
   active,
-  onClick,
 }) => (
   <span
-    onClick={(e) => { e.stopPropagation(); onClick(); }}
     className={`
       flex items-center justify-center
-      px-3 h-full
-      font-cinzel font-bold text-[10px] tracking-[0.2em] uppercase
-      transition-all duration-200 cursor-pointer select-none
+      w-10 h-[80%] rounded-lg
+      font-cinzel font-bold text-[10px] tracking-[0.1em]
+      transition-all duration-200
       ${active
-        ? 'text-amber-300 bg-amber-500/15'
-        : 'text-white/30 hover:text-white/60 bg-transparent'
+        ? 'text-amber-300 bg-amber-500/15 border border-amber-500/30'
+        : 'text-white/30 bg-transparent border border-transparent'
       }
     `}
   >

@@ -575,11 +575,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                           {/* Toggle spectator */}
                           {onToggleSpectator && (
                             <button
-                              onClick={() => onToggleSpectator(player.id)}
+                              onClick={(e) => { e.stopPropagation(); onToggleSpectator(player.id); }}
                               className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-300 ${
                                 player.isSpectator
-                                  ? 'text-blue-400/60 hover:text-blue-300 hover:bg-blue-500/10'
-                                  : 'text-white/20 hover:text-blue-400 hover:bg-blue-500/10'
+                                  ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
+                                  : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
                               }`}
                               title={player.isSpectator ? 'Make player' : 'Make spectator'}
                             >
@@ -605,11 +605,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                       {/* Self-toggle spectator for players on their own card */}
                       {player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
                         <button
-                          onClick={() => onToggleSpectator(player.id)}
+                          onClick={(e) => { e.stopPropagation(); onToggleSpectator(player.id); }}
                           className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-300 shrink-0 ${
                             player.isSpectator
-                              ? 'text-blue-400 bg-blue-500/10 hover:text-blue-300 hover:bg-blue-500/20'
-                              : 'text-white/20 hover:text-blue-400 hover:bg-blue-500/10'
+                              ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
+                              : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
                           }`}
                           title={player.isSpectator ? 'Entrar como jogador' : 'Ser espectador'}
                         >
