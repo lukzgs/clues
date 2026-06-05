@@ -86,6 +86,7 @@ export const translations = {
       cardSent: 'Card sent! Waiting for others...',
       playersChoosing: 'Players are choosing their cards...',
       // Voting phase
+      playersVoting: 'Players are voting...',
       // Results phase  
       leaveRoomButton: 'LEAVE',
     },
@@ -226,6 +227,8 @@ export const translations = {
       theClueIs: 'A pista é',
       cardSent: 'Carta enviada! Aguardando os outros...',
       playersChoosing: 'Os jogadores estão escolhendo suas cartas...',
+      // Voting phase
+      playersVoting: 'Os jogadores estão votando...',
       // Leave button
       leaveRoomButton: 'SAIR',
     },
