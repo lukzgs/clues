@@ -200,7 +200,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   // Resultados e Game Over usam layout diferente, porém com mesmo background base
   if (gameState.phase === GamePhase.RESULTS) {
     return (
-      <div className="relative min-h-screen flex flex-col overflow-hidden z-0">
+      <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
         {/* Ambient Lighting */}
         <div
           className="fixed inset-0 pointer-events-none z-[-1]"
@@ -225,7 +225,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   if (gameState.phase === GamePhase.GAME_OVER) {
     return (
-      <div className="relative min-h-screen flex flex-col overflow-hidden z-0">
+      <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
         {/* Ambient Lighting */}
         <div
           className="fixed inset-0 pointer-events-none z-[-1]"
@@ -247,7 +247,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden z-0">
+    <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
       {/* Ambient Lighting */}
       <div
         className="fixed inset-0 pointer-events-none z-[-1]"
@@ -496,7 +496,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* ===== CENTER CONTENT ===== */}
         <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-6">
-          <div className={`flex-1 flex flex-col items-center p-4 md:p-8 ${gameState.phase === GamePhase.LOBBY ? 'justify-center' : 'justify-start pt-6 md:pt-10'}`}>
+          <div className={`shrink-0 md:flex-1 flex flex-col items-center p-4 md:p-8 ${gameState.phase === GamePhase.LOBBY ? 'justify-center' : 'justify-start pt-6 md:pt-10'}`}>
 
             {/* Fase: Narrador escolhendo */}
             {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
