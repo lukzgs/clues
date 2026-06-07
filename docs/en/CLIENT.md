@@ -101,7 +101,6 @@ Game settings, player list, and deck selection. Optimized for mobile with a dedi
 | `currentPlayer` | `Player \| undefined` | Current player data |
 | `onStartGame` | `(victoryCondition: VictoryCondition) => void` | Starts the game with chosen victory condition (host) |
 | `onLeaveRoom` | `() => void` | Leaves the room |
-| `onAddBot` | `() => void` | Adds bot player (host) |
 | `onRemoveBot` | `(botId: string) => void` | Removes bot (host) |
 | `onKickPlayer` | `(playerId: string) => void` | Kicks player (host) |
 | `onToggleSpectator` | `(playerId: string) => void` | Toggles spectator status for self (any player) or others (host) |

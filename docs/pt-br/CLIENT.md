@@ -102,7 +102,6 @@ Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada pa
 | `currentPlayer` | `Player \| undefined` | Dados do jogador atual |
 | `onStartGame` | `(victoryCondition: VictoryCondition) => void` | Inicia o jogo com condição de vitória escolhida (host) |
 | `onLeaveRoom` | `() => void` | Sai da sala |
-| `onAddBot` | `() => void` | Adiciona jogador bot (host) |
 | `onRemoveBot` | `(botId: string) => void` | Remove bot (host) |
 | `onKickPlayer` | `(playerId: string) => void` | Expulsa jogador (host) |
 | `onToggleSpectator` | `(playerId: string) => void` | Alterna status de espectador para si mesmo (qualquer jogador) ou outros (host) |
