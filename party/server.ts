@@ -823,22 +823,32 @@ export default class GameServer implements Party.Server {
     // Cannot kick yourself
     if (hostId === targetId) return;
 
-    // Save narrator ID before removal for re-location after array shift
+    // Save narrator ID for safety checks
     const currentNarratorId = this.state.players[this.state.narratorIndex]?.id;
 
-    // Remove player from state
-    this.state.players = this.state.players.filter(p => p.id !== targetId);
+    if (this.state.phase === GamePhase.LOBBY) {
+      // Lobby phase: completely remove player from state
+      this.state.players = this.state.players.filter(p => p.id !== targetId);
+      // Clean up their table cards and votes just in case
+      delete this.state.votes[targetId];
+      this.state.tableCards = this.state.tableCards.filter(tc => tc.playerId !== targetId);
+    } else {
+      // Mid-game phase: soft-delete to preserve array indexes
+      target.isConnected = false;
+      target.isSpectator = true;
+      // Remove their votes (they forfeit voting)
+      delete this.state.votes[targetId];
+      // Note: We DO NOT remove their tableCard if they already played it, so the round doesn't break
+    }
 
-    // Clean up their votes and table cards
-    delete this.state.votes[targetId];
-    this.state.tableCards = this.state.tableCards.filter(tc => tc.playerId !== targetId);
     this.state.playersWhoReadied = this.state.playersWhoReadied.filter(id => id !== targetId);
     this.state.afkKickVotes = this.state.afkKickVotes.filter(id => id !== targetId);
 
     // If kicked player was host (shouldn't happen but safety), reassign
     if (target.isHost && this.state.players.length > 0) {
-      const newHost = this.state.players.find(p => !p.isSpectator) || this.state.players[0];
-      newHost.isHost = true;
+      target.isHost = false;
+      const newHost = this.state.players.find(p => !p.isSpectator && p.id !== targetId) || this.state.players[0];
+      if (newHost) newHost.isHost = true;
     }
 
     // Close the kicked player's connection
@@ -864,10 +874,11 @@ export default class GameServer implements Party.Server {
       playerName: target.name,
     });
 
-    // If during game, check if narrator was kicked or phase needs progression
+    // If during game, handle edge cases and phase progression
     if (this.state.phase !== GamePhase.LOBBY) {
-      // If active players dropped below minimum, end the game
       const remainingActive = this.state.players.filter(p => !p.isSpectator);
+      
+      // If active players dropped below minimum, end the game
       if (remainingActive.length < GAME_CONFIG.MIN_PLAYERS) {
         this.changePhase(GamePhase.GAME_OVER);
         const winner = remainingActive.reduce((prev, curr) => prev.score > curr.score ? prev : curr, remainingActive[0]);
@@ -876,21 +887,12 @@ export default class GameServer implements Party.Server {
         return;
       }
 
-      // Re-locate narrator by ID after array shift
-      const newNarratorIdx = this.state.players.findIndex(p => p.id === currentNarratorId);
-      this.state.narratorIndex = newNarratorIdx >= 0
-        ? newNarratorIdx
-        : Math.min(this.state.narratorIndex, Math.max(0, this.state.players.length - 1));
-
-      const narrator = this.state.players[this.state.narratorIndex];
-      if (!narrator || narrator.isSpectator) {
-        // Skip to results and advance
-        if (this.state.phase === GamePhase.NARRATOR_CHOOSING) {
-          this.changePhase(GamePhase.RESULTS);
-          const hostPlayer = this.state.players.find(p => p.isHost);
-          if (hostPlayer) this.handleNextRound(hostPlayer.id);
-          return;
-        }
+      // If the narrator was kicked during NARRATOR_CHOOSING, abort the round
+      if (this.state.phase === GamePhase.NARRATOR_CHOOSING && targetId === currentNarratorId) {
+        this.changePhase(GamePhase.RESULTS);
+        const hostPlayer = this.state.players.find(p => p.isHost);
+        if (hostPlayer) this.handleNextRound(hostPlayer.id);
+        return;
       }
 
       // Check if phase can now progress (fewer players needed)
