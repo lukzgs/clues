@@ -58,14 +58,29 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, []);
 
   const setSession = useCallback((newSession: GameSession | null) => {
+    console.log('[DEBUG GameSessionProvider] setSession called with:', newSession);
     setSessionState(prev => {
-      if (prev === null && newSession === null) return prev;
-      if (prev && newSession && 
-          prev.roomCode === newSession.roomCode && 
-          prev.playerName === newSession.playerName && 
-          prev.playerId === newSession.playerId) {
+      if (prev === null && newSession === null) {
+        console.log('[DEBUG GameSessionProvider] Both prev and newSession are null.');
         return prev;
       }
+      if (prev && newSession) {
+        const roomCodeEqual = prev.roomCode === newSession.roomCode;
+        const playerNameEqual = prev.playerName === newSession.playerName;
+        const playerIdEqual = prev.playerId === newSession.playerId;
+        console.log('[DEBUG GameSessionProvider] comparing:', {
+          prev,
+          newSession,
+          roomCodeEqual,
+          playerNameEqual,
+          playerIdEqual
+        });
+        if (roomCodeEqual && playerNameEqual && playerIdEqual) {
+          console.log('[DEBUG GameSessionProvider] Objects match. Returning prev reference to bail out.');
+          return prev;
+        }
+      }
+      console.log('[DEBUG GameSessionProvider] Returning new session object.');
       return newSession;
     });
     

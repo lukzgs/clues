@@ -28,7 +28,28 @@ export function useGameSocket({
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
 
+  const prevDepsRef = useRef<{
+    roomCode: string | null;
+    playerName: string | null;
+    savedPlayerId?: string;
+    onJoinSuccess: any;
+    onKicked: any;
+  } | null>(null);
+
   useEffect(() => {
+    if (prevDepsRef.current) {
+      const changed: string[] = [];
+      if (prevDepsRef.current.roomCode !== roomCode) changed.push(`roomCode: ${prevDepsRef.current.roomCode} -> ${roomCode}`);
+      if (prevDepsRef.current.playerName !== playerName) changed.push(`playerName: ${prevDepsRef.current.playerName} -> ${playerName}`);
+      if (prevDepsRef.current.savedPlayerId !== savedPlayerId) changed.push(`savedPlayerId: ${prevDepsRef.current.savedPlayerId} -> ${savedPlayerId}`);
+      if (prevDepsRef.current.onJoinSuccess !== onJoinSuccess) changed.push(`onJoinSuccess reference changed`);
+      if (prevDepsRef.current.onKicked !== onKicked) changed.push(`onKicked reference changed`);
+      console.log('[DEBUG useGameSocket] useEffect triggered because of changed deps:', changed);
+    } else {
+      console.log('[DEBUG useGameSocket] useEffect triggered (initial/mount). deps:', { roomCode, playerName, savedPlayerId });
+    }
+    prevDepsRef.current = { roomCode, playerName, savedPlayerId, onJoinSuccess, onKicked };
+
     if (!roomCode || !playerName) return;
 
     let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
