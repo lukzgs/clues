@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameState, Player, VictoryCondition, DeckOption, PhaseTimeouts } from '../../types';
 import { GAME_CONFIG } from '../../constants';
 import { useTranslation } from '../../i18n/index.tsx';
@@ -8,6 +8,7 @@ interface LobbyScreenProps {
   gameState: GameState;
   currentPlayer: Player | undefined;
   onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
+  onUpdateSettings?: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
   onLeaveRoom: () => void;
   onAddBot?: () => void;
   onRemoveBot?: (botId: string) => void;
@@ -20,6 +21,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   gameState,
   currentPlayer,
   onStartGame,
+  onUpdateSettings,
   onLeaveRoom,
   onRemoveBot,
   onKickPlayer,
@@ -54,13 +56,30 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     }
   };
 
-  // Victory condition is fully local — only sent to server on START_GAME
-  const [vc, setVC] = useState<VictoryCondition>({
-    scoreEnabled: true,
-    targetScore: GAME_CONFIG.WINNING_SCORE,
-    narratorRoundsEnabled: false,
-    narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
-  });
+  // Local state for debouncing
+  const [vc, setVC] = useState<VictoryCondition>(gameState.victoryCondition);
+  const [deckOption, setDeckOptionState] = useState<DeckOption>(gameState.deckOption);
+  const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>(gameState.phaseTimeouts);
+
+  // Sync from server if not host (or on initial load)
+  useEffect(() => {
+    if (!isHost) {
+      setVC(gameState.victoryCondition);
+      setDeckOptionState(gameState.deckOption);
+      setPhaseTimeouts(gameState.phaseTimeouts);
+    }
+  }, [gameState.victoryCondition, gameState.deckOption, gameState.phaseTimeouts, isHost]);
+
+  // Debounce sync to server (only for host)
+  useEffect(() => {
+    if (!isHost || !onUpdateSettings) return;
+
+    const timer = setTimeout(() => {
+      onUpdateSettings(vc, deckOption, phaseTimeouts);
+    }, 750);
+
+    return () => clearTimeout(timer);
+  }, [vc, deckOption, phaseTimeouts, isHost, onUpdateSettings]);
 
   const updateVC = (patch: Partial<VictoryCondition>) => {
     setVC(prev => {
@@ -71,17 +90,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     });
   };
 
-  const [deckOption, setDeckOption] = useState<DeckOption>('mixed');
+  const setDeckOption = (option: DeckOption) => {
+    setDeckOptionState(option);
+  };
 
   const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS && activePlayers.length <= maxPlayersForDeck;
-
-  const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>({
-    narrator: 60,
-    othersChoosing: 45,
-    voting: 30,
-    results: 15,
-  });
 
   const updateTimeout = (key: keyof PhaseTimeouts, value: number) => {
     setPhaseTimeouts(prev => ({ ...prev, [key]: Math.max(0, Math.min(120, value)) }));
@@ -317,7 +331,9 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                               value={phaseTimeouts[key]}
                               onChange={(e) => {
                                 const v = Number(e.target.value);
-                                if (!isNaN(v)) setPhaseTimeouts(prev => ({ ...prev, [key]: v }));
+                                if (!isNaN(v)) {
+                                  updateTimeout(key, v);
+                                }
                               }}
                               onBlur={() => updateTimeout(key, phaseTimeouts[key])}
                               className="w-14 bg-transparent text-amber-300 font-cinzel font-bold text-lg tabular-nums outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

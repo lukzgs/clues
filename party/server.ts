@@ -229,6 +229,10 @@ export default class GameServer implements Party.Server {
           if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts);
           break;
 
+        case 'UPDATE_SETTINGS':
+          if (playerId) this.handleUpdateSettings(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts);
+          break;
+
         case 'SUBMIT_CLUE':
           if (playerId) this.handleSubmitClue(playerId, msg.cardId, msg.clue);
           break;
@@ -462,6 +466,33 @@ export default class GameServer implements Party.Server {
       playerId: player.id,
       playerName: player.name,
     });
+
+    this.broadcastState();
+  }
+
+  private handleUpdateSettings(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) {
+    if (this.state.phase !== GamePhase.LOBBY) return;
+    
+    const player = this.state.players.find(p => p.id === playerId);
+    if (!player?.isHost) return;
+
+    // Apply victory condition from host
+    this.state.victoryCondition = {
+      scoreEnabled: victoryCondition.scoreEnabled,
+      targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
+      narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
+      narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
+    };
+
+    // Apply phase timeouts from host
+    this.state.phaseTimeouts = {
+      narrator: Math.max(0, Math.min(120, phaseTimeouts.narrator)),
+      othersChoosing: Math.max(0, Math.min(120, phaseTimeouts.othersChoosing)),
+      voting: Math.max(0, Math.min(120, phaseTimeouts.voting)),
+      results: Math.max(0, Math.min(120, phaseTimeouts.results)),
+    };
+
+    this.state.deckOption = deckOption;
 
     this.broadcastState();
   }

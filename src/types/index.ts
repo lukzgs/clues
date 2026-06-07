@@ -103,6 +103,7 @@ export enum ClientMessageType {
   // [BOT] Mensagens para controle de bots
   ADD_BOT = 'ADD_BOT',
   REMOVE_BOT = 'REMOVE_BOT',
+  UPDATE_SETTINGS = 'UPDATE_SETTINGS',
 }
 
 export interface JoinRoomMessage {
@@ -117,6 +118,13 @@ export interface LeaveRoomMessage {
 
 export interface StartGameMessage {
   type: ClientMessageType.START_GAME;
+  victoryCondition: VictoryCondition;
+  deckOption: DeckOption;
+  phaseTimeouts: PhaseTimeouts;
+}
+
+export interface UpdateSettingsMessage {
+  type: ClientMessageType.UPDATE_SETTINGS;
   victoryCondition: VictoryCondition;
   deckOption: DeckOption;
   phaseTimeouts: PhaseTimeouts;
@@ -189,7 +197,8 @@ export type ClientMessage =
   | VoteKickAfkMessage
   | KickPlayerMessage
   | ToggleSpectatorMessage
-  | RequestPlayMessage;
+  | RequestPlayMessage
+  | UpdateSettingsMessage;
 
 // ============================================
 // MENSAGENS SERVIDOR -> CLIENTE

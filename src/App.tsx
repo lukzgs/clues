@@ -54,6 +54,7 @@ const App: React.FC = () => {
     clearError,
     roomCloseTime,
     startGame,
+    updateSettings,
     submitClue,
     playCard,
     vote,
@@ -250,6 +251,7 @@ const App: React.FC = () => {
           gameState={gameState}
           currentPlayer={gameState.players.find(p => p.id === playerId)}
           onStartGame={startGame}
+          onUpdateSettings={updateSettings}
           onLeaveRoom={handleLeaveRoom}
           onAddBot={addBot}
           onRemoveBot={removeBot}

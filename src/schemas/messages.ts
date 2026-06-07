@@ -54,6 +54,13 @@ export const StartGameSchema = z.object({
     phaseTimeouts: PhaseTimeoutsSchema,
 });
 
+export const UpdateSettingsSchema = z.object({
+    type: z.literal('UPDATE_SETTINGS'),
+    victoryCondition: VictoryConditionSchema,
+    deckOption: z.enum(['original', 'new', 'mixed']),
+    phaseTimeouts: PhaseTimeoutsSchema,
+});
+
 export const SubmitClueSchema = z.object({
     type: z.literal('SUBMIT_CLUE'),
     cardId: PositiveInt,
@@ -126,6 +133,7 @@ export const ClientMessageSchema = z.discriminatedUnion('type', [
     KickPlayerSchema,
     ToggleSpectatorSchema,
     RequestPlaySchema,
+    UpdateSettingsSchema,
 ]);
 
 // ============================================

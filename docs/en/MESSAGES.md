@@ -25,6 +25,7 @@ enum ClientMessageType {
   KICK_PLAYER = 'KICK_PLAYER',
   TOGGLE_SPECTATOR = 'TOGGLE_SPECTATOR',
   REQUEST_PLAY = 'REQUEST_PLAY',
+  UPDATE_SETTINGS = 'UPDATE_SETTINGS',
 }
 ```
 
@@ -45,6 +46,7 @@ enum ClientMessageType {
 | `KICK_PLAYER` | `playerId: string` | Any (host only) |
 | `TOGGLE_SPECTATOR` | `playerId: string` | LOBBY (host only) |
 | `REQUEST_PLAY` | (none) | LOBBY (spectators only) |
+| `UPDATE_SETTINGS` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts` | LOBBY (host only) |
 
 ### Example Messages
 

@@ -17,6 +17,7 @@ import {
   VoteSchema,
   RemoveBotSchema,
   StartGameSchema,
+  UpdateSettingsSchema,
 } from '../schemas';
 
 // ============================================
@@ -39,6 +40,7 @@ interface UseGameRoomReturn {
 
   // Acoes
   startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
+  updateSettings: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
   submitClue: (cardId: number, clue: string) => void;
   playCard: (cardId: number) => void;
   vote: (orderId: number) => void;
@@ -227,6 +229,20 @@ export function useGameRoom({
     }
   }, [send]);
 
+  const updateSettings = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
+    const result = UpdateSettingsSchema.safeParse({
+      type: ClientMessageType.UPDATE_SETTINGS,
+      victoryCondition,
+      deckOption,
+      phaseTimeouts,
+    });
+    if (result.success) {
+      send(result.data);
+    } else {
+      console.error('Validation failed for UPDATE_SETTINGS:', result.error);
+    }
+  }, [send]);
+
   const submitClue = useCallback((cardId: number, clue: string) => {
     const result = SubmitClueSchema.safeParse({
       type: 'SUBMIT_CLUE',
@@ -310,6 +326,7 @@ export function useGameRoom({
     clearError: useCallback(() => setError(null), []),
     roomCloseTime,
     startGame,
+    updateSettings,
     submitClue,
     playCard,
     vote,
