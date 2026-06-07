@@ -104,7 +104,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     [GamePhase.LOBBY]: 'LOBBY',
     [GamePhase.NARRATOR_CHOOSING]: isNarrator ? t.game.youAreNarrator : t.game.waitingForNarrator,
     [GamePhase.OTHERS_CHOOSING]: t.game.theClueIs,
-    [GamePhase.VOTING]: 'VOTING PHASE',
+    [GamePhase.VOTING]: t.game.votingPhase,
     [GamePhase.RESULTS]: 'RESULTS',
     [GamePhase.GAME_OVER]: 'GAME OVER',
   };
@@ -383,9 +383,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
         {/* ===== SIDEBAR (Players) - Hidden on mobile ===== */}
         <aside className="hidden lg:flex flex-col w-[300px] shrink-0 bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-4 shadow-[20px_0_40px_rgba(0,0,0,0.5)] self-start mt-8 my-8 ml-6">
-          <h2 className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-6 font-sans font-bold text-center">
-            {t.game.currentScore}
-          </h2>
           <div className="space-y-3">
             {[...gameState.players]
               .filter(p => !p.isSpectator)
@@ -761,8 +758,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         <div className="lg:hidden fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowScoreModal(false)} />
           <div className="relative bg-black/90 backdrop-blur-2xl border border-white/20 rounded-t-3xl w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-amber-300 font-cinzel font-bold text-base tracking-widest uppercase">{t.game.currentScore}</h3>
+            <div className="flex justify-end items-center mb-5">
               <button
                 onClick={() => setShowScoreModal(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"

@@ -87,6 +87,7 @@ export const translations = {
       cardSent: 'Card sent! Waiting for others...',
       playersChoosing: 'Players are choosing their cards...',
       // Voting phase
+      votingPhase: 'Voting Phase',
       playersVoting: 'Players are voting...',
       // Results phase  
       leaveRoomButton: 'LEAVE',
@@ -230,6 +231,7 @@ export const translations = {
       cardSent: 'Carta enviada! Aguardando os outros...',
       playersChoosing: 'Os jogadores estão escolhendo suas cartas...',
       // Voting phase
+      votingPhase: 'Fase de Votação',
       playersVoting: 'Os jogadores estão votando...',
       // Leave button
       leaveRoomButton: 'SAIR',
