@@ -131,6 +131,12 @@ clues/
 │       └── messages.ts     # Validação de mensagens
 ├── party/                  # Código do servidor
 │   ├── server.ts           # Servidor PartyKit principal
+│   ├── handlers/           # Handlers de mensagens e lógica
+│   │   ├── room.ts         # Gerenciamento de lobby e sala
+│   │   ├── game.ts         # Lógica central do jogo
+│   │   ├── spectator.ts    # Lógica de espectadores
+│   │   ├── afk.ts          # Lógica de AFK e progressão
+│   │   └── bot.ts          # Lógica de gerenciamento de bots
 │   └── bots/               # IA dos bots
 │       ├── manager.ts      # Orquestração de bots
 │       └── ai.ts           # Lógica de decisão dos bots

@@ -33,6 +33,8 @@ class GameServer implements Party.Server {
 
 ## Handlers de Mensagens
 
+O tratamento de mensagens é delegado a módulos especializados no diretório `party/handlers/`. A classe `GameServer` atua como uma fachada, roteando as mensagens WebSocket recebidas para esses handlers.
+
 ### Fase de Lobby
 
 | Handler | Gatilho | Descrição |

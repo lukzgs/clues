@@ -33,6 +33,8 @@ class GameServer implements Party.Server {
 
 ## Message Handlers
 
+Message handling is delegated to specialized modules in the `party/handlers/` directory. The `GameServer` class acts as a facade, proxying incoming WebSocket messages to these handlers.
+
 ### Lobby Phase
 
 | Handler | Trigger | Description |

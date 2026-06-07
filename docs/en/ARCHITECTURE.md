@@ -131,6 +131,12 @@ clues/
 │       └── messages.ts     # Message validation
 ├── party/                  # Server code
 │   ├── server.ts           # Main PartyKit server
+│   ├── handlers/           # Message and logic handlers
+│   │   ├── room.ts         # Lobby and room management
+│   │   ├── game.ts         # Core gameplay logic
+│   │   ├── spectator.ts    # Spectator logic
+│   │   ├── afk.ts          # AFK and progression logic
+│   │   └── bot.ts          # Bot management logic
 │   └── bots/               # Bot AI
 │       ├── manager.ts      # Bot orchestration
 │       └── ai.ts           # Bot decision logic
