@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 import { useTranslation } from './i18n/index.tsx';
+import { GameSessionProvider, useGameSession } from './providers/GameSessionProvider';
 
 // Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
@@ -12,40 +13,10 @@ function generateRoomCode(): string {
   return Array.from(array, byte => chars[byte % chars.length]).join('');
 }
 
-type AppState =
-  | { screen: 'join' }
-  | { screen: 'connecting'; roomCode: string; playerName: string }
-  | { screen: 'game'; roomCode: string; playerName: string };
-
-const getInitialState = (): AppState => {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const urlRoomCode = params.get('room');
-
-    const sessionStr = localStorage.getItem('story-weaver:active_session');
-    if (sessionStr) {
-      const session = JSON.parse(sessionStr);
-      if (session.roomCode && session.playerName) {
-        // If joining via link to a different room, ignore the old session
-        if (!urlRoomCode || urlRoomCode === session.roomCode) {
-          return { screen: 'connecting', roomCode: session.roomCode, playerName: session.playerName };
-        } else {
-          // Clear old session so it doesn't conflict later
-          localStorage.removeItem('story-weaver:active_session');
-        }
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to parse session storage');
-  }
-  return { screen: 'join' };
-};
-
-const App: React.FC = () => {
-  const [appState, setAppState] = useState<AppState>(getInitialState());
+const GameRouter: React.FC = () => {
+  const { session, setSession, clearSession, urlRoomCode, clearUrlRoomCode } = useGameSession();
   const { t } = useTranslation();
 
-  // Hook do jogo - só conecta quando temos roomCode e playerName
   const {
     gameState,
     playerId,
@@ -67,77 +38,50 @@ const App: React.FC = () => {
     kickPlayer,
     toggleSpectator,
     requestPlay,
-  } = useGameRoom({
-    roomCode: appState.screen !== 'join' ? appState.roomCode : '',
-    playerName: appState.screen !== 'join' ? appState.playerName : '',
-  });
+  } = useGameRoom({ roomCode: session?.roomCode || null, playerName: session?.playerName || null });
 
-  // Handlers
   const handleCreateRoom = useCallback((playerName: string) => {
     const roomCode = generateRoomCode();
-    setAppState({ screen: 'connecting', roomCode, playerName });
-  }, []);
+    setSession({ roomCode, playerName });
+  }, [setSession]);
 
   const handleJoinRoom = useCallback((roomCode: string, playerName: string) => {
-    setAppState({ screen: 'connecting', roomCode, playerName });
-  }, []);
+    setSession({ roomCode, playerName });
+  }, [setSession]);
 
   const handleLeaveRoom = useCallback(() => {
     leaveRoom();
-    localStorage.removeItem('story-weaver:active_session');
-    setAppState({ screen: 'join' });
-  }, [leaveRoom]);
+    clearSession();
+  }, [leaveRoom, clearSession]);
 
-  // Transição de connecting para game quando conectado
-  useEffect(() => {
-    if (appState.screen === 'connecting' && isConnected && gameState) {
-      setAppState(prev =>
-        prev.screen === 'connecting'
-          ? { screen: 'game', roomCode: prev.roomCode, playerName: prev.playerName }
-          : prev
-      );
-    }
-  }, [appState.screen, isConnected, gameState]);
+  const handleCancelInvite = useCallback(() => {
+    clearUrlRoomCode();
+  }, [clearUrlRoomCode]);
 
   // Auto-dismiss error after 5 seconds
   useEffect(() => {
-    if (error && appState.screen === 'game') {
+    if (error && gameState) {
       const timer = setTimeout(() => clearError(), 5000);
       return () => clearTimeout(timer);
     }
-  }, [error, appState.screen, clearError]);
-
-  // Extract ?room= from URL (invite link)
-  const [prefillRoomCode, setPrefillRoomCode] = useState<string | undefined>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const room = params.get('room')?.toUpperCase();
-    if (room && room.length === 6) {
-      // Clean up URL without reloading
-      window.history.replaceState({}, '', window.location.pathname);
-      return room;
-    }
-    return undefined;
-  });
+  }, [error, gameState, clearError]);
 
   // Tela de join
-  if (appState.screen === 'join') {
+  if (!session) {
     return (
       <JoinScreen
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
-        prefillRoomCode={prefillRoomCode}
-        onCancelInvite={() => setPrefillRoomCode(undefined)}
+        prefillRoomCode={urlRoomCode || undefined}
+        onCancelInvite={handleCancelInvite}
       />
     );
   }
 
   // Tela de conexão
-  if (appState.screen === 'connecting' || !gameState || !playerId) {
-    const roomCode = appState.screen === 'connecting' ? appState.roomCode :
-      appState.screen === 'game' ? appState.roomCode : '';
+  if (!gameState || !playerId) {
     return (
       <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
-        {/* Ambient Lighting — same as JoinScreen */}
         <div
           className="fixed inset-0 pointer-events-none z-[-1]"
           style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
@@ -151,7 +95,6 @@ const App: React.FC = () => {
             className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center"
             style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
           >
-            {/* Spinner */}
             <div className="mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
               <div className="absolute inset-0 rounded-full border-2 border-amber-500/20" />
               <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-400 animate-spin" />
@@ -161,26 +104,24 @@ const App: React.FC = () => {
               </svg>
             </div>
 
-            {/* Text */}
             <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">
               {t.connecting.label}
             </p>
             <div className="bg-[#1A1A1A]/50 rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border border-white/10 mb-2">
               <span className="text-lg md:text-xl font-cinzel font-bold text-amber-300 tracking-wider">
-                {roomCode}
+                {session.roomCode}
               </span>
             </div>
             <p className="text-white/15 text-[10px] font-sans tracking-wide">
               {t.connecting.joiningRoom}
             </p>
 
-            {/* Error Display */}
             <div className={`mt-5 md:mt-6 w-full text-center transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
               <div className="flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium mb-4">
                 <span>{error}</span>
               </div>
               <button
-                onClick={() => setAppState({ screen: 'join' })}
+                onClick={() => clearSession()}
                 className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
               >
                 {t.connecting.back}
@@ -189,7 +130,6 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none">
           <p className="text-white/20 text-[10px] font-sans tracking-wide">
             {t.common.copyright}
@@ -199,10 +139,8 @@ const App: React.FC = () => {
     );
   }
 
-  // Connection overlay (banner + error toast) for lobby and game screens
   const connectionOverlay = (
     <>
-      {/* Disconnection banner */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           !isConnected ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
@@ -218,7 +156,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Error toast */}
       <div
         className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-400 ${
           error && isConnected ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none'
@@ -242,14 +179,13 @@ const App: React.FC = () => {
     </>
   );
 
-  // Tela de lobby
   if (gameState.phase === GamePhase.LOBBY) {
     return (
       <>
         {connectionOverlay}
         <LobbyScreen
           gameState={gameState}
-          currentPlayer={gameState.players.find(p => p.id === playerId)}
+          currentPlayer={gameState.players.find((p: any) => p.id === playerId)}
           onStartGame={startGame}
           onUpdateSettings={updateSettings}
           onLeaveRoom={handleLeaveRoom}
@@ -263,7 +199,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Tela de jogo
   return (
     <>
       {connectionOverlay}
@@ -281,6 +216,14 @@ const App: React.FC = () => {
         onKickPlayer={kickPlayer}
       />
     </>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <GameSessionProvider>
+      <GameRouter />
+    </GameSessionProvider>
   );
 };
 

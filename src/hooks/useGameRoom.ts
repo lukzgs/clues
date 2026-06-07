@@ -1,365 +1,52 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import PartySocket from 'partysocket';
-import {
-  GameState,
-  ClientMessageType,
-  ServerMessageType,
-  ServerMessage,
-  VictoryCondition,
-  DeckOption,
-  PhaseTimeouts,
-} from '../types';
-import { PARTYKIT_HOST } from '../constants';
-import {
-  JoinRoomSchema,
-  SubmitClueSchema,
-  PlayCardSchema,
-  VoteSchema,
-  RemoveBotSchema,
-  StartGameSchema,
-  UpdateSettingsSchema,
-} from '../schemas';
-
-// ============================================
-// TIPOS DO HOOK
-// ============================================
+import { useCallback } from 'react';
+import { useGameSocket } from './game/useGameSocket';
+import { useGameActions } from './game/useGameActions';
+import { useGameSession } from '../providers/GameSessionProvider';
 
 interface UseGameRoomOptions {
-  roomCode: string;
-  playerName: string;
+  roomCode: string | null;
+  playerName: string | null;
 }
 
-interface UseGameRoomReturn {
-  // Estado
-  gameState: GameState | null;
-  playerId: string | null;
-  isConnected: boolean;
-  error: string | null;
-  clearError: () => void;
-  roomCloseTime: number | null;
+export function useGameRoom({ roomCode, playerName }: UseGameRoomOptions) {
+  const { session, clearSession, setSession } = useGameSession();
 
-  // Acoes
-  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
-  updateSettings: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
-  submitClue: (cardId: number, clue: string) => void;
-  playCard: (cardId: number) => void;
-  vote: (orderId: number) => void;
-  nextRound: () => void;
-  restartGame: () => void;
-  leaveRoom: () => void;
-  // [BOT] Ações de bots
-  addBot: () => void;
-  removeBot: (botId: string) => void;
-  // [SPECTATOR] Ações de spectator/kick
-  kickPlayer: (targetId: string) => void;
-  toggleSpectator: (targetId: string) => void;
-  requestPlay: () => void;
-
-  // AFK
-  voteKickAfk: () => void;
-}
-
-// ============================================
-// HOOK PRINCIPAL
-// ============================================
-
-export function useGameRoom({
-  roomCode,
-  playerName
-}: UseGameRoomOptions): UseGameRoomReturn {
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [playerId, setPlayerId] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [roomCloseTime, setRoomCloseTime] = useState<number | null>(null);
-
-  const socketRef = useRef<PartySocket | null>(null);
-  const hasJoinedRef = useRef(false);
-
-  // localStorage key for reconnection (survives tab/browser close)
-  const storageKey = 'story-weaver:active_session';
-
-  // Conecta ao servidor
-  useEffect(() => {
-    if (!roomCode || !playerName) return;
-
-    let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
-      if (!hasJoinedRef.current || !gameState) {
-        console.warn('Connection timeout: room is likely gone or server is down.');
-        localStorage.removeItem(storageKey);
-        setError('Não foi possível conectar à sala (tempo limite esgotado)');
-        setIsConnected(false);
-        hasJoinedRef.current = false;
-        if (socketRef.current) {
-          socketRef.current.close();
-        }
-      }
-    }, 3000);
-
-    const socket = new PartySocket({
-      host: PARTYKIT_HOST,
-      room: roomCode,
-    });
-
-    socketRef.current = socket;
-
-    socket.addEventListener('open', () => {
-      if (socketRef.current !== socket) return;
-      setIsConnected(true);
-      setError(null);
-
-      // Entra na sala (com validação)
-      if (!hasJoinedRef.current) {
-        let savedPlayerId: string | undefined = undefined;
-        try {
-          const sessionStr = localStorage.getItem(storageKey);
-          if (sessionStr) {
-            const session = JSON.parse(sessionStr);
-            if (session.roomCode === roomCode) {
-              savedPlayerId = session.playerId;
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to parse session storage');
-        }
-
-        const result = JoinRoomSchema.safeParse({
-          type: 'JOIN_ROOM',
-          playerName,
-          reconnectId: savedPlayerId,
-        });
-        if (result.success) {
-          socket.send(JSON.stringify(result.data));
-          hasJoinedRef.current = true;
-        }
-      }
-    });
-
-    socket.addEventListener('message', (event) => {
-      if (socketRef.current !== socket) return;
-      try {
-        const rawMsg = JSON.parse(event.data);
-        const msg: any = rawMsg;
-
-        switch (msg.type) {
-          case 'SERVER_CLOSING_WARNING':
-            setRoomCloseTime((msg as any).closeTime);
-            break;
-
-          case 'SERVER_CLOSING_CANCELLED':
-            setRoomCloseTime(null);
-            break;
-
-          case 'SERVER_CLOSED':
-            setError('A sala foi fechada por inatividade');
-            setGameState(null);
-            break;
-
-          case ServerMessageType.SYNC_STATE:
-            setGameState(msg.gameState);
-            if (msg.yourPlayerId) {
-              setPlayerId(msg.yourPlayerId);
-              // Persist session for reconnection
-              localStorage.setItem(storageKey, JSON.stringify({
-                roomCode,
-                playerName,
-                playerId: msg.yourPlayerId,
-              }));
-              
-              // Clear connection timeout since we successfully joined/reconnected
-              if (connectionTimeout) {
-                clearTimeout(connectionTimeout);
-                connectionTimeout = null;
-              }
-            }
-            break;
-
-          case ServerMessageType.ERROR:
-            setError(msg.message);
-            hasJoinedRef.current = false;
-            break;
-
-          case ServerMessageType.PLAYER_JOINED:
-            // Poderia mostrar toast, mas o SYNC_STATE já atualiza
-            break;
-
-          case ServerMessageType.PLAYER_LEFT:
-            // Poderia mostrar toast, mas o SYNC_STATE já atualiza
-            break;
-
-          // [SPECTATOR] Handle kick notification
-          case ServerMessageType.PLAYER_KICKED:
-            if ((msg as any).playerId === playerId) {
-              // We were kicked — clean up session and close connection
-              localStorage.removeItem(storageKey);
-              setError('Você foi removido da sala');
-              socket.close();
-            }
-            break;
-        }
-      } catch (e) {
-        console.error('Error parsing message:', e);
-      }
-    });
-
-    socket.addEventListener('close', () => {
-      if (socketRef.current === socket) {
-        setIsConnected(false);
-        hasJoinedRef.current = false;
-      }
-    });
-
-    socket.addEventListener('error', () => {
-      if (socketRef.current === socket) {
-        setError('Erro de conexão');
-        setIsConnected(false);
-      }
-    });
-
-    return () => {
-      if (connectionTimeout) {
-        clearTimeout(connectionTimeout);
-      }
-      socket.close();
-      socketRef.current = null;
-      hasJoinedRef.current = false;
-    };
-  }, [roomCode, playerName]);
-
-  // Helper para enviar mensagens
-  const send = useCallback((message: object) => {
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(message));
+  const handleJoinSuccess = useCallback((playerId: string) => {
+    if (roomCode && playerName) {
+      setSession({ roomCode, playerName, playerId });
     }
-  }, []);
+  }, [roomCode, playerName, setSession]);
 
-  // ============================================
-  // AÇÕES DO JOGO
-  // ============================================
+  const handleKicked = useCallback(() => {
+    clearSession();
+  }, [clearSession]);
 
-  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
-    const result = StartGameSchema.safeParse({
-      type: ClientMessageType.START_GAME,
-      victoryCondition,
-      deckOption,
-      phaseTimeouts,
-    });
-    if (result.success) {
-      send(result.data);
-    } else {
-      console.error('Validation failed for START_GAME:', result.error);
-    }
-  }, [send]);
+  const {
+    gameState,
+    playerId,
+    isConnected,
+    error,
+    roomCloseTime,
+    setError,
+    send,
+    socketRef,
+  } = useGameSocket({
+    roomCode,
+    playerName,
+    savedPlayerId: session?.playerId,
+    onJoinSuccess: handleJoinSuccess,
+    onKicked: handleKicked,
+  });
 
-  const updateSettings = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
-    const result = UpdateSettingsSchema.safeParse({
-      type: ClientMessageType.UPDATE_SETTINGS,
-      victoryCondition,
-      deckOption,
-      phaseTimeouts,
-    });
-    if (result.success) {
-      send(result.data);
-    } else {
-      console.error('Validation failed for UPDATE_SETTINGS:', result.error);
-    }
-  }, [send]);
-
-  const submitClue = useCallback((cardId: number, clue: string) => {
-    const result = SubmitClueSchema.safeParse({
-      type: 'SUBMIT_CLUE',
-      cardId,
-      clue
-    });
-    if (result.success) {
-      send(result.data);
-    } else {
-      setError(result.error.issues[0]?.message || 'Dados inválidos');
-    }
-  }, [send]);
-
-  const playCard = useCallback((cardId: number) => {
-    send({
-      type: ClientMessageType.PLAY_CARD,
-      cardId
-    });
-  }, [send]);
-
-  const vote = useCallback((orderId: number) => {
-    const result = VoteSchema.safeParse({
-      type: 'VOTE',
-      orderId
-    });
-    if (result.success) {
-      send(result.data);
-    }
-  }, [send]);
-
-  const nextRound = useCallback(() => {
-    send({ type: ClientMessageType.NEXT_ROUND });
-  }, [send]);
-
-  const restartGame = useCallback(() => {
-    send({ type: ClientMessageType.RESTART_GAME });
-  }, [send]);
-
-  const leaveRoom = useCallback(() => {
-    send({ type: ClientMessageType.LEAVE_ROOM });
-    socketRef.current?.close();
-  }, [send]);
-
-  // [BOT] Ações de bots
-  const addBot = useCallback(() => {
-    send({ type: ClientMessageType.ADD_BOT });
-  }, [send]);
-
-  const removeBot = useCallback((botId: string) => {
-    const result = RemoveBotSchema.safeParse({
-      type: 'REMOVE_BOT',
-      botId
-    });
-    if (result.success) {
-      send(result.data);
-    }
-  }, [send]);
-
-  const voteKickAfk = useCallback(() => {
-    send({ type: ClientMessageType.VOTE_KICK_AFK });
-  }, [send]);
-
-  // [SPECTATOR] Ações de spectator/kick
-  const kickPlayer = useCallback((targetId: string) => {
-    send({ type: ClientMessageType.KICK_PLAYER, targetPlayerId: targetId });
-  }, [send]);
-
-  const toggleSpectator = useCallback((targetId: string) => {
-    send({ type: ClientMessageType.TOGGLE_SPECTATOR, targetPlayerId: targetId });
-  }, [send]);
-
-  const requestPlay = useCallback(() => {
-    send({ type: ClientMessageType.REQUEST_PLAY });
-  }, [send]);
+  const actions = useGameActions({ send, setError, socketRef });
 
   return {
     gameState,
     playerId,
     isConnected,
     error,
-    clearError: useCallback(() => setError(null), []),
+    clearError: useCallback(() => setError(null), [setError]),
     roomCloseTime,
-    startGame,
-    updateSettings,
-    submitClue,
-    playCard,
-    vote,
-    nextRound,
-    restartGame,
-    leaveRoom,
-    addBot,
-    removeBot,
-    voteKickAfk,
-    kickPlayer,
-    toggleSpectator,
-    requestPlay,
+    ...actions,
   };
 }
