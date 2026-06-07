@@ -80,6 +80,7 @@ export const translations = {
       narratorSubtitle: 'Choose a card and write a clue',
       cluePlaceholder: 'Write a creative clue...',
       waitingNarrator: 'Waiting...',
+      waitingForNarrator: 'Waiting for Narrator',
       narratorChoosingCard: 'is choosing a card',
       // Others choosing phase
       theClueIs: 'The clue is',
@@ -222,6 +223,7 @@ export const translations = {
       narratorSubtitle: 'Escolha uma carta e escreva uma pista',
       cluePlaceholder: 'Escreva uma pista criativa...',
       waitingNarrator: 'Aguardando...',
+      waitingForNarrator: 'Aguardando o Narrador',
       narratorChoosingCard: 'está escolhendo uma carta',
       // Others choosing phase
       theClueIs: 'A pista é',

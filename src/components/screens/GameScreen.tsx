@@ -102,7 +102,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   const phaseLabels: Record<GamePhase, string> = {
     [GamePhase.LOBBY]: 'LOBBY',
-    [GamePhase.NARRATOR_CHOOSING]: t.game.youAreNarrator,
+    [GamePhase.NARRATOR_CHOOSING]: isNarrator ? t.game.youAreNarrator : t.game.waitingForNarrator,
     [GamePhase.OTHERS_CHOOSING]: t.game.theClueIs,
     [GamePhase.VOTING]: 'VOTING PHASE',
     [GamePhase.RESULTS]: 'RESULTS',
@@ -414,13 +414,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     <div className="text-white font-cinzel font-bold text-base truncate">
                       {player.name}
                     </div>
-                    <div className="text-white/60 font-sans text-xs mt-0.5 flex items-baseline gap-1">
-                      {player.score} <span className="text-[9px] uppercase tracking-widest text-white/30">Pts</span>
-                    </div>
                   </div>
 
-                  {/* Right Actions Area - Fixed width to prevent misalignment when kick button is missing */}
-                  <div className="flex items-center gap-2 w-[64px] justify-end shrink-0">
+                  {/* Right Actions Area */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    {/* Score */}
+                    <span className="font-sans font-black text-lg text-white/80 shrink-0">
+                      {player.score}
+                    </span>
+
                     {/* Status indicator */}
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-md border shrink-0 transition-all duration-300 ${
                       status === 'voted' || status === 'played'
@@ -441,24 +443,20 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                           </svg>
                         </div>
                       ) : (
-                        <span className="leading-none opacity-40">?</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
                       )}
                     </div>
 
                     {/* Kick button (host only, not self) */}
-                    {isHost && onKickPlayer ? (
-                      !isMe ? (
-                        <button
-                          onClick={() => setKickTarget({ id: player.id, name: player.name })}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
-                          title="Remove player"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        </button>
-                      ) : (
-                        <div className="w-7 h-7 shrink-0" /> // Placeholder to maintain alignment
-                      )
-                    ) : null}
+                    {isHost && onKickPlayer && !isMe && (
+                      <button
+                        onClick={() => setKickTarget({ id: player.id, name: player.name })}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-white/15 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0"
+                        title="Remove player"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -502,34 +500,21 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
               <div className="flex flex-col items-center gap-8 animate-fade-in w-full max-w-4xl lg:mb-auto lg:mt-8">
                 {isNarrator ? (
-                  <>
-                    {/* Announcement Card */}
-                    <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-[0_0_50px_rgba(245,158,11,0.15)] flex flex-col items-center justify-center">
-          <h2 className="text-4xl md:text-5xl text-amber-300 font-cinzel font-bold mb-4 tracking-[0.1em] leading-tight">
-                        {t.game.youAreNarrator}
-                      </h2>
-                      <p className="text-white/60 font-sans text-sm md:text-base uppercase tracking-[0.25em] mt-5 font-medium">
-                        {t.game.narratorSubtitle}
-                      </p>
-                    </div>
-
-                    {/* Input placeholder */}
-                    <div className="w-full max-w-2xl">
-                      <input
-                         type="text"
-                         placeholder={t.game.cluePlaceholder}
-                         className="w-full bg-[#1A1A1A]/50 border border-white/20 p-6 md:p-8 rounded-[2rem] text-white text-center placeholder:text-white/30 outline-none transition-colors font-cinzel italic text-xl md:text-2xl shadow-lg opacity-50"
-                         disabled
-                       />
-                    </div>
-                  </>
+                  <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-6 md:p-8 rounded-2xl md:rounded-3xl text-center w-full max-w-md shadow-2xl transition-all duration-300">
+                    <h2 className="text-xl md:text-2xl text-amber-300 font-cinzel font-bold mb-2 tracking-[0.1em] leading-tight">
+                      {t.game.youAreNarrator}
+                    </h2>
+                    <p className="text-white/60 font-sans text-xs md:text-sm uppercase tracking-[0.15em] mt-4 font-medium">
+                      {t.game.narratorSubtitle}
+                    </p>
+                  </div>
                 ) : (
-                  <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-10 md:p-14 rounded-3xl md:rounded-[2.5rem] text-center w-full max-w-2xl shadow-2xl">
-                    <h2 className="text-2xl md:text-3xl text-white mb-4 font-cinzel font-bold tracking-[0.2em] uppercase text-amber-100/90">
+                  <div className="bg-black/40 backdrop-blur-2xl border border-white/10 ring-1 ring-white/5 p-6 md:p-8 rounded-2xl md:rounded-3xl text-center w-full max-w-md shadow-2xl">
+                    <h2 className="text-lg md:text-xl text-white mb-2 font-cinzel font-bold tracking-[0.2em] uppercase text-amber-100/90">
                       {t.game.waitingNarrator}
                     </h2>
-                    <p className="text-white/60 font-sans text-base md:text-lg tracking-wider mt-6">
-                      <span style={{ color: narrator?.color }} className="font-cinzel font-bold uppercase tracking-wider text-lg md:text-xl bg-white/5 px-4 py-1.5 rounded-lg mx-1.5 shadow-inner">{narrator?.name}</span> <span className="uppercase tracking-[0.1em] font-sans text-xs md:text-sm font-medium ml-2">{t.game.narratorChoosingCard}</span>
+                    <p className="text-white/60 font-sans text-sm md:text-base tracking-wider mt-4">
+                      <span style={{ color: narrator?.color }} className="font-cinzel font-bold uppercase tracking-wider text-xs md:text-sm bg-white/5 px-3 py-1 rounded-md mx-1 shadow-inner">{narrator?.name}</span> <span className="uppercase tracking-[0.1em] font-sans text-[10px] md:text-xs font-medium ml-1.5">{t.game.narratorChoosingCard}</span>
                     </p>
                   </div>
                 )}
@@ -667,70 +652,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           </div>
 
           {/* ===== PLAYER HAND (Bottom) ===== */}
-          {/* During OTHERS_CHOOSING (if already played/narrator) or VOTING (always): show status scoreboard */}
           {currentPlayer && !currentPlayer.isSpectator && (
-            (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
-            (gameState.phase === GamePhase.VOTING)
-          ) && (
-            <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-[#1A1A1A]/60 backdrop-blur-md border-t border-white/10 relative z-10 px-4 md:px-8">
-              <div className="max-w-screen-md w-full mx-auto">
-                <p className="text-white/30 text-[10px] uppercase tracking-[0.25em] font-sans font-bold text-center mb-4">
-                  {gameState.phase === GamePhase.VOTING ? t.game.playersVoting : t.game.playersChoosing}
-                </p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {[...gameState.players]
-                    .filter(p => !p.isSpectator)
-                    .map(player => {
-                      let done = false;
-                      if (gameState.phase === GamePhase.VOTING) {
-                        done = gameState.playersWhoVoted?.includes(player.id) || player.id === narrator?.id;
-                      } else {
-                        done = gameState.playersWhoPlayed?.includes(player.id) || player.id === narrator?.id;
-                      }
-
-                      const isMe = player.id === playerId;
-                      return (
-                        <div
-                          key={player.id}
-                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all duration-300 ${
-                            done
-                              ? 'bg-green-500/10 border-green-500/20'
-                              : 'bg-white/[0.03] border-white/5'
-                          }`}
-                        >
-                          <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 border border-white/10"
-                            style={{ backgroundColor: player.color }}
-                          >
-                            {player.name.charAt(0).toUpperCase()}
-                          </div>
-                          <span className={`font-cinzel font-bold text-xs ${isMe ? 'text-amber-300' : 'text-white/70'}`}>
-                            {player.name}{isMe && <span className="text-white/30 font-sans text-[9px] ml-1">({t.common.you})</span>}
-                          </span>
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
-                            done
-                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                              : 'bg-black/40 text-white/20 border-white/5'
-                          }`}>
-                            {done ? (
-                              <span className="text-[9px] font-bold leading-none">✓</span>
-                            ) : (
-                              <span className="text-[9px] opacity-40 leading-none">?</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })
-                  }
-                </div>
-              </div>
-            </div>
-          )}
-
-          {currentPlayer && !currentPlayer.isSpectator && !(
-            (gameState.phase === GamePhase.OTHERS_CHOOSING && (isNarrator || hasPlayed)) ||
-            (gameState.phase === GamePhase.VOTING)
-          ) && (
             <div className="pb-6 md:pb-10 pt-4 w-full bg-[#1A1A1A]/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-white/10 md:border-none relative z-10 px-4 md:px-0">
               <div className="max-w-screen-2xl w-full mx-auto">
                 <div className="md:hidden flex justify-between items-center mb-4 pt-2 px-2">
@@ -855,21 +777,35 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                 .map((player, index) => {
                   const status = getPlayerStatus(player);
                   const isMe = player.id === playerId;
-                  return (
-                    <div
-                      key={player.id}
-                      className={`flex items-center gap-3 p-3 rounded-2xl border ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5'}`}
-                    >
-                      <span className={`w-6 text-center font-cinzel font-bold text-sm shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/30'}`}>{index + 1}°</span>
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/10 ${isMe ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black' : ''}`}
-                        style={{ backgroundColor: player.color }}
-                      >
-                        {player.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white font-cinzel font-bold text-sm truncate">{player.name}{isMe && <span className="text-white/30 font-sans text-[10px] ml-1">({t.common.you})</span>}</div>
-                      </div>
+                      const isHost = currentPlayer?.isHost ?? false;
+                      return (
+                        <div
+                          key={player.id}
+                          className={`flex items-center gap-3 p-3 rounded-2xl border ${isMe ? 'bg-[#1A1A1A]/60 border-amber-500/30' : 'bg-[#1A1A1A]/40 border-white/5'}`}
+                        >
+                          <span className={`w-6 text-center font-cinzel font-bold text-sm shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/30'}`}>{index + 1}°</span>
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 border border-white/10 ${isMe ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black' : ''}`}
+                            style={{ backgroundColor: player.color }}
+                          >
+                            {player.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0 flex items-center gap-2">
+                            <span className="text-white font-cinzel font-bold text-sm truncate">{player.name}</span>
+                            {isMe && <span className="text-white/30 font-sans text-[10px] shrink-0">({t.common.you})</span>}
+                            {isHost && onKickPlayer && !isMe && (
+                              <button
+                                onClick={() => setKickTarget({ id: player.id, name: player.name })}
+                                className="text-white/20 hover:text-red-400 hover:bg-red-500/10 p-1 rounded-lg transition-colors shrink-0"
+                                title="Remove player"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="18" y1="6" x2="6" y2="18"/>
+                                  <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                              </button>
+                            )}
+                          </div>
                       <div className={`font-sans font-black text-xl shrink-0 ${index === 0 ? 'text-amber-400' : 'text-white/80'}`}>{player.score}</div>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border ${
                         status === 'voted' || status === 'played' || status === 'readied'
@@ -883,7 +819,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                         ) : (status === 'voted' || status === 'played' || status === 'readied') ? (
                           <span className="text-[9px] font-bold">✓</span>
                         ) : (
-                          <span className="opacity-30 text-[9px]">?</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
                         )}
                       </div>
                     </div>

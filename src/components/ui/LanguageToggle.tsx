@@ -10,7 +10,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "" }
 
   const toggle = () => setLang(lang === 'pt' ? 'en' : 'pt');
 
-  const isCustomPositioned = className.includes('fixed') || className.includes('absolute') || className.includes('top-') || className.includes('right-');
+  const isCustomPositioned = className.trim() !== '';
   const basePosition = isCustomPositioned ? '' : 'fixed top-4 right-4 z-[300]';
 
   return (
