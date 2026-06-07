@@ -35,10 +35,12 @@ export const PlayerList: React.FC<PlayerListProps> = ({
         {gameState.players.map((player) => (
           <div
             key={player.id}
-            className={`flex items-center gap-3 bg-[#1A1A1A]/60 p-3 rounded-2xl border transition-all duration-300 h-[72px] md:h-[76px] shadow-sm ${
-              player.isSpectator
-                ? 'border-white/5 opacity-60'
-                : 'border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80'
+            className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 h-[72px] md:h-[76px] shadow-sm ${
+              player.id === currentPlayer?.id
+                ? 'bg-amber-500/10 border-amber-500/30 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]'
+                : player.isSpectator
+                ? 'bg-[#1A1A1A]/60 border-white/5 opacity-60'
+                : 'bg-[#1A1A1A]/60 border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80'
             }`}
           >
             <div
@@ -55,9 +57,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                 {player.name}
               </span>
               <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-                {player.id === currentPlayer?.id && (
-                  <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans font-medium shrink-0">({t.common.you})</span>
-                )}
                 {player.isHost && (
                   <span className="text-amber-400 text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)] shrink-0">
                     {t.lobby.host}
