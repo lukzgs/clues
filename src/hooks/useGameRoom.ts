@@ -83,6 +83,19 @@ export function useGameRoom({
   useEffect(() => {
     if (!roomCode || !playerName) return;
 
+    let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
+      if (!hasJoinedRef.current || !gameState) {
+        console.warn('Connection timeout: room is likely gone or server is down.');
+        localStorage.removeItem(storageKey);
+        setError('Não foi possível conectar à sala (tempo limite esgotado)');
+        setIsConnected(false);
+        hasJoinedRef.current = false;
+        if (socketRef.current) {
+          socketRef.current.close();
+        }
+      }
+    }, 3000);
+
     const socket = new PartySocket({
       host: PARTYKIT_HOST,
       room: roomCode,
@@ -152,6 +165,12 @@ export function useGameRoom({
                 playerName,
                 playerId: msg.yourPlayerId,
               }));
+              
+              // Clear connection timeout since we successfully joined/reconnected
+              if (connectionTimeout) {
+                clearTimeout(connectionTimeout);
+                connectionTimeout = null;
+              }
             }
             break;
 
@@ -198,6 +217,9 @@ export function useGameRoom({
     });
 
     return () => {
+      if (connectionTimeout) {
+        clearTimeout(connectionTimeout);
+      }
       socket.close();
       socketRef.current = null;
       hasJoinedRef.current = false;

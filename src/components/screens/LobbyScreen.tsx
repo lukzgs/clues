@@ -56,17 +56,32 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     }
   };
 
+  // Valores padrão para robustez caso o estado venha desatualizado ou corrompido
+  const defaultVC = gameState.victoryCondition || {
+    scoreEnabled: true,
+    targetScore: GAME_CONFIG.WINNING_SCORE,
+    narratorRoundsEnabled: false,
+    narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
+  };
+  const defaultDeckOption = gameState.deckOption || 'mixed';
+  const defaultTimeouts = gameState.phaseTimeouts || {
+    narrator: 60,
+    othersChoosing: 45,
+    voting: 30,
+    results: 15,
+  };
+
   // Local state for debouncing
-  const [vc, setVC] = useState<VictoryCondition>(gameState.victoryCondition);
-  const [deckOption, setDeckOptionState] = useState<DeckOption>(gameState.deckOption);
-  const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>(gameState.phaseTimeouts);
+  const [vc, setVC] = useState<VictoryCondition>(defaultVC);
+  const [deckOption, setDeckOptionState] = useState<DeckOption>(defaultDeckOption);
+  const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>(defaultTimeouts);
 
   // Sync from server if not host (or on initial load)
   useEffect(() => {
     if (!isHost) {
-      setVC(gameState.victoryCondition);
-      setDeckOptionState(gameState.deckOption);
-      setPhaseTimeouts(gameState.phaseTimeouts);
+      setVC(gameState.victoryCondition || defaultVC);
+      setDeckOptionState(gameState.deckOption || defaultDeckOption);
+      setPhaseTimeouts(gameState.phaseTimeouts || defaultTimeouts);
     }
   }, [gameState.victoryCondition, gameState.deckOption, gameState.phaseTimeouts, isHost]);
 
