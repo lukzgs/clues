@@ -187,6 +187,8 @@ export function checkVictoryCondition(
 // PUBLIC STATE FILTERING
 // ============================================
 
+import GAME_CONFIG from '../game.config.json';
+
 /**
  * Creates a filtered view of the game state for a specific player.
  *
@@ -200,53 +202,73 @@ export function getPublicState(
   state: ServerGameState,
   forPlayerId: string | null,
 ): GameState {
-  const narrator = state.players[state.narratorIndex];
+  const narrator = state.players ? state.players[state.narratorIndex] : undefined;
   const isNarrator = forPlayerId === narrator?.id;
   const isRevealed = state.phase === GamePhase.RESULTS || state.phase === GamePhase.GAME_OVER;
 
   // Filter tableCards: hide playerId unless narrator or in RESULTS/GAME_OVER
-  const tableCards = state.tableCards.map(tc => ({
-    ...tc,
+  const tableCards = (state.tableCards || []).map(tc => ({
+    orderId: tc.orderId,
     playerId: (isNarrator || isRevealed) ? tc.playerId : '',
+    card: tc.card,
     isMine: tc.playerId === forPlayerId,
   }));
 
   // Filter votes: hide until RESULTS/GAME_OVER; during VOTING show only own vote
   let votes: Record<string, number> = {};
-  if (isRevealed) {
-    votes = state.votes;
-  } else if (forPlayerId && state.votes[forPlayerId] !== undefined) {
-    votes = { [forPlayerId]: state.votes[forPlayerId] };
+  if (state.votes) {
+    if (isRevealed) {
+      votes = state.votes;
+    } else if (forPlayerId && state.votes[forPlayerId] !== undefined) {
+      votes = { [forPlayerId]: state.votes[forPlayerId] };
+    }
   }
 
   // playersWhoPlayed: safe list of IDs who already placed a card (no card association)
-  const playersWhoPlayed = state.tableCards.map(tc => tc.playerId);
+  const playersWhoPlayed = (state.tableCards || []).map(tc => tc.playerId);
   
   // playersWhoVoted: safe list of IDs who already voted (no choice association)
-  const playersWhoVoted = Object.keys(state.votes);
+  const playersWhoVoted = state.votes ? Object.keys(state.votes) : [];
 
   return {
-    roomCode: state.roomCode,
-    phase: state.phase,
-    players: state.players.map(p => ({
-      ...p,
-      // Hide other players' hands
-      hand: p.id === forPlayerId ? p.hand : p.hand.map(() => ({ id: -1, imageUrl: '' })),
+    roomCode: state.roomCode || '',
+    phase: state.phase || GamePhase.LOBBY,
+    players: (state.players || []).map(p => ({
+      id: p.id || '',
+      name: p.name || '',
+      score: typeof p.score === 'number' ? p.score : 0,
+      hand: p.id === forPlayerId ? (p.hand || []) : (p.hand || []).map(() => ({ id: -1, imageUrl: '' })),
+      color: p.color || '#000000',
+      isConnected: typeof p.isConnected === 'boolean' ? p.isConnected : false,
+      isHost: typeof p.isHost === 'boolean' ? p.isHost : false,
+      isBot: typeof p.isBot === 'boolean' ? p.isBot : false,
+      isSpectator: typeof p.isSpectator === 'boolean' ? p.isSpectator : false,
     })),
-    narratorIndex: state.narratorIndex,
-    currentClue: state.currentClue,
+    narratorIndex: typeof state.narratorIndex === 'number' ? state.narratorIndex : 0,
+    currentClue: state.currentClue || '',
     tableCards,
     votes,
-    winner: state.winner,
-    deckCount: state.deck.length,
+    winner: state.winner || null,
+    deckCount: state.deck ? state.deck.length : 0,
     playersWhoPlayed,
     playersWhoVoted,
-    victoryCondition: state.victoryCondition,
-    currentRound: state.currentRound,
-    phaseStartTime: state.phaseStartTime,
-    afkKickVotes: state.afkKickVotes,
-    deckOption: state.deckOption,
-    playersWhoReadied: state.playersWhoReadied,
-    phaseTimeouts: state.phaseTimeouts,
+    victoryCondition: state.victoryCondition || {
+      scoreEnabled: true,
+      targetScore: GAME_CONFIG.WINNING_SCORE,
+      narratorRoundsEnabled: false,
+      narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
+    },
+    currentRound: typeof state.currentRound === 'number' ? state.currentRound : 0,
+    phaseStartTime: typeof state.phaseStartTime === 'number' ? state.phaseStartTime : Date.now(),
+    afkKickVotes: state.afkKickVotes || [],
+    deckOption: state.deckOption || 'mixed',
+    playersWhoReadied: state.playersWhoReadied || [],
+    phaseTimeouts: state.phaseTimeouts || {
+      narrator: 60,
+      othersChoosing: 45,
+      voting: 30,
+      results: 15,
+    },
   };
 }
+

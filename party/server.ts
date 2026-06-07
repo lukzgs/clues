@@ -11,16 +11,24 @@ import {
   DeckOption,
   PhaseTimeouts,
 } from "../src/types";
-import { PLAYER_COLORS } from "../src/config";
 import { ClientMessageSchema } from "../src/schemas";
+import { getPublicState } from "./game-logic";
+import GAME_CONFIG from '../game.config.json';
+
+// Import local handlers
+import { handleJoinRoom, handleLeaveRoom, handleUpdateSettings } from "./handlers/room";
 import {
-  createDeck,
-  shuffle,
-  generatePlayerId,
-  calculateScores as calculateScoresPure,
-  checkVictoryCondition,
-  getPublicState,
-} from "./game-logic";
+  handleStartGame,
+  handleSubmitClue,
+  handlePlayCard,
+  handleVote,
+  calculateScores,
+  handleNextRound,
+  handleRestartGame,
+} from "./handlers/game";
+import { handleKickPlayer, handleToggleSpectator, handleRequestPlay } from "./handlers/spectator";
+import { getAfkPlayers, handleVoteKickAfk, checkPhaseProgression } from "./handlers/afk";
+import { handleAddBot, handleRemoveBot, triggerBotActions } from "./handlers/bot";
 
 // [BOT] Import dinâmico - não falha se bots não existir
 let BotManagerClass: any = null;
@@ -33,24 +41,18 @@ try {
 }
 
 // ============================================
-// CONFIGURAÇÕES (importado de game.config.json)
-// ============================================
-
-import GAME_CONFIG from '../game.config.json';
-
-// ============================================
 // SERVIDOR DO JOGO
 // ============================================
 
 export default class GameServer implements Party.Server {
   // Estado interno completo
-  private state: ServerGameState;
+  public state: ServerGameState;
 
   // Mapeamento: connectionId -> playerId
-  private connections: Map<string, string> = new Map();
+  public connections: Map<string, string> = new Map();
 
   // [BOT] Gerenciador de bots (opcional)
-  private botManager: any = null;
+  public botManager: any = null;
 
   // Rate limiting: connectionId -> { count, windowStart }
   private rateLimitData: Map<string, { count: number; windowStart: number }> = new Map();
@@ -63,7 +65,7 @@ export default class GameServer implements Party.Server {
     }
   }
 
-  private createInitialState(): ServerGameState {
+  public createInitialState(): ServerGameState {
     return {
       roomCode: this.room.id,
       phase: GamePhase.LOBBY,
@@ -90,7 +92,7 @@ export default class GameServer implements Party.Server {
   }
 
   // [SPECTATOR] Returns max active players based on deck option
-  private getMaxPlayersForDeck(deckOption: DeckOption): number {
+  public getMaxPlayersForDeck(deckOption: DeckOption): number {
     return deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   }
 
@@ -167,7 +169,9 @@ export default class GameServer implements Party.Server {
 
       this.broadcastState();
     }
-  }  // ============================================
+  }
+
+  // ============================================
   // RATE LIMITING
   // ============================================
 
@@ -284,7 +288,7 @@ export default class GameServer implements Party.Server {
     }
   }
 
-  private async resetInactivityTimer() {
+  public async resetInactivityTimer() {
     const isClosing = await this.room.storage.get<boolean>('isClosing');
     if (isClosing) {
       await this.room.storage.delete('isClosing');
@@ -319,804 +323,126 @@ export default class GameServer implements Party.Server {
   }
 
   // ============================================
-  // HANDLERS DE AÇÕES
+  // HANDLERS DELEGATION BRIDGES
   // ============================================
 
-  private async handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
-    // Verifica se já está conectado
-    if (this.connections.has(conn.id)) {
-      this.sendError(conn, 'Você já está na sala');
-      return;
-    }
-
-    // Reconnection: try to reclaim a player by ID (even if they still appear connected due to ghost socket)
-    if (reconnectId) {
-      const player = this.state.players.find(p => p.id === reconnectId && !p.isBot);
-      if (player) {
-        // Verifica se já existe uma conexão ativa para este jogador
-        let existingConn: Party.Connection | undefined;
-        let existingConnIdSaved: string | undefined;
-        for (const [existingConnId, existingPlayerId] of this.connections.entries()) {
-          if (existingPlayerId === player.id) {
-            existingConn = this.room.getConnection(existingConnId);
-            existingConnIdSaved = existingConnId;
-            break;
-          }
-        }
-
-        if (existingConn) {
-          // Assume que a nova conexão (mesmo jogador) é a correta e derruba a antiga imediatamente.
-          if (existingConnIdSaved) this.connections.delete(existingConnIdSaved);
-          existingConn.close(1000, "Reconnected elsewhere");
-        }
-
-        // Reclaim: map new connection to existing player
-        player.isConnected = true;
-        
-        this.connections.set(conn.id, player.id);
-
-        // Remove from readied list so they can re-confirm if disconnected during RESULTS
-        this.state.playersWhoReadied = this.state.playersWhoReadied.filter(id => id !== player.id);
-
-        this.broadcast({
-          type: ServerMessageType.PLAYER_JOINED,
-          player: { ...player, hand: [] },
-        });
-
-        this.broadcastState();
-        
-        // Send confirmation with player ID so client can restore local state
-        conn.send(JSON.stringify({
-          type: ServerMessageType.SYNC_STATE,
-          gameState: getPublicState(this.state, player.id),
-          yourPlayerId: player.id
-        }));
-        
-        return;
-      }
-      // reconnectId invalid — fall through to normal join
-    }
-
-    // Verifica fase — allow mid-game join as spectator
-    if (this.state.phase !== GamePhase.LOBBY) {
-      // Mid-game: check total connections limit
-      if (this.state.players.length >= GAME_CONFIG.MAX_CONNECTIONS) {
-        this.sendError(conn, 'Sala cheia');
-        return;
-      }
-
-      // Create spectator player
-      const playerId = generatePlayerId();
-      const playerIndex = this.state.players.length;
-
-      const newPlayer: Player = {
-        id: playerId,
-        name: playerName.trim() || `Jogador ${playerIndex + 1}`,
-        score: 0,
-        hand: [],
-        color: PLAYER_COLORS[playerIndex % PLAYER_COLORS.length],
-        isConnected: true,
-        isHost: false,
-        isSpectator: true, // Mid-game joins are always spectators
-      };
-
-      this.state.players.push(newPlayer);
-      this.connections.set(conn.id, playerId);
-
-      this.broadcast({
-        type: ServerMessageType.PLAYER_JOINED,
-        player: { ...newPlayer, hand: [] },
-      });
-
-      this.broadcastState();
-      return;
-    }
-
-    // Verifica limite total de conexões
-    if (this.state.players.length >= GAME_CONFIG.MAX_CONNECTIONS) {
-      this.sendError(conn, 'Sala cheia');
-      return;
-    }
-
-    // Cria jogador
-    const playerId = generatePlayerId();
-    const playerIndex = this.state.players.length;
-
-    const newPlayer: Player = {
-      id: playerId,
-      name: playerName.trim() || `Jogador ${playerIndex + 1}`,
-      score: 0,
-      hand: [],
-      color: PLAYER_COLORS[playerIndex % PLAYER_COLORS.length],
-      isConnected: true,
-      isHost: playerIndex === 0, // Primeiro jogador é host
-    };
-
-    this.state.players.push(newPlayer);
-    this.connections.set(conn.id, playerId);
-
-    // Notifica todos
-    this.broadcast({
-      type: ServerMessageType.PLAYER_JOINED,
-      player: { ...newPlayer, hand: [] },
-    });
-
-    this.broadcastState();
+  public async handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
+    return handleJoinRoom(this, playerName, conn, reconnectId);
   }
 
-  private handleLeaveRoom(playerId: string, conn: Party.Connection) {
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player) return;
-
-    // Remove do jogo se no lobby
-    if (this.state.phase === GamePhase.LOBBY) {
-      this.state.players = this.state.players.filter(p => p.id !== playerId);
-
-      if (player.isHost && this.state.players.length > 0) {
-        this.state.players[0].isHost = true;
-      }
-    } else {
-      player.isConnected = false;
-    }
-
-    this.connections.delete(conn.id);
-
-    this.broadcast({
-      type: ServerMessageType.PLAYER_LEFT,
-      playerId: player.id,
-      playerName: player.name,
-    });
-
-    this.broadcastState();
+  public handleLeaveRoom(playerId: string, conn: Party.Connection) {
+    return handleLeaveRoom(this, playerId, conn);
   }
 
-  private handleUpdateSettings(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) {
-    if (this.state.phase !== GamePhase.LOBBY) return;
-    
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player?.isHost) return;
-
-    // Apply victory condition from host
-    this.state.victoryCondition = {
-      scoreEnabled: victoryCondition.scoreEnabled,
-      targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
-      narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
-      narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
-    };
-
-    // Apply phase timeouts from host
-    this.state.phaseTimeouts = {
-      narrator: Math.max(0, Math.min(120, phaseTimeouts.narrator)),
-      othersChoosing: Math.max(0, Math.min(120, phaseTimeouts.othersChoosing)),
-      voting: Math.max(0, Math.min(120, phaseTimeouts.voting)),
-      results: Math.max(0, Math.min(120, phaseTimeouts.results)),
-    };
-
-    this.state.deckOption = deckOption;
-
-    this.broadcastState();
+  public handleUpdateSettings(
+    playerId: string,
+    victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
+    deckOption: DeckOption,
+    phaseTimeouts: PhaseTimeouts
+  ) {
+    return handleUpdateSettings(this, playerId, victoryCondition, deckOption, phaseTimeouts);
   }
 
-  private handleStartGame(playerId: string, victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number }, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) {
-    const player = this.state.players.find(p => p.id === playerId);
-
-    // Apenas host pode iniciar
-    if (!player?.isHost) {
-      return;
-    }
-
-    // Remove disconnected players before starting (lobby cleanup)
-    this.state.players = this.state.players.filter(p => p.isConnected || p.isBot);
-
-    // [SPECTATOR] Verifica minimo de jogadores ATIVOS (não spectators)
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    if (activePlayers.length < GAME_CONFIG.MIN_PLAYERS) {
-      return;
-    }
-
-    // [SPECTATOR] Verifica maximo de jogadores ativos para o deck selecionado
-    const maxPlayers = this.getMaxPlayersForDeck(deckOption);
-    if (activePlayers.length > maxPlayers) {
-      return;
-    }
-
-    // At least one condition must be enabled
-    if (!victoryCondition.scoreEnabled && !victoryCondition.narratorRoundsEnabled) {
-      return;
-    }
-
-    // Apply victory condition from host
-    this.state.victoryCondition = {
-      scoreEnabled: victoryCondition.scoreEnabled,
-      targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
-      narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
-      narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
-    };
-
-    // Apply phase timeouts from host
-    this.state.phaseTimeouts = {
-      narrator: Math.max(0, Math.min(120, phaseTimeouts.narrator)),
-      othersChoosing: Math.max(0, Math.min(120, phaseTimeouts.othersChoosing)),
-      voting: Math.max(0, Math.min(120, phaseTimeouts.voting)),
-      results: Math.max(0, Math.min(120, phaseTimeouts.results)),
-    };
-
-    // Create and shuffle deck based on option
-    this.state.deckOption = deckOption;
-    this.state.deck = shuffle(createDeck(deckOption, GAME_CONFIG.ORIGINAL_DECK_SIZE, GAME_CONFIG.NEW_DECK_SIZE));
-
-    // [SPECTATOR] Distribui cartas apenas para jogadores ativos
-    this.state.players.forEach(p => {
-      if (!p.isSpectator) {
-        p.hand = this.state.deck.splice(0, GAME_CONFIG.HAND_SIZE);
-        p.score = 0;
-      } else {
-        p.hand = [];
-        p.score = 0;
-      }
-    });
-
-    // Inicia o jogo — primeiro narrador deve ser ativo
-    this.changePhase(GamePhase.NARRATOR_CHOOSING);
-    // Find first active player as narrator
-    let narratorIdx = 0;
-    while (narratorIdx < this.state.players.length && this.state.players[narratorIdx].isSpectator) {
-      narratorIdx++;
-    }
-    this.state.narratorIndex = narratorIdx;
-    this.state.currentClue = '';
-    this.state.tableCards = [];
-    this.state.votes = {};
-    this.state.winner = null;
-    this.state.currentRound = 0;
-
-    this.broadcastState();
-
-    // [BOT] Faz bots agirem se necessário
-    this.triggerBotActions();
+  public handleStartGame(
+    playerId: string,
+    victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
+    deckOption: DeckOption,
+    phaseTimeouts: PhaseTimeouts
+  ) {
+    return handleStartGame(this, playerId, victoryCondition, deckOption, phaseTimeouts);
   }
 
-  private handleSubmitClue(playerId: string, cardId: number, clue: string) {
-    if (this.state.phase !== GamePhase.NARRATOR_CHOOSING) return;
-
-    const narrator = this.state.players[this.state.narratorIndex];
-    if (narrator.id !== playerId) return;
-
-    const cardIndex = narrator.hand.findIndex(c => c.id === cardId);
-    if (cardIndex === -1) return;
-
-    if (!clue.trim()) return;
-
-    // Remove carta da mão e coloca na mesa
-    const [card] = narrator.hand.splice(cardIndex, 1);
-
-    this.state.tableCards = [{
-      orderId: 0,
-      playerId: narrator.id,
-      card,
-    }];
-
-    this.state.currentClue = clue.trim();
-    this.changePhase(GamePhase.OTHERS_CHOOSING);
-
-    this.broadcastState();
-
-    // [BOT] Faz bots jogarem cartas
-    this.triggerBotActions();
+  public handleSubmitClue(playerId: string, cardId: number, clue: string) {
+    return handleSubmitClue(this, playerId, cardId, clue);
   }
 
-  private handlePlayCard(playerId: string, cardId: number) {
-    if (this.state.phase !== GamePhase.OTHERS_CHOOSING) return;
-
-    const narrator = this.state.players[this.state.narratorIndex];
-    if (narrator.id === playerId) return; // Narrador não joga
-
-    // Verifica se já jogou
-    if (this.state.tableCards.some(tc => tc.playerId === playerId)) return;
-
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player) return;
-
-    // Spectators cannot play cards
-    if (player.isSpectator) return;
-
-    const cardIndex = player.hand.findIndex(c => c.id === cardId);
-    if (cardIndex === -1) return;
-
-    // Remove carta da mão e coloca na mesa
-    const [card] = player.hand.splice(cardIndex, 1);
-
-    this.state.tableCards.push({
-      orderId: this.state.tableCards.length,
-      playerId: player.id,
-      card,
-    });
-
-    // Verifica se todos jogaram
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    if (this.state.tableCards.length >= activePlayers.length) {
-      // Embaralha as cartas na mesa
-      this.state.tableCards = shuffle(this.state.tableCards).map((tc, i) => ({
-        ...tc,
-        orderId: i,
-      }));
-
-      this.changePhase(GamePhase.VOTING);
-      this.triggerBotActions();
-    }
-
-    this.broadcastState();
+  public handlePlayCard(playerId: string, cardId: number) {
+    return handlePlayCard(this, playerId, cardId);
   }
 
-  private handleVote(playerId: string, orderId: number) {
-    if (this.state.phase !== GamePhase.VOTING) return;
-
-    const narrator = this.state.players[this.state.narratorIndex];
-    if (narrator.id === playerId) return; // Narrador não vota
-
-    // Spectators cannot vote
-    const voter = this.state.players.find(p => p.id === playerId);
-    if (voter?.isSpectator) return;
-
-    // Verifica se já votou
-    if (this.state.votes[playerId] !== undefined) return;
-
-    // Verifica se a carta existe
-    const votedCard = this.state.tableCards.find(tc => tc.orderId === orderId);
-    if (!votedCard) return;
-
-    // Não pode votar na própria carta
-    if (votedCard.playerId === playerId) return;
-
-    this.state.votes[playerId] = orderId;
-
-    // Verifica se todos votaram
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    const votersCount = activePlayers.length - 1; // -1 narrador
-    
-    // Contar apenas votos de jogadores ativos
-    const activeVotes = Object.keys(this.state.votes).filter(vId => !this.state.players.find(p => p.id === vId)?.isSpectator);
-    
-    if (activeVotes.length >= votersCount) {
-      this.calculateScores();
-    }
-
-    this.broadcastState();
+  public handleVote(playerId: string, orderId: number) {
+    return handleVote(this, playerId, orderId);
   }
 
-  private calculateScores() {
-    // Delegate scoring to pure function
-    const pointsEarned = calculateScoresPure(
-      this.state.players,
-      this.state.narratorIndex,
-      this.state.tableCards,
-      this.state.votes,
-    );
-
-    // Apply earned points to player scores
-    for (const player of this.state.players) {
-      player.score += pointsEarned[player.id] || 0;
-    }
-
-    // Check victory conditions
-    const winnerId = checkVictoryCondition(
-      this.state.players,
-      this.state.victoryCondition,
-      this.state.currentRound,
-    );
-
-    if (winnerId) {
-      this.state.winner = winnerId;
-    }
-
-    this.changePhase(GamePhase.RESULTS);
-    // [BOT] Auto-ready bots so they don't block round advancement
-    this.state.players.forEach(p => {
-      if (p.isBot && !p.isSpectator) {
-        this.state.playersWhoReadied.push(p.id);
-      }
-    });
+  public calculateScores() {
+    return calculateScores(this);
   }
 
-  private handleNextRound(playerId: string) {
-    if (this.state.phase !== GamePhase.RESULTS) return;
-
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player) return;
-
-    // Spectators cannot ready up
-    if (player.isSpectator) return;
-
-    // Mark player as ready
-    if (!this.state.playersWhoReadied.includes(playerId)) {
-      this.state.playersWhoReadied.push(playerId);
-    }
-
-    // Check if all active (non-spectator) players are ready
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    const allReady = activePlayers.every(p => this.state.playersWhoReadied.includes(p.id));
-
-    if (!allReady) {
-      this.broadcastState();
-      return;
-    }
-
-    // All players are ready — advance to next round
-    
-    // Check if game is already won from previous round
-    if (this.state.winner) {
-      this.changePhase(GamePhase.GAME_OVER);
-      this.broadcastState();
-      return;
-    }
-
-    // Check if deck has enough cards for the next round
-    if (this.state.deck.length < activePlayers.length) {
-      this.changePhase(GamePhase.GAME_OVER);
-      const winner = activePlayers.reduce((prev, current) => (prev.score > current.score) ? prev : current);
-      this.state.winner = winner.id;
-      this.broadcastState();
-      return;
-    }
-
-    // Increment round counter
-    this.state.currentRound++;
-
-    // [SPECTATOR] Distribute a new card only to active players
-    this.state.players.forEach(p => {
-      if (!p.isSpectator && this.state.deck.length > 0) {
-        p.hand.push(this.state.deck.shift()!);
-      }
-    });
-
-    // Próximo narrador (pula desconectados e spectators)
-    let nextIndex = (this.state.narratorIndex + 1) % this.state.players.length;
-    let attempts = 0;
-    while ((!this.state.players[nextIndex].isConnected || this.state.players[nextIndex].isSpectator) && attempts < this.state.players.length) {
-      nextIndex = (nextIndex + 1) % this.state.players.length;
-      attempts++;
-    }
-
-    this.state.narratorIndex = nextIndex;
-    this.state.currentClue = '';
-    this.state.tableCards = [];
-    this.state.votes = {};
-    this.changePhase(GamePhase.NARRATOR_CHOOSING);
-
-    this.broadcastState();
-
-    // [BOT] Faz bots agirem se próximo narrador for bot
-    this.triggerBotActions();
+  public handleNextRound(playerId: string) {
+    return handleNextRound(this, playerId);
   }
 
-  private handleRestartGame(playerId: string) {
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player?.isHost) return;
-
-    // [SPECTATOR] Mantém jogadores e preserva status de spectator
-    const players = this.state.players.map(p => ({
-      ...p,
-      score: 0,
-      hand: [],
-      // isSpectator is preserved — spectators can request to play in lobby
-    }));
-
-    this.state = {
-      ...this.createInitialState(),
-      players,
-    };
-
-    this.broadcastState();
+  public handleRestartGame(playerId: string) {
+    return handleRestartGame(this, playerId);
   }
 
-  // ============================================
-  // [SPECTATOR] KICK & SPECTATOR HANDLERS
-  // ============================================
-
-  private handleKickPlayer(hostId: string, targetId: string) {
-    const host = this.state.players.find(p => p.id === hostId);
-    if (!host?.isHost) return;
-
-    const target = this.state.players.find(p => p.id === targetId);
-    if (!target) return;
-
-    // Cannot kick yourself
-    if (hostId === targetId) return;
-
-    // Save narrator ID for safety checks
-    const currentNarratorId = this.state.players[this.state.narratorIndex]?.id;
-
-    if (this.state.phase === GamePhase.LOBBY) {
-      // Lobby phase: completely remove player from state
-      this.state.players = this.state.players.filter(p => p.id !== targetId);
-      // Clean up their table cards and votes just in case
-      delete this.state.votes[targetId];
-      this.state.tableCards = this.state.tableCards.filter(tc => tc.playerId !== targetId);
-    } else {
-      // Mid-game phase: soft-delete to preserve array indexes
-      target.isConnected = false;
-      target.isSpectator = true;
-      // Remove their votes (they forfeit voting)
-      delete this.state.votes[targetId];
-      // Note: We DO NOT remove their tableCard if they already played it, so the round doesn't break
-    }
-
-    this.state.playersWhoReadied = this.state.playersWhoReadied.filter(id => id !== targetId);
-    this.state.afkKickVotes = this.state.afkKickVotes.filter(id => id !== targetId);
-
-    // If kicked player was host (shouldn't happen but safety), reassign
-    if (target.isHost && this.state.players.length > 0) {
-      target.isHost = false;
-      const newHost = this.state.players.find(p => !p.isSpectator && p.id !== targetId) || this.state.players[0];
-      if (newHost) newHost.isHost = true;
-    }
-
-    // Close the kicked player's connection
-    for (const [connId, pId] of this.connections) {
-      if (pId === targetId) {
-        const conn = this.room.getConnection(connId);
-        if (conn) {
-          this.sendToConnection(conn, {
-            type: ServerMessageType.PLAYER_KICKED,
-            playerId: targetId,
-            playerName: target.name,
-          });
-        }
-        this.connections.delete(connId);
-        break;
-      }
-    }
-
-    // Broadcast to remaining players
-    this.broadcast({
-      type: ServerMessageType.PLAYER_KICKED,
-      playerId: target.id,
-      playerName: target.name,
-    });
-
-    // If during game, handle edge cases and phase progression
-    if (this.state.phase !== GamePhase.LOBBY) {
-      const remainingActive = this.state.players.filter(p => !p.isSpectator);
-      
-      // If active players dropped below minimum, end the game
-      if (remainingActive.length < GAME_CONFIG.MIN_PLAYERS) {
-        this.changePhase(GamePhase.GAME_OVER);
-        const winner = remainingActive.reduce((prev, curr) => prev.score > curr.score ? prev : curr, remainingActive[0]);
-        this.state.winner = winner?.id ?? null;
-        this.broadcastState();
-        return;
-      }
-
-      // If the narrator was kicked during NARRATOR_CHOOSING, abort the round
-      if (this.state.phase === GamePhase.NARRATOR_CHOOSING && targetId === currentNarratorId) {
-        this.changePhase(GamePhase.RESULTS);
-        const hostPlayer = this.state.players.find(p => p.isHost);
-        if (hostPlayer) this.handleNextRound(hostPlayer.id);
-        return;
-      }
-
-      // Check if phase can now progress (fewer players needed)
-      this.checkPhaseProgression();
-    }
-
-    this.broadcastState();
+  public handleKickPlayer(hostId: string, targetId: string) {
+    return handleKickPlayer(this, hostId, targetId);
   }
 
-  private handleToggleSpectator(requesterId: string, targetId: string) {
-    // Only in lobby
-    if (this.state.phase !== GamePhase.LOBBY) return;
-
-    const requester = this.state.players.find(p => p.id === requesterId);
-    if (!requester) return;
-
-    const target = this.state.players.find(p => p.id === targetId);
-    if (!target) return;
-
-    // Permission check:
-    // - Host can toggle anyone except themselves
-    // - Any player can toggle themselves
-    const isSelf = requesterId === targetId;
-    const isHost = requester.isHost;
-
-    if (!isSelf && !isHost) return; // Not allowed
-
-    if (target.isSpectator) {
-      // Spectator → Player: check max active players
-      const activePlayers = this.state.players.filter(p => !p.isSpectator);
-      const maxPlayers = this.getMaxPlayersForDeck(this.state.deckOption);
-      if (activePlayers.length >= maxPlayers) return;
-      target.isSpectator = false;
-    } else {
-      // Player → Spectator
-      target.isSpectator = true;
-    }
-
-    this.broadcastState();
+  public handleToggleSpectator(requesterId: string, targetId: string) {
+    return handleToggleSpectator(this, requesterId, targetId);
   }
 
-
-  private handleRequestPlay(playerId: string) {
-    // Only in lobby
-    if (this.state.phase !== GamePhase.LOBBY) return;
-
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player) return;
-    if (!player.isSpectator) return; // Already a player
-
-    // Check max active players
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    const maxPlayers = this.getMaxPlayersForDeck(this.state.deckOption);
-    if (activePlayers.length >= maxPlayers) return;
-
-    player.isSpectator = false;
-    this.broadcastState();
+  public handleRequestPlay(playerId: string) {
+    return handleRequestPlay(this, playerId);
   }
 
-  // ============================================
-  // AFK & TIMEOUT SYSTEM
-  // ============================================
-
-  private changePhase(newPhase: GamePhase) {
+  public changePhase(newPhase: GamePhase) {
     this.state.phase = newPhase;
     this.state.phaseStartTime = Date.now();
     this.state.afkKickVotes = [];
     this.state.playersWhoReadied = [];
   }
 
-  private getAfkPlayers(): Player[] {
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    switch (this.state.phase) {
-      case GamePhase.NARRATOR_CHOOSING:
-        const narrator = this.state.players[this.state.narratorIndex];
-        return narrator && !narrator.isSpectator ? [narrator] : [];
-      case GamePhase.OTHERS_CHOOSING:
-        return activePlayers.filter(p =>
-          p.id !== this.state.players[this.state.narratorIndex]?.id &&
-          !this.state.tableCards.some(tc => tc.playerId === p.id)
-        );
-      case GamePhase.VOTING:
-        return activePlayers.filter(p =>
-          p.id !== this.state.players[this.state.narratorIndex]?.id &&
-          this.state.votes[p.id] === undefined
-        );
-      case GamePhase.RESULTS:
-        return activePlayers.filter(p => !this.state.playersWhoReadied.includes(p.id));
-      default:
-        return [];
-    }
+  public getAfkPlayers(): Player[] {
+    return getAfkPlayers(this);
   }
 
-  private handleVoteKickAfk(playerId: string) {
-    const voter = this.state.players.find(p => p.id === playerId && !p.isSpectator);
-    if (!voter) return;
-
-    if (!this.state.afkKickVotes.includes(playerId)) {
-      this.state.afkKickVotes.push(playerId);
-    }
-
-    const activeVoters = this.state.players.filter(p => !p.isSpectator && !p.isBot);
-    const majority = Math.floor(activeVoters.length / 2) + 1;
-
-    if (this.state.afkKickVotes.length >= majority) {
-      const afkPlayers = this.getAfkPlayers();
-      if (afkPlayers.length === 0) return;
-
-      afkPlayers.forEach(p => {
-        p.isSpectator = true;
-        
-        // If Host is kicked, reassign host
-        if (p.isHost) {
-          p.isHost = false;
-          const newHost = this.state.players.find(np => !np.isSpectator);
-          if (newHost) newHost.isHost = true;
-        }
-      });
-
-      this.state.afkKickVotes = [];
-
-      // Anti-soft-lock: se o narrador for kickado na sua vez, pula a rodada
-      if (this.state.phase === GamePhase.NARRATOR_CHOOSING && afkPlayers.some(p => p.id === this.state.players[this.state.narratorIndex]?.id)) {
-        this.changePhase(GamePhase.RESULTS);
-        const hostId = this.state.players.find(p => p.isHost)?.id;
-        if (hostId) this.handleNextRound(hostId);
-        return;
-      }
-
-      this.checkPhaseProgression();
-      this.broadcastState();
-    }
+  public handleVoteKickAfk(playerId: string) {
+    return handleVoteKickAfk(this, playerId);
   }
 
-  private checkPhaseProgression() {
-    const activePlayers = this.state.players.filter(p => !p.isSpectator);
-    
-    if (this.state.phase === GamePhase.OTHERS_CHOOSING) {
-      if (this.state.tableCards.length >= activePlayers.length) {
-        this.state.tableCards = shuffle(this.state.tableCards).map((tc, i) => ({
-          ...tc,
-          orderId: i,
-        }));
-        this.changePhase(GamePhase.VOTING);
-        this.triggerBotActions();
-      }
-    } else if (this.state.phase === GamePhase.VOTING) {
-      const votersCount = activePlayers.length - 1; // -1 for narrator
-      const activeVotes = Object.keys(this.state.votes).filter(vId => !this.state.players.find(p => p.id === vId)?.isSpectator);
-      if (activeVotes.length >= votersCount) {
-        this.calculateScores();
-      }
-    }
+  public checkPhaseProgression() {
+    return checkPhaseProgression(this);
   }
 
-  // ============================================
-  // [BOT] HANDLERS DE BOTS - Removiveis
-  // ============================================
-
-  private handleAddBot(playerId: string) {
-    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
-
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player?.isHost) return;
-    if (this.state.phase !== GamePhase.LOBBY) return;
-
-    const usedColors = this.state.players.map(p => p.color);
-    const bot = this.botManager.addBot(this.state.players, usedColors);
-
-    if (bot) {
-      this.state.players.push(bot);
-      this.broadcast({
-        type: ServerMessageType.PLAYER_JOINED,
-        player: { ...bot, hand: [] },
-      });
-      this.broadcastState();
-    }
+  public handleAddBot(playerId: string) {
+    return handleAddBot(this, playerId);
   }
 
-  private handleRemoveBot(playerId: string, botId: string) {
-    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
-
-    const player = this.state.players.find(p => p.id === playerId);
-    if (!player?.isHost) return;
-    if (this.state.phase !== GamePhase.LOBBY) return;
-
-    const bot = this.state.players.find(p => p.id === botId && p.isBot);
-    if (!bot) return;
-
-    this.state.players = this.botManager.removeBot(this.state.players, botId);
-
-    this.broadcast({
-      type: ServerMessageType.PLAYER_LEFT,
-      playerId: bot.id,
-      playerName: bot.name,
-    });
-    this.broadcastState();
+  public handleRemoveBot(playerId: string, botId: string) {
+    return handleRemoveBot(this, playerId, botId);
   }
 
-  private triggerBotActions() {
-    if (!GAME_CONFIG.ENABLE_BOTS || !this.botManager) return;
-
-    this.botManager.executeBotActions(this.state, {
-      submitClue: (botId: string, cardId: number, clue: string) => {
-        this.handleSubmitClue(botId, cardId, clue);
-      },
-      playCard: (botId: string, cardId: number) => {
-        this.handlePlayCard(botId, cardId);
-      },
-      vote: (botId: string, orderId: number) => {
-        this.handleVote(botId, orderId);
-      },
-    });
+  public triggerBotActions() {
+    return triggerBotActions(this);
   }
 
   // ============================================
   // UTILITÁRIOS DE COMUNICAÇÃO
   // ============================================
 
-  private getPublicState(forPlayerId: string | null): GameState {
+  public getPublicState(forPlayerId: string | null): GameState {
+    // Migração de estado interno ativa
+    if (!this.state.phaseTimeouts) {
+      this.state.phaseTimeouts = { narrator: 60, othersChoosing: 45, voting: 30, results: 15 };
+    }
+    if (!this.state.victoryCondition) {
+      this.state.victoryCondition = {
+        scoreEnabled: true,
+        targetScore: GAME_CONFIG.WINNING_SCORE,
+        narratorRoundsEnabled: false,
+        narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
+      };
+    }
+    if (!this.state.deckOption) {
+      this.state.deckOption = 'mixed';
+    }
     return getPublicState(this.state, forPlayerId);
   }
 
-  private broadcastState() {
+  public broadcastState() {
     for (const [connId, playerId] of this.connections) {
       const conn = this.room.getConnection(connId);
       if (conn) {
@@ -1129,16 +455,16 @@ export default class GameServer implements Party.Server {
     }
   }
 
-  private broadcast(message: object) {
+  public broadcast(message: object) {
     const json = JSON.stringify(message);
     this.room.broadcast(json);
   }
 
-  private sendToConnection(conn: Party.Connection, message: object) {
+  public sendToConnection(conn: Party.Connection, message: object) {
     conn.send(JSON.stringify(message));
   }
 
-  private sendError(conn: Party.Connection, message: string) {
+  public sendError(conn: Party.Connection, message: string) {
     this.sendToConnection(conn, {
       type: ServerMessageType.ERROR,
       message,
