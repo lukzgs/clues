@@ -21,7 +21,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   currentPlayer,
   onStartGame,
   onLeaveRoom,
-  onAddBot,
   onRemoveBot,
   onKickPlayer,
   onToggleSpectator,
@@ -76,7 +75,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
   const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS && activePlayers.length <= maxPlayersForDeck;
-  const canAddBot = GAME_CONFIG.ENABLE_BOTS && gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS && activePlayers.length < maxPlayersForDeck && onAddBot;
 
   const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>({
     narrator: 60,
@@ -379,16 +377,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                     >
                       {t.lobby.settings}
                     </button>
-
-                    {canAddBot && (
-                      <button
-                        onClick={onAddBot}
-                        className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
-                      >
-                        <span className="text-xl leading-none mr-1 font-sans font-light">+</span>
-                        {t.lobby.addBot}
-                      </button>
-                    )}
 
                     {onToggleSpectator && currentPlayer && (
                       <button
