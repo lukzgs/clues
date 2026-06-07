@@ -28,28 +28,20 @@ export function useGameSocket({
   const socketRef = useRef<PartySocket | null>(null);
   const hasJoinedRef = useRef(false);
 
-  const prevDepsRef = useRef<{
-    roomCode: string | null;
-    playerName: string | null;
-    savedPlayerId?: string;
-    onJoinSuccess: any;
-    onKicked: any;
-  } | null>(null);
+  // Use refs to avoid stale closures inside event listeners
+  // and to avoid triggering socket reconnections when these values change.
+  const savedPlayerIdRef = useRef(savedPlayerId);
+  const playerIdRef = useRef(playerId);
 
   useEffect(() => {
-    if (prevDepsRef.current) {
-      const changed: string[] = [];
-      if (prevDepsRef.current.roomCode !== roomCode) changed.push(`roomCode: ${prevDepsRef.current.roomCode} -> ${roomCode}`);
-      if (prevDepsRef.current.playerName !== playerName) changed.push(`playerName: ${prevDepsRef.current.playerName} -> ${playerName}`);
-      if (prevDepsRef.current.savedPlayerId !== savedPlayerId) changed.push(`savedPlayerId: ${prevDepsRef.current.savedPlayerId} -> ${savedPlayerId}`);
-      if (prevDepsRef.current.onJoinSuccess !== onJoinSuccess) changed.push(`onJoinSuccess reference changed`);
-      if (prevDepsRef.current.onKicked !== onKicked) changed.push(`onKicked reference changed`);
-      console.log('[DEBUG useGameSocket] useEffect triggered because of changed deps:', changed);
-    } else {
-      console.log('[DEBUG useGameSocket] useEffect triggered (initial/mount). deps:', { roomCode, playerName, savedPlayerId });
-    }
-    prevDepsRef.current = { roomCode, playerName, savedPlayerId, onJoinSuccess, onKicked };
+    savedPlayerIdRef.current = savedPlayerId;
+  }, [savedPlayerId]);
 
+  useEffect(() => {
+    playerIdRef.current = playerId;
+  }, [playerId]);
+
+  useEffect(() => {
     if (!roomCode || !playerName) return;
 
     let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
@@ -81,7 +73,7 @@ export function useGameSocket({
         const result = JoinRoomSchema.safeParse({
           type: 'JOIN_ROOM',
           playerName,
-          reconnectId: savedPlayerId,
+          reconnectId: savedPlayerIdRef.current,
         });
         
         if (result.success) {
@@ -130,7 +122,7 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.PLAYER_KICKED:
-            if ((msg as any).playerId === playerId || (msg as any).playerId === savedPlayerId) {
+            if ((msg as any).playerId === playerIdRef.current || (msg as any).playerId === savedPlayerIdRef.current) {
               onKicked();
               setError('Você foi removido da sala');
               socket.close();
@@ -164,7 +156,7 @@ export function useGameSocket({
       socketRef.current = null;
       hasJoinedRef.current = false;
     };
-  }, [roomCode, playerName, savedPlayerId, onJoinSuccess, onKicked]); // Added dependencies safely
+  }, [roomCode, playerName, onJoinSuccess, onKicked]); // Removed savedPlayerId to prevent reconnection loops
 
   const send = useCallback((message: object) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -183,3 +175,4 @@ export function useGameSocket({
     socketRef,
   };
 }
+
