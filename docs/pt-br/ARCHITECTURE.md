@@ -119,18 +119,25 @@ Validação dupla garante segurança:
 ```
 clues/
 ├── src/                    # Código do cliente
-│   ├── App.tsx             # Componente raiz
+│   ├── App.tsx             # Componente raiz e roteador
 │   ├── components/         # Componentes React
 │   │   ├── game/           # Componentes específicos do jogo
 │   │   └── screens/        # Telas de página inteira
+│   │       ├── lobby/      # Sub-componentes do lobby
+│   │       └── game/       # Sub-componentes do jogo
 │   ├── hooks/              # React hooks
-│   │   └── useGameRoom.ts  # Conexão WebSocket
+│   │   ├── useGameRoom.ts  # Hook de fachada (Facade) do jogo
+│   │   └── game/           # Hooks de conexão e ações
+│   │       ├── useGameSocket.ts
+│   │       └── useGameActions.ts
+│   ├── providers/          # Provedores de contexto React
+│   │   └── GameSessionProvider.tsx # Estado persistente da sessão
 │   ├── types/              # Tipos TypeScript
 │   │   └── index.ts        # Definições de tipos compartilhados
 │   └── schemas/            # Schemas Zod
 │       └── messages.ts     # Validação de mensagens
 ├── party/                  # Código do servidor
-│   ├── server.ts           # Servidor PartyKit principal
+│   ├── server.ts           # Despachante principal do servidor PartyKit
 │   ├── handlers/           # Handlers de mensagens e lógica
 │   │   ├── room.ts         # Gerenciamento de lobby e sala
 │   │   ├── game.ts         # Lógica central do jogo

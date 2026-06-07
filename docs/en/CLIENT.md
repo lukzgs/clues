@@ -8,20 +8,23 @@ The frontend is a React 19 application using TypeScript. It connects to the Part
 
 ### `src/App.tsx`
 
-Main application component managing app-level state:
+The application entry point. It wraps the app with `GameSessionProvider` and renders `GameRouter`, which orchestrates routing based on the session presence and game phase:
+- Displays `JoinScreen` if no active session exists.
+- Displays connection loader screen if connecting/syncing.
+- Displays `LobbyScreen` or `GameScreen` depending on current game phase.
 
-```typescript
-type AppState =
-  | { screen: 'join' }
-  | { screen: 'connecting'; roomCode: string; playerName: string }
-  | { screen: 'game'; roomCode: string; playerName: string };
-```
+---
 
-**Key Functions:**
-- `generateRoomCode()` - Creates cryptographically secure 5-char room codes
-- `handleCreateRoom()` - Creates new room and connects
-- `handleJoinRoom()` - Joins existing room
-- `handleLeaveRoom()` - Disconnects and returns to join screen
+## Providers
+
+### `GameSessionProvider` (`src/providers/GameSessionProvider.tsx`)
+
+A React context provider that manages browser session storage and URL query params.
+
+**Key Responsibilities:**
+- Checks and parses the URL parameter `?room=CODE` on initial load.
+- Retrieves, parses, and synchronizes the active game session (`story-weaver:active_session`) with `localStorage`.
+- Automatically handles clearing stale sessions if joining a different room via invite link.
 
 ---
 
@@ -29,41 +32,32 @@ type AppState =
 
 ### `useGameRoom` (`src/hooks/useGameRoom.ts`)
 
-Primary hook for WebSocket connection and game actions.
+Acts as a **Facade Pattern** wrapper. Under the hood, it delegates connection logic to `useGameSocket` and actions mapping to `useGameActions`, exposing a unified hook interface to client components to preserve backward compatibility.
 
 **Parameters:**
 ```typescript
 interface UseGameRoomOptions {
-  roomCode: string;
-  playerName: string;
+  roomCode: string | null;
+  playerName: string | null;
 }
 ```
 
-**Returns:**
-```typescript
-{
-  gameState: GameState | null;
-  playerId: string | null;
-  isConnected: boolean;
-  error: string | null;
-  clearError: () => void;
-  roomCloseTime: number | null;
-  
-  // Actions
-  startGame: (victoryCondition: VictoryCondition, deckOption: DeckOption) => void;
-  submitClue: (cardId: number, clue: string) => void;
-  playCard: (cardId: number) => void;
-  vote: (orderId: number) => void;
-  nextRound: () => void;
-  restartGame: () => void;
-  leaveRoom: () => void;
-  addBot: () => void;
-  removeBot: (botId: string) => void;
-  kickPlayer: (playerId: string) => void;
-  toggleSpectator: (playerId: string) => void;
-  requestPlay: () => void;
-}
-```
+### `useGameSocket` (`src/hooks/game/useGameSocket.ts`)
+
+Encapsulates WebSocket connection lifecycle and message parsing.
+
+**Key Responsibilities:**
+- Instantiates `PartySocket`.
+- Listens to raw events (`open`, `message`, `error`, `close`).
+- Dispatches parsed server events (`SYNC_STATE`, `ERROR`, `PLAYER_KICKED`, etc.) to React states.
+- Manages reconnection timeouts.
+
+### `useGameActions` (`src/hooks/game/useGameActions.ts`)
+
+Encapsulates all actions triggerable by the player, validating payloads using Zod schemas before emitting them over the socket.
+
+**Key Functions:**
+- `startGame`, `updateSettings`, `submitClue`, `playCard`, `vote`, `nextRound`, `restartGame`, `leaveRoom`, `addBot`, `removeBot`, `kickPlayer`, `toggleSpectator`, `requestPlay`.
 
 ---
 

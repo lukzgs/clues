@@ -119,18 +119,26 @@ Double validation ensures security:
 ```
 clues/
 ├── src/                    # Client code
-│   ├── App.tsx             # Root component
+├── src/                    # Client code
+│   ├── App.tsx             # Root component and router
 │   ├── components/         # React components
 │   │   ├── game/           # Game-specific components
 │   │   └── screens/        # Full-page screens
+│   │       ├── lobby/      # Lobby sub-components
+│   │       └── game/       # Game sub-components
 │   ├── hooks/              # React hooks
-│   │   └── useGameRoom.ts  # WebSocket connection
+│   │   ├── useGameRoom.ts  # Game room Facade hook
+│   │   └── game/           # Connection and action hooks
+│   │       ├── useGameSocket.ts
+│   │       └── useGameActions.ts
+│   ├── providers/          # React context providers
+│   │   └── GameSessionProvider.tsx # Session storage state
 │   ├── types/              # TypeScript types
 │   │   └── index.ts        # Shared type definitions
 │   └── schemas/            # Zod schemas
 │       └── messages.ts     # Message validation
 ├── party/                  # Server code
-│   ├── server.ts           # Main PartyKit server
+│   ├── server.ts           # Main PartyKit server dispatcher
 │   ├── handlers/           # Message and logic handlers
 │   │   ├── room.ts         # Lobby and room management
 │   │   ├── game.ts         # Core gameplay logic
