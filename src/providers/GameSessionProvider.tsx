@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 export type GameSession = {
   roomCode: string;
@@ -57,31 +57,49 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     setIsLoaded(true);
   }, []);
 
-  const setSession = (newSession: GameSession | null) => {
-    setSessionState(newSession);
+  const setSession = useCallback((newSession: GameSession | null) => {
+    setSessionState(prev => {
+      if (prev === null && newSession === null) return prev;
+      if (prev && newSession && 
+          prev.roomCode === newSession.roomCode && 
+          prev.playerName === newSession.playerName && 
+          prev.playerId === newSession.playerId) {
+        return prev;
+      }
+      return newSession;
+    });
+    
     if (newSession) {
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newSession));
     } else {
       localStorage.removeItem(SESSION_STORAGE_KEY);
     }
-  };
+  }, []);
 
-  const clearSession = () => {
+  const clearSession = useCallback(() => {
     setSessionState(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
-  };
+  }, []);
 
-  const clearUrlRoomCode = () => {
+  const clearUrlRoomCode = useCallback(() => {
     setUrlRoomCode(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('room');
     window.history.replaceState({}, document.title, url.toString());
-  };
+  }, []);
+
+  const contextValue = React.useMemo(() => ({
+    session,
+    setSession,
+    clearSession,
+    urlRoomCode,
+    clearUrlRoomCode
+  }), [session, setSession, clearSession, urlRoomCode, clearUrlRoomCode]);
 
   if (!isLoaded) return null; // Or a loading spinner
 
   return (
-    <GameSessionContext.Provider value={{ session, setSession, clearSession, urlRoomCode, clearUrlRoomCode }}>
+    <GameSessionContext.Provider value={contextValue}>
       {children}
     </GameSessionContext.Provider>
   );
