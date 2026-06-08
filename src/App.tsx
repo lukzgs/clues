@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
@@ -39,6 +39,32 @@ const GameRouter: React.FC = () => {
     toggleSpectator,
     requestPlay,
   } = useGameRoom({ roomCode: session?.roomCode || null, playerName: session?.playerName || null });
+
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'reconnected'>('connected');
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isConnected) {
+      setConnectionStatus(prev => {
+        if (prev === 'disconnected') {
+          timer = setTimeout(() => {
+            setConnectionStatus('connected');
+          }, 2500);
+          return 'reconnected';
+        }
+        return 'connected';
+      });
+    } else {
+      timer = setTimeout(() => {
+        setConnectionStatus('disconnected');
+      }, 1200);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isConnected]);
 
   const handleCreateRoom = useCallback((playerName: string) => {
     const roomCode = generateRoomCode();
@@ -139,19 +165,33 @@ const GameRouter: React.FC = () => {
     );
   }
 
+  const showBanner = connectionStatus !== 'connected';
+  const isReconnecting = connectionStatus === 'disconnected';
+
   const connectionOverlay = (
     <>
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          !isConnected ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+          showBanner ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="bg-amber-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-2.5 flex items-center justify-center gap-3">
-          <div className="w-4 h-4 relative flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-300 animate-spin" />
-          </div>
-          <span className="text-amber-200 text-xs font-sans font-medium tracking-wide">
-            {t.connecting.lostConnection}
+        <div className={`backdrop-blur-md border-b px-4 py-2.5 flex items-center justify-center gap-3 transition-colors duration-300 ${
+          isReconnecting 
+            ? 'bg-amber-950/90 border-amber-500/30 text-amber-200' 
+            : 'bg-emerald-950/90 border-emerald-500/30 text-emerald-200'
+        }`}>
+          {isReconnecting ? (
+            <div className="w-4 h-4 relative flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-300 animate-spin" />
+            </div>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-300 shrink-0">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          )}
+          <span className="text-xs font-sans font-medium tracking-wide">
+            {isReconnecting ? t.connecting.lostConnection : t.connecting.reconnected}
           </span>
         </div>
       </div>

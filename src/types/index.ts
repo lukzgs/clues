@@ -75,6 +75,7 @@ export interface GameState {
   deckOption: DeckOption;
   playersWhoReadied: string[]; // IDs of players who already clicked "Next Round"
   phaseTimeouts: PhaseTimeouts;
+  timerEnabled: boolean;
 }
 
 // Estado completo do servidor (não exposto ao cliente)
@@ -121,6 +122,7 @@ export interface StartGameMessage {
   victoryCondition: VictoryCondition;
   deckOption: DeckOption;
   phaseTimeouts: PhaseTimeouts;
+  timerEnabled: boolean;
 }
 
 export interface UpdateSettingsMessage {
@@ -128,6 +130,7 @@ export interface UpdateSettingsMessage {
   victoryCondition: VictoryCondition;
   deckOption: DeckOption;
   phaseTimeouts: PhaseTimeouts;
+  timerEnabled: boolean;
 }
 
 export interface SubmitClueMessage {

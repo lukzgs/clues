@@ -129,6 +129,7 @@ interface ServerGameState {
   currentRound: number; // 0-based round counter
   playersWhoReadied: string[]; // IDs of players who clicked "Next Round"
   phaseTimeouts: PhaseTimeouts; // Timeout configuration for each phase
+  timerEnabled: boolean; // Global toggle to enable/disable phase timers
 }
 ```
 

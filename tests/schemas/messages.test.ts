@@ -372,6 +372,7 @@ describe('StartGameSchema', () => {
         voting: 30,
         results: 15,
       },
+      timerEnabled: true,
     });
     expect(result.success).toBe(true);
   });

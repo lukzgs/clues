@@ -67,6 +67,7 @@ const createMockGameState = (players: Player[]): GameState => ({
   playersWhoVoted: [],
   playersWhoReadied: [],
   phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+  timerEnabled: true,
 });
 
 function renderLobbyScreen(gameState: GameState, currentPlayer: Player, overrides = {}) {
@@ -110,10 +111,11 @@ describe('LobbyScreen', () => {
       expect(screen.getByText(/PLAYERS \(2\/\d+\)/i)).toBeInTheDocument();
     });
 
-    it('adds (you) indicator for the current player', () => {
+    it('applies highlight styling for the current player card', () => {
       renderLobbyScreen(defaultGameState, guestPlayer);
-      // We expect 1 instance of '(you)' next to Bob
-      expect(screen.getByText('(you)')).toBeInTheDocument();
+      const bobName = screen.getByText('Bob');
+      const card = bobName.closest('.rounded-xl');
+      expect(card).toHaveClass('bg-amber-500/10');
     });
   });
 

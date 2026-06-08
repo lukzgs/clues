@@ -129,6 +129,7 @@ interface ServerGameState {
   currentRound: number; // Contador de rodadas (base 0)
   playersWhoReadied: string[]; // IDs dos jogadores que clicaram em "Próxima Rodada"
   phaseTimeouts: PhaseTimeouts; // Configuração de timeout para cada fase
+  timerEnabled: boolean; // Flag global para habilitar/desabilitar temporizadores
 }
 ```
 

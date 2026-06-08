@@ -88,6 +88,7 @@ export default class GameServer implements Party.Server {
       afkKickVotes: [],
       playersWhoReadied: [],
       phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+      timerEnabled: true,
     };
   }
 
@@ -230,11 +231,11 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'START_GAME':
-          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts);
+          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
           break;
 
         case 'UPDATE_SETTINGS':
-          if (playerId) this.handleUpdateSettings(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts);
+          if (playerId) this.handleUpdateSettings(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
           break;
 
         case 'SUBMIT_CLUE':
@@ -338,18 +339,20 @@ export default class GameServer implements Party.Server {
     playerId: string,
     victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
     deckOption: DeckOption,
-    phaseTimeouts: PhaseTimeouts
+    phaseTimeouts: PhaseTimeouts,
+    timerEnabled: boolean
   ) {
-    return handleUpdateSettings(this, playerId, victoryCondition, deckOption, phaseTimeouts);
+    return handleUpdateSettings(this, playerId, victoryCondition, deckOption, phaseTimeouts, timerEnabled);
   }
 
   public handleStartGame(
     playerId: string,
     victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
     deckOption: DeckOption,
-    phaseTimeouts: PhaseTimeouts
+    phaseTimeouts: PhaseTimeouts,
+    timerEnabled: boolean
   ) {
-    return handleStartGame(this, playerId, victoryCondition, deckOption, phaseTimeouts);
+    return handleStartGame(this, playerId, victoryCondition, deckOption, phaseTimeouts, timerEnabled);
   }
 
   public handleSubmitClue(playerId: string, cardId: number, clue: string) {
@@ -438,6 +441,9 @@ export default class GameServer implements Party.Server {
     }
     if (!this.state.deckOption) {
       this.state.deckOption = 'mixed';
+    }
+    if (this.state.timerEnabled === undefined) {
+      this.state.timerEnabled = true;
     }
     return getPublicState(this.state, forPlayerId);
   }

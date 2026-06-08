@@ -77,6 +77,7 @@ describe('Spectator cannot play cards', () => {
       victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
       deckOption: 'mixed',
       phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+      timerEnabled: true,
     }), conn1);
 
     // Narrator submits clue

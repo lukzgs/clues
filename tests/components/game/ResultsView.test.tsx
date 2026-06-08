@@ -58,6 +58,7 @@ const createMockGameState = (): GameState => ({
   victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
   phaseStartTime: Date.now(),
   afkKickVotes: [],
+  timerEnabled: true,
 });
 
 describe('ResultsView', () => {

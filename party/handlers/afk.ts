@@ -26,8 +26,8 @@ export function getAfkPlayers(server: GameServer): Player[] {
 }
 
 export function handleVoteKickAfk(server: GameServer, playerId: string) {
-  const voter = server.state.players.find(p => p.id === playerId && !p.isSpectator);
-  if (!voter) return;
+  // Desabilitado completamente a pedido do usuário
+  return;
 
   if (!server.state.afkKickVotes.includes(playerId)) {
     server.state.afkKickVotes.push(playerId);
@@ -57,7 +57,7 @@ export function handleVoteKickAfk(server: GameServer, playerId: string) {
     if (server.state.phase === GamePhase.NARRATOR_CHOOSING && afkPlayers.some(p => p.id === server.state.players[server.state.narratorIndex]?.id)) {
       server.changePhase(GamePhase.RESULTS);
       const hostId = server.state.players.find(p => p.isHost)?.id;
-      if (hostId) server.handleNextRound(hostId);
+      if (hostId) server.handleNextRound(hostId as string);
       return;
     }
 

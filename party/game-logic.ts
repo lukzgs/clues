@@ -274,6 +274,7 @@ export function getPublicState(
       voting: 30,
       results: 15,
     },
+    timerEnabled: typeof state.timerEnabled === 'boolean' ? state.timerEnabled : true,
   };
 }
 

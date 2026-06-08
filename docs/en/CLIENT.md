@@ -137,7 +137,7 @@ Located in `src/components/game/`:
 
 | Component | Description |
 |-----------|-------------|
-| `AfkAlertBar.tsx` | Sticky alert bar shown when host or players are AFK. Features a refined design with border-glow and glassmorphism effects. |
+| `AfkAlertBar.tsx` | A subtle visual progress bar showing the remaining time for the current phase. Disappears when the timeout runs out. |
 | `RoomTimeoutBar` | Component inside GameScreen that shows a countdown when the room is about to close due to inactivity. |
 | `LobbyScreen.tsx` | Game settings, player list, and deck selection. Features a standardized "Mythic" design system with polished typography and full Portuguese localization for the interface. |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards. Includes a `dimWhenDisabled` prop (defaults to true) which can be set to false to retain full card visibility/opacity when the card is in a disabled state. |

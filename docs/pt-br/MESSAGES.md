@@ -35,7 +35,7 @@ enum ClientMessageType {
 |----------|---------|-------------|
 | `JOIN_ROOM` | `playerName: string` | Qualquer |
 | `LEAVE_ROOM` | (nenhum) | Qualquer |
-| `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts` | LOBBY (apenas host) |
+| `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean` | LOBBY (apenas host) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (apenas narrador) |
 | `PLAY_CARD` | `cardId: number` | OTHERS_CHOOSING (não-narradores) |
 | `VOTE` | `orderId: number` | VOTING (não-narradores) |
@@ -46,7 +46,7 @@ enum ClientMessageType {
 | `KICK_PLAYER` | `playerId: string` | Qualquer (apenas host) |
 | `TOGGLE_SPECTATOR` | `playerId: string` | LOBBY (apenas host) |
 | `REQUEST_PLAY` | (nenhum) | LOBBY (apenas espectadores) |
-| `UPDATE_SETTINGS` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts` | LOBBY (apenas host) |
+| `UPDATE_SETTINGS` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean` | LOBBY (apenas host) |
 
 ### Exemplos de Mensagens
 
@@ -57,12 +57,13 @@ enum ClientMessageType {
 // Enviar uma dica como narrador
 { type: 'SUBMIT_CLUE', cardId: 42, clue: 'Um sonho dentro de um sonho' }
 
-// Iniciar jogo com condições de vitória, opção de baralho e tempos de fase
+// Iniciar jogo com condições de vitória, opção de baralho, tempos de fase e switch de tempo
 { 
   type: 'START_GAME', 
   victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 }, 
   deckOption: 'mixed',
-  phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 }
+  phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+  timerEnabled: true
 }
 
 // Votar em uma carta

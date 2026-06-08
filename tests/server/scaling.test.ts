@@ -50,7 +50,8 @@ describe('Scaling Test - 10 Players', () => {
         othersChoosing: 45,
         voting: 30,
         results: 15
-      }
+      },
+      timerEnabled: true
     }), hostConn as any);
     
     // Check if phase changed
@@ -86,7 +87,8 @@ describe('Scaling Test - 10 Players', () => {
         othersChoosing: 45,
         voting: 30,
         results: 15
-      }
+      },
+      timerEnabled: true
     }), hostConn as any);
     
     // Should still be in LOBBY

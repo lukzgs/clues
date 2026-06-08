@@ -52,6 +52,7 @@ export const StartGameSchema = z.object({
     victoryCondition: VictoryConditionSchema,
     deckOption: z.enum(['original', 'new', 'mixed']),
     phaseTimeouts: PhaseTimeoutsSchema,
+    timerEnabled: z.boolean(),
 });
 
 export const UpdateSettingsSchema = z.object({
@@ -59,6 +60,7 @@ export const UpdateSettingsSchema = z.object({
     victoryCondition: VictoryConditionSchema,
     deckOption: z.enum(['original', 'new', 'mixed']),
     phaseTimeouts: PhaseTimeoutsSchema,
+    timerEnabled: z.boolean(),
 });
 
 export const SubmitClueSchema = z.object({

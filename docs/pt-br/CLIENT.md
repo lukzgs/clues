@@ -139,7 +139,7 @@ Localizados em `src/components/game/`:
 
 | Componente | Descrição |
 |------------|-----------|
-| `AfkAlertBar.tsx` | Barra de alerta flutuante mostrada quando o host ou jogadores estão AFK. Apresenta um design refinado com brilho de borda e glassmorfismo. |
+| `AfkAlertBar.tsx` | Uma barra sutil de progresso visual que mostra o tempo restante para a fase atual. Desaparece quando o temporizador expira. |
 | `RoomTimeoutBar` | Componente interno da GameScreen que mostra uma contagem regressiva quando a sala está prestes a fechar por inatividade. |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso. Inclui a prop `dimWhenDisabled` (padrão true) que pode ser configurada como false para reter a visibilidade/opacidade total quando a carta está desabilitada. |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |

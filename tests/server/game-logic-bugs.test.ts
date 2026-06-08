@@ -64,6 +64,7 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
     deckOption: 'mixed',
     playersWhoReadied: [],
     phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    timerEnabled: true,
     ...overrides,
   };
 }

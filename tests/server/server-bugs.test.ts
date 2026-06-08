@@ -32,6 +32,7 @@ async function startGame(server: any, hostConn: any) {
     },
     deckOption: 'mixed',
     phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    timerEnabled: true,
   }), hostConn);
 }
 
@@ -148,8 +149,8 @@ describe('BUG #6 — Kicking player before narrator corrupts narratorIndex', () 
 // players can never be vote-kicked.
 // ============================================
 
-describe('BUG #7 — Non-host AFK players unkickable during RESULTS', () => {
-  it('should identify non-host AFK player and kick them via vote', async () => {
+describe('BUG #7 — Non-host AFK players unkickable during RESULTS (DISABLED)', () => {
+  it('should NOT kick AFK player since AFK kicking system is disabled', async () => {
     const room = createMockRoom('AFK-TEST');
     const server = new GameServer(room as any);
 
@@ -184,11 +185,11 @@ describe('BUG #7 — Non-host AFK players unkickable during RESULTS', () => {
     await server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn2);
     await server.onMessage(JSON.stringify({ type: 'VOTE_KICK_AFK' }), conn3);
 
-    // P4 should be identified as AFK and made spectator
+    // P4 should NOT be made spectator because AFK kicking is disabled
     state = getLastSyncState(conn1);
     const p4State = state.gameState.players.find((p: any) => p.id === playerIds[3]);
 
-    expect(p4State?.isSpectator).toBe(true);
+    expect(p4State?.isSpectator).toBe(false);
   });
 });
 
@@ -361,6 +362,7 @@ describe('Connectivity — Disconnected players cleaned on game start', () => {
       victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
       deckOption: 'mixed',
       phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+      timerEnabled: true,
     }), conn1);
 
     const state = getLastSyncState(conn1);
@@ -396,6 +398,7 @@ describe('Connectivity — Mid-game host reassignment', () => {
       victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
       deckOption: 'mixed',
       phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+      timerEnabled: true,
     }), conn1);
 
     // Disconnect host mid-game

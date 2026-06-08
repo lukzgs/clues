@@ -241,11 +241,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         } 
       />
 
-      <AfkAlertBar 
-        gameState={gameState} 
-        voteKickAfk={voteKickAfk} 
-        currentPlayerId={playerId} 
-      />
+      {gameState.timerEnabled && (
+        <AfkAlertBar 
+          gameState={gameState} 
+        />
+      )}
 
       {roomCloseTime && (
         <RoomTimeoutBar closeTime={roomCloseTime} />

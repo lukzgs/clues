@@ -8,8 +8,8 @@ import { GameOptions, PlayerList, RoomCodeDisplay, LobbyActions } from './lobby'
 interface LobbyScreenProps {
   gameState: GameState;
   currentPlayer: Player | undefined;
-  onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
-  onUpdateSettings?: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => void;
+  onStartGame: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean) => void;
+  onUpdateSettings?: (victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean) => void;
   onLeaveRoom: () => void;
   onAddBot?: () => void;
   onRemoveBot?: (botId: string) => void;
@@ -55,6 +55,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const [vc, setVC] = useState<VictoryCondition>(defaultVC);
   const [deckOption, setDeckOptionState] = useState<DeckOption>(defaultDeckOption);
   const [phaseTimeouts, setPhaseTimeouts] = useState<PhaseTimeouts>(defaultTimeouts);
+  const [timerEnabled, setTimerEnabled] = useState<boolean>(gameState.timerEnabled ?? true);
 
   // Sync from server if not host (or on initial load)
   useEffect(() => {
@@ -62,19 +63,20 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
       setVC(gameState.victoryCondition || defaultVC);
       setDeckOptionState(gameState.deckOption || defaultDeckOption);
       setPhaseTimeouts(gameState.phaseTimeouts || defaultTimeouts);
+      setTimerEnabled(gameState.timerEnabled ?? true);
     }
-  }, [gameState.victoryCondition, gameState.deckOption, gameState.phaseTimeouts, isHost]);
+  }, [gameState.victoryCondition, gameState.deckOption, gameState.phaseTimeouts, gameState.timerEnabled, isHost]);
 
   // Debounce sync to server (only for host)
   useEffect(() => {
     if (!isHost || !onUpdateSettings) return;
 
     const timer = setTimeout(() => {
-      onUpdateSettings(vc, deckOption, phaseTimeouts);
+      onUpdateSettings(vc, deckOption, phaseTimeouts, timerEnabled);
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [vc, deckOption, phaseTimeouts, isHost, onUpdateSettings]);
+  }, [vc, deckOption, phaseTimeouts, timerEnabled, isHost, onUpdateSettings]);
 
   const updateVC = (patch: Partial<VictoryCondition>) => {
     setVC(prev => {
@@ -97,7 +99,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   };
 
   const handleStartGame = () => {
-    onStartGame(vc, deckOption, phaseTimeouts);
+    onStartGame(vc, deckOption, phaseTimeouts, timerEnabled);
   };
 
   return (
@@ -114,21 +116,23 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
       <div className="w-full max-w-[1250px] z-10 h-full max-h-[95dvh] md:max-h-[90dvh] flex flex-col">
         <div
-          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2.5rem] p-5 md:p-10 flex flex-col flex-1 min-h-0"
+          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 flex flex-col flex-1 min-h-0"
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 flex-1 min-h-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 min-h-0">
             
             {/* Left Panel: Game Options (Desktop Only) */}
-            <div className="hidden lg:flex flex-col h-full min-h-0 bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+            <div className="hidden lg:flex flex-col h-full min-h-0 bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 md:p-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
               <GameOptions 
                 isHost={isHost}
                 vc={vc}
                 deckOption={deckOption}
                 phaseTimeouts={phaseTimeouts}
+                timerEnabled={timerEnabled}
                 updateVC={updateVC}
                 setDeckOption={setDeckOption}
                 updateTimeout={updateTimeout}
+                setTimerEnabled={setTimerEnabled}
               />
               <div className="mt-6 md:mt-8 shrink-0">
                 <LobbyActions 
@@ -147,7 +151,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             </div>
 
             {/* Right Panel: Room Code & Players */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-3xl p-6 md:p-8 min-h-0" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 md:p-6 min-h-0" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               <RoomCodeDisplay roomCode={gameState.roomCode} />
 
               <PlayerList 
@@ -210,9 +214,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               vc={vc}
               deckOption={deckOption}
               phaseTimeouts={phaseTimeouts}
+              timerEnabled={timerEnabled}
               updateVC={updateVC}
               setDeckOption={setDeckOption}
               updateTimeout={updateTimeout}
+              setTimerEnabled={setTimerEnabled}
             />
           </div>
         </div>

@@ -13,9 +13,12 @@ export function handleStartGame(
   playerId: string,
   victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
   deckOption: DeckOption,
-  phaseTimeouts: PhaseTimeouts
+  phaseTimeouts: PhaseTimeouts,
+  timerEnabled: boolean
 ) {
   const player = server.state.players.find(p => p.id === playerId);
+
+  server.state.timerEnabled = timerEnabled;
 
   // Apenas host pode iniciar
   if (!player?.isHost) {

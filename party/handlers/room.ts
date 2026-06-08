@@ -163,12 +163,15 @@ export function handleUpdateSettings(
   playerId: string,
   victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
   deckOption: DeckOption,
-  phaseTimeouts: PhaseTimeouts
+  phaseTimeouts: PhaseTimeouts,
+  timerEnabled: boolean
 ) {
   if (server.state.phase !== GamePhase.LOBBY) return;
   
   const player = server.state.players.find(p => p.id === playerId);
   if (!player?.isHost) return;
+
+  server.state.timerEnabled = timerEnabled;
 
   // Apply victory condition from host
   server.state.victoryCondition = {
