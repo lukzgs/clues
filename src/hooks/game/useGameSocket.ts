@@ -32,6 +32,10 @@ export function useGameSocket({
   // and to avoid triggering socket reconnections when these values change.
   const savedPlayerIdRef = useRef(savedPlayerId);
   const playerIdRef = useRef(playerId);
+  const onJoinSuccessRef = useRef(onJoinSuccess);
+  const onKickedRef = useRef(onKicked);
+
+  const gameStateRef = useRef<GameState | null>(null);
 
   useEffect(() => {
     savedPlayerIdRef.current = savedPlayerId;
@@ -42,10 +46,23 @@ export function useGameSocket({
   }, [playerId]);
 
   useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  useEffect(() => {
+    onJoinSuccessRef.current = onJoinSuccess;
+  }, [onJoinSuccess]);
+
+  useEffect(() => {
+    onKickedRef.current = onKicked;
+  }, [onKicked]);
+
+  useEffect(() => {
     if (!roomCode || !playerName) return;
+    console.log('[DEBUG] useGameSocket useEffect executando', { roomCode, playerName });
 
     let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
-      if (!hasJoinedRef.current || !gameState) {
+      if (!hasJoinedRef.current || !gameStateRef.current) {
         console.warn('Connection timeout: room is likely gone or server is down.');
         setError('Não foi possível conectar à sala (tempo limite esgotado)');
         setIsConnected(false);
@@ -111,7 +128,7 @@ export function useGameSocket({
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
-              onJoinSuccess(msg.yourPlayerId);
+              onJoinSuccessRef.current(msg.yourPlayerId);
               
               if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
@@ -127,7 +144,7 @@ export function useGameSocket({
 
           case ServerMessageType.PLAYER_KICKED:
             if ((msg as any).playerId === playerIdRef.current || (msg as any).playerId === savedPlayerIdRef.current) {
-              onKicked();
+              onKickedRef.current();
               setError('Você foi removido da sala');
               socket.close();
             }
@@ -153,6 +170,7 @@ export function useGameSocket({
     });
 
     return () => {
+      console.log('[DEBUG] useGameSocket useEffect CLEANUP executando');
       if (connectionTimeout) {
         clearTimeout(connectionTimeout);
       }
@@ -160,7 +178,7 @@ export function useGameSocket({
       socketRef.current = null;
       hasJoinedRef.current = false;
     };
-  }, [roomCode, playerName, onJoinSuccess, onKicked]); // Removed savedPlayerId to prevent reconnection loops
+  }, [roomCode, playerName]); // Removed savedPlayerId, onJoinSuccess and onKicked to prevent reconnection loops
 
   const send = useCallback((message: object) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
