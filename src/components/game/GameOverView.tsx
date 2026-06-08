@@ -26,7 +26,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
         <h1 className="text-5xl md:text-6xl font-cinzel font-bold text-amber-300 tracking-[0.15em] drop-shadow-[0_0_15px_rgba(251,191,36,0.3)] mb-4">
           {t.gameOver.title}
         </h1>
-        <p className="text-xl md:text-2xl text-white/80 font-sans tracking-wide font-light">
+        <p className="text-xl md:text-2xl text-white/80 font-cinzel tracking-wide font-light">
           {t.gameOver.winner(winner?.name ?? '')}
         </p>
       </div>
@@ -60,7 +60,7 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
                   className="w-9 h-9 md:w-10 md:h-10 rounded-full shadow-lg shrink-0 border border-white/20"
                   style={{ backgroundColor: player.color, boxShadow: `0 0 10px ${player.color}60` }}
                 />
-                <span className="flex-1 text-white/90 font-sans tracking-wide">
+                <span className="flex-1 text-white/90 font-cinzel tracking-wide">
                   {player.name}
                   {player.id === playerId && (
                     <span className="text-white/40 text-[10px] ml-2 tracking-widest uppercase">({t.common.you})</span>

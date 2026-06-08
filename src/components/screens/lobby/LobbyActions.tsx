@@ -32,7 +32,7 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
 
   return (
     <>
-      <div className="mt-8 space-y-3.5 pt-6 border-t border-white/10">
+      <div className="mt-8 space-y-3.5">
         {isHost ? (
           <>
             <button
@@ -77,7 +77,7 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
               <button
                 onClick={onRequestPlay}
                 disabled={activePlayersCount >= maxPlayersForDeck}
-                className={`w-full py-3.5 md:py-4 rounded-xl font-cinzel font-bold uppercase tracking-[0.2em] text-base md:text-lg transition-all duration-300 ${
+                className={`w-full py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-300 ${
                   activePlayersCount < maxPlayersForDeck
                     ? 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]'
                     : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
@@ -86,8 +86,8 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
                 {activePlayersCount < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull}
               </button>
             )}
-            <div className="text-center py-3 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-sans text-sm tracking-wide flex items-center justify-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/60"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <div className="w-full bg-white/5 border border-white/10 text-blue-300/80 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base flex items-center justify-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               {t.lobby.watchingAsSpectator}
             </div>
           </div>
