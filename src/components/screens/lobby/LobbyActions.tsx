@@ -32,7 +32,7 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
 
   return (
     <>
-      <div className="mt-8 space-y-3.5">
+      <div className="space-y-3.5">
         {isHost ? (
           <>
             <button
@@ -93,7 +93,7 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="text-center py-5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
+            <div className="text-center py-3 md:py-3.5 text-white/40 bg-[#1A1A1A]/40 rounded-xl border border-white/10 font-cinzel font-bold uppercase tracking-widest text-sm md:text-base">
               <span className="w-2 h-2 bg-amber-400/80 rounded-full inline-block animate-pulse mr-3 shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
               {t.lobby.waitingHost}
             </div>

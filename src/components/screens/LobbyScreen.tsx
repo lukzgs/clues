@@ -71,7 +71,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
     const timer = setTimeout(() => {
       onUpdateSettings(vc, deckOption, phaseTimeouts);
-    }, 750);
+    }, 250);
 
     return () => clearTimeout(timer);
   }, [vc, deckOption, phaseTimeouts, isHost, onUpdateSettings]);
@@ -130,7 +130,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 setDeckOption={setDeckOption}
                 updateTimeout={updateTimeout}
               />
-              <div className="mt-8 pt-6 border-t border-white/10 shrink-0">
+              <div className="mt-6 md:mt-8 shrink-0">
                 <LobbyActions 
                   isHost={isHost}
                   canStart={canStart}
@@ -160,7 +160,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               />
 
               {/* Mobile Only: Actions */}
-              <div className="lg:hidden">
+              <div className="lg:hidden mt-6 md:mt-8">
                 <LobbyActions 
                   isHost={isHost}
                   canStart={canStart}
