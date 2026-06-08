@@ -36,16 +36,16 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
 
       <div className="space-y-4">
         {/* Score condition */}
-        <div className={`rounded-2xl border transition-all duration-300 ${
-          vc.scoreEnabled
-            ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-            : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
-        }`}>
-          <div className="flex items-center justify-between p-3 pb-2">
-            <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
-              {t.lobby.byScore}
-            </span>
-            {isHost && (
+        {isHost ? (
+          <div className={`rounded-2xl border transition-all duration-300 ${
+            vc.scoreEnabled
+              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
+              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+          }`}>
+            <div className="flex items-center justify-between p-3 pb-2">
+              <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                {t.lobby.byScore}
+              </span>
               <button
                 onClick={() => updateVC({ scoreEnabled: !vc.scoreEnabled })}
                 className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
@@ -57,15 +57,13 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                   vc.scoreEnabled ? 'translate-x-5' : 'translate-x-0'
                 }`} />
               </button>
-            )}
-          </div>
+            </div>
 
-          {vc.scoreEnabled && (
-            <div className="px-3 pb-3 pt-0.5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.firstToReach}</span>
-                <div className="flex items-center gap-1.5">
-                  {isHost ? (
+            {vc.scoreEnabled && (
+              <div className="px-3 pb-3 pt-0.5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.firstToReach}</span>
+                  <div className="flex items-center gap-1.5">
                     <input
                       type="number"
                       min={10}
@@ -80,46 +78,57 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                       className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                  ) : (
-                    <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-3 py-1.5 text-amber-300/90 font-cinzel font-bold text-base md:text-lg tabular-nums">{vc.targetScore}</span>
-                  )}
-                  <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.points}</span>
+                    <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.points}</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  step={5}
+                  value={Math.max(10, Math.min(100, vc.targetScore))}
+                  onChange={(e) => updateVC({ targetScore: Number(e.target.value) })}
+                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
+                    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
+                  <span>10</span>
+                  <span>100</span>
                 </div>
               </div>
-              {isHost && (
-                <>
-                  <input
-                    type="range"
-                    min={10}
-                    max={100}
-                    step={5}
-                    value={Math.max(10, Math.min(100, vc.targetScore))}
-                    onChange={(e) => updateVC({ targetScore: Number(e.target.value) })}
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
-                      [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
-                    <span>10</span>
-                    <span>100</span>
-                  </div>
-                </>
+            )}
+          </div>
+        ) : (
+          <div className={`rounded-2xl border transition-all duration-300 ${
+            vc.scoreEnabled
+              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
+              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+          }`}>
+            <div className="flex items-center justify-between p-3">
+              <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                {t.lobby.byScore}
+              </span>
+              {vc.scoreEnabled && (
+                <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                  {vc.targetScore}
+                </span>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Narrator rounds condition */}
-        <div className={`rounded-2xl border transition-all duration-300 ${
-          vc.narratorRoundsEnabled
-            ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-            : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
-        }`}>
-          <div className="flex items-center justify-between p-3 pb-2">
-            <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
-              {t.lobby.byRounds}
-            </span>
-            {isHost && (
+        {isHost ? (
+          <div className={`rounded-2xl border transition-all duration-300 ${
+            vc.narratorRoundsEnabled
+              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
+              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+          }`}>
+            <div className="flex items-center justify-between p-3 pb-2">
+              <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
+                {t.lobby.byRounds}
+              </span>
               <button
                 onClick={() => updateVC({ narratorRoundsEnabled: !vc.narratorRoundsEnabled })}
                 className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
@@ -131,15 +140,13 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                   vc.narratorRoundsEnabled ? 'translate-x-5' : 'translate-x-0'
                 }`} />
               </button>
-            )}
-          </div>
+            </div>
 
-          {vc.narratorRoundsEnabled && (
-            <div className="px-3 pb-3 pt-0.5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.eachPlayerNarrates}</span>
-                <div className="flex items-center gap-1.5">
-                  {isHost ? (
+            {vc.narratorRoundsEnabled && (
+              <div className="px-3 pb-3 pt-0.5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">{t.lobby.eachPlayerNarrates}</span>
+                  <div className="flex items-center gap-1.5">
                     <input
                       type="number"
                       min={1}
@@ -154,34 +161,45 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                       className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                  ) : (
-                    <span className="bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-3 py-1.5 text-amber-300/90 font-cinzel font-bold text-base md:text-lg tabular-nums">{vc.narratorRounds}</span>
-                  )}
-                  <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.times}</span>
+                    <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.times}</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={Math.max(1, Math.min(5, vc.narratorRounds))}
+                  onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
+                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
+                    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                />
+                <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
+                  <span>1x</span>
+                  <span>5x</span>
                 </div>
               </div>
-              {isHost && (
-                <>
-                  <input
-                    type="range"
-                    min={1}
-                    max={5}
-                    step={1}
-                    value={Math.max(1, Math.min(5, vc.narratorRounds))}
-                    onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                      [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
-                      [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
-                  />
-                  <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
-                    <span>1x</span>
-                    <span>5x</span>
-                  </div>
-                </>
+            )}
+          </div>
+        ) : (
+          <div className={`rounded-2xl border transition-all duration-300 ${
+            vc.narratorRoundsEnabled
+              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
+              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+          }`}>
+            <div className="flex items-center justify-between p-3">
+              <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
+                {t.lobby.byRounds}
+              </span>
+              {vc.narratorRoundsEnabled && (
+                <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                  {vc.narratorRounds}
+                </span>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Info when both enabled */}
         {vc.scoreEnabled && vc.narratorRoundsEnabled && (
@@ -253,8 +271,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 <div key={key} className="bg-[#1A1A1A]/30 border border-white/5 rounded-xl p-3">
                   <div className={`flex items-center justify-between ${isHost ? 'mb-2' : ''}`}>
                     <span className="text-xs md:text-sm font-cinzel font-bold text-white/80">{label}</span>
-                    <div className="flex items-center gap-1.5 bg-[#1A1A1A]/80 border border-white/10 rounded-lg px-2 py-1">
-                      {isHost ? (
+                    {isHost ? (
+                      <div className="flex items-center gap-1.5">
                         <input
                           type="number"
                           min={0}
@@ -268,13 +286,15 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                             }
                           }}
                           onBlur={() => updateTimeout(key, phaseTimeouts[key])}
-                          className="w-10 md:w-12 bg-transparent text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
-                      ) : (
-                        <span className="text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">{phaseTimeouts[key]}</span>
-                      )}
-                      <span className="text-white/30 text-[9px] md:text-[10px] font-sans uppercase font-bold tracking-widest">{t.lobby.sec}</span>
-                    </div>
+                        <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.sec}</span>
+                      </div>
+                    ) : (
+                      <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                        {phaseTimeouts[key]}
+                      </span>
+                    )}
                   </div>
                   {isHost && (
                     <input
