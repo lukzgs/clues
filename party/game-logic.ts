@@ -230,6 +230,11 @@ export function getPublicState(
   // playersWhoVoted: safe list of IDs who already voted (no choice association)
   const playersWhoVoted = state.votes ? Object.keys(state.votes) : [];
 
+  console.log(`[DEBUG-SERVER] getPublicState gerado para o jogador ${forPlayerId}:`, {
+    phase: state.phase,
+    playersWhoVoted
+  });
+
   return {
     roomCode: state.roomCode || '',
     phase: state.phase || GamePhase.LOBBY,

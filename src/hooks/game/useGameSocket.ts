@@ -104,6 +104,10 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.SYNC_STATE:
+            console.log('[DEBUG-CLIENT] SYNC_STATE recebido:', {
+              phase: msg.gameState?.phase,
+              playersWhoVoted: msg.gameState?.playersWhoVoted
+            });
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
