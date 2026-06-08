@@ -21,6 +21,16 @@ export const PlayerList: React.FC<PlayerListProps> = ({
   onRemoveBot,
 }) => {
   const { t } = useTranslation();
+  const [isToggling, setIsToggling] = React.useState(false);
+  
+  const handleToggleSpectator = (targetId: string) => {
+    if (isToggling || !onToggleSpectator) return;
+    setIsToggling(true);
+    onToggleSpectator(targetId);
+    setTimeout(() => {
+      setIsToggling(false);
+    }, 800);
+  };
   
   const activePlayers = gameState.players.filter(p => !p.isSpectator);
   const spectators = gameState.players.filter(p => p.isSpectator);
@@ -57,16 +67,6 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                 {player.name}
               </span>
               <div className="flex items-center gap-1.5 mt-0.5 overflow-hidden">
-                {player.isHost && (
-                  <span className="text-amber-400 text-[9px] md:text-[10px] font-cinzel font-bold uppercase tracking-widest drop-shadow-[0_0_5px_rgba(251,191,36,0.5)] shrink-0">
-                    {t.lobby.host}
-                  </span>
-                )}
-                {player.isSpectator && (
-                  <span className="text-blue-400/70 text-[9px] md:text-[10px] font-sans font-bold uppercase tracking-widest shrink-0">
-                    {t.common.spectator}
-                  </span>
-                )}
                 {!player.isConnected && !player.isBot && (
                   <span className="text-red-400 text-[9px] md:text-[10px] font-sans uppercase tracking-widest shrink-0">
                     {t.common.disconnected}
@@ -75,67 +75,90 @@ export const PlayerList: React.FC<PlayerListProps> = ({
               </div>
             </div>
 
-            {/* Host actions: toggle spectator + kick (not on self) */}
-            {isHost && player.id !== currentPlayer?.id && (
-              <div className="flex items-center gap-0.5 shrink-0">
-                {/* Toggle spectator */}
-                {onToggleSpectator && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onToggleSpectator(player.id); }}
-                    className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 ${
-                      player.isSpectator
-                        ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
-                        : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
-                    }`}
-                    title={player.isSpectator ? 'Make player' : 'Make spectator'}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                )}
-                {/* Kick */}
-                {onKickPlayer && (
-                  <button
-                    onClick={() => onKickPlayer(player.id)}
-                    className="text-white/20 hover:text-red-400 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300"
-                    title="Remove player"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Self-toggle spectator for players on their own card */}
-            {player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onToggleSpectator(player.id); }}
-                className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 shrink-0 ${
-                  player.isSpectator
-                    ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
-                    : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
-                }`}
-                title={player.isSpectator ? t.lobby.enterAsPlayer : t.lobby.becomeSpectator}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            )}
-
-            {/* Bot remove (legacy) */}
-            {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && !onKickPlayer && (
-              <button
-                onClick={() => onRemoveBot(player.id)}
-                className="text-white/20 hover:text-red-400 text-base w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300 mr-1"
-                title="Remove bot"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
+            {/* Actions and status area */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Crown for host card (shown to all players) */}
+              {player.isHost && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] shrink-0"
+                >
+                  <title>Host</title>
+                  <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
                 </svg>
-              </button>
-            )}
+              )}
+
+              {/* Host actions: toggle spectator + kick (not on self) */}
+              {isHost && player.id !== currentPlayer?.id && (
+                <div className="flex items-center gap-0.5">
+                  {/* Toggle spectator */}
+                  {onToggleSpectator && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleToggleSpectator(player.id); }}
+                      disabled={isToggling}
+                      className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 ${
+                        isToggling
+                          ? 'opacity-50 cursor-not-allowed text-white/30 bg-white/5'
+                          : player.isSpectator
+                          ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
+                          : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
+                      }`}
+                      title={player.isSpectator ? 'Make player' : 'Make spectator'}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  )}
+                  {/* Kick */}
+                  {onKickPlayer && (
+                    <button
+                      onClick={() => onKickPlayer(player.id)}
+                      className="text-white/20 hover:text-red-400 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300"
+                      title="Remove player"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Self-toggle spectator for players on their own card */}
+              {player.id === currentPlayer?.id && !player.isBot && onToggleSpectator && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleToggleSpectator(player.id); }}
+                  disabled={isToggling}
+                  className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 shrink-0 ${
+                    isToggling
+                      ? 'opacity-50 cursor-not-allowed text-white/30 bg-white/5'
+                      : player.isSpectator
+                      ? 'text-blue-400 bg-blue-500/20 hover:text-blue-300 hover:bg-blue-500/30'
+                      : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
+                  }`}
+                  title={player.isSpectator ? t.lobby.enterAsPlayer : t.lobby.becomeSpectator}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              )}
+
+              {/* Bot remove (legacy) */}
+              {GAME_CONFIG.ENABLE_BOTS && player.isBot && isHost && onRemoveBot && !onKickPlayer && (
+                <button
+                  onClick={() => onRemoveBot(player.id)}
+                  className="text-white/20 hover:text-red-400 text-base w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300 mr-1"
+                  title="Remove bot"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
 
         ))}
