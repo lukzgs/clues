@@ -22,12 +22,13 @@ interface UseGameActionsProps {
 
 export function useGameActions({ send, setError, socketRef }: UseGameActionsProps) {
   
-  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
+  const startGame = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean) => {
     const result = StartGameSchema.safeParse({
       type: ClientMessageType.START_GAME,
       victoryCondition,
       deckOption,
       phaseTimeouts,
+      timerEnabled,
     });
     if (result.success) {
       send(result.data);
@@ -36,12 +37,13 @@ export function useGameActions({ send, setError, socketRef }: UseGameActionsProp
     }
   }, [send]);
 
-  const updateSettings = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts) => {
+  const updateSettings = useCallback((victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean) => {
     const result = UpdateSettingsSchema.safeParse({
       type: ClientMessageType.UPDATE_SETTINGS,
       victoryCondition,
       deckOption,
       phaseTimeouts,
+      timerEnabled,
     });
     if (result.success) {
       send(result.data);
