@@ -225,7 +225,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   return (
-    <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
+    <div className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0">
       <div className="fixed inset-0 pointer-events-none z-[-1]" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
       <div className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]" />
       
@@ -241,84 +241,88 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         } 
       />
 
-      {gameState.timerEnabled && (
-        <AfkAlertBar 
-          gameState={gameState} 
-        />
-      )}
+      <div className="flex-1 flex flex-col min-h-0 w-full p-3 md:p-4 gap-3 md:gap-4 overflow-hidden">
+        {gameState.timerEnabled && (
+          <AfkAlertBar 
+            gameState={gameState} 
+          />
+        )}
 
-      {roomCloseTime && (
-        <RoomTimeoutBar closeTime={roomCloseTime} />
-      )}
+        {roomCloseTime && (
+          <RoomTimeoutBar closeTime={roomCloseTime} />
+        )}
 
-      {currentPlayer?.isSpectator && (
-        <div className="bg-blue-900/30 border-b border-blue-500/20 text-blue-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2 relative z-50">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          MODO ESPECTADOR
-        </div>
-      )}
-
-      <div className="flex flex-1 overflow-hidden w-full relative pt-20 md:pt-16">
-        <PlayerSidebar 
-          gameState={gameState} 
-          currentPlayer={currentPlayer} 
-          isHost={isHost} 
-          canRevealResults={false} 
-          onKickPlayer={isHost ? (id) => setKickTarget({ id, name: gameState.players.find(p => p.id === id)?.name || 'Player' }) : undefined}
-          hasChosenCard={hasChosenCardFn}
-          hasVoted={hasVotedFn}
-        />
-
-        <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-[40vh] md:pb-[45vh] pt-10 px-4 md:px-8 relative z-10">
-          <div className="flex flex-col items-center justify-start w-full h-full">
-            {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
-              <NarratorChoosingView 
-                isNarrator={isNarrator} 
-                narrator={narrator} 
-              />
-            )}
-            
-            {gameState.phase === GamePhase.OTHERS_CHOOSING && (
-              <OthersChoosingView 
-                gameState={gameState} 
-                isNarrator={isNarrator} 
-                hasPlayed={hasPlayed} 
-              />
-            )}
-
-            {gameState.phase === GamePhase.VOTING && (
-              <VotingView 
-                gameState={gameState} 
-                isNarrator={isNarrator} 
-                hasVoted={hasVoted} 
-                selectedCard={selectedCard ? selectedCard.id.toString() : null}
-                onCardSelect={handleCardSelect}
-                onVote={() => setShowClueModal(true)}
-                tableMobileView={tableMobileView}
-                setTableMobileView={setTableMobileView}
-                isHost={isHost}
-              />
-            )}
+        {currentPlayer?.isSpectator && (
+          <div className="bg-blue-900/30 border border-blue-500/20 text-blue-200 text-center py-2 rounded-xl text-xs font-sans font-medium flex items-center justify-center gap-2 shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            MODO ESPECTADOR
           </div>
-        </main>
-      </div>
+        )}
 
-      <PlayerHand 
-        gameState={gameState}
-        currentPlayer={currentPlayer}
-        selectedCard={selectedCard ? selectedCard.id.toString() : null}
-        onCardSelect={handleCardSelect}
-        onConfirmCard={() => setShowClueModal(true)}
-        layout={layout}
-        setLayout={setLayout}
-        isMobileScoreOpen={showScoreModal}
-        setIsMobileScoreOpen={setShowScoreModal}
-        hideHand={hideHand}
-        setHideHand={setHideHand}
-        shouldShowHand={shouldShowHand}
-        isNarrator={isNarrator}
-        hasChosenCard={hasChosenCardFn(playerId)}
-      />
+        <div className="flex flex-1 min-h-0 w-full gap-3 md:gap-4 relative">
+          <PlayerSidebar 
+            gameState={gameState} 
+            currentPlayer={currentPlayer} 
+            isHost={isHost} 
+            canRevealResults={false} 
+            onKickPlayer={isHost ? (id) => setKickTarget({ id, name: gameState.players.find(p => p.id === id)?.name || 'Player' }) : undefined}
+            hasChosenCard={hasChosenCardFn}
+            hasVoted={hasVotedFn}
+          />
+
+          <div className="flex-1 flex flex-col min-h-0 relative overflow-visible">
+            <main className="flex-1 flex flex-col min-h-0 overflow-y-auto relative z-10">
+              <div className="flex flex-col items-center justify-start pt-0 pb-8 w-full min-h-full">
+                {gameState.phase === GamePhase.NARRATOR_CHOOSING && (
+                  <NarratorChoosingView 
+                    isNarrator={isNarrator} 
+                    narrator={narrator} 
+                  />
+                )}
+                
+                {gameState.phase === GamePhase.OTHERS_CHOOSING && (
+                  <OthersChoosingView 
+                    gameState={gameState} 
+                    isNarrator={isNarrator} 
+                    hasPlayed={hasPlayed} 
+                  />
+                )}
+
+                {gameState.phase === GamePhase.VOTING && (
+                  <VotingView 
+                    gameState={gameState} 
+                    isNarrator={isNarrator} 
+                    hasVoted={hasVoted} 
+                    selectedCard={selectedCard ? selectedCard.id.toString() : null}
+                    onCardSelect={handleCardSelect}
+                    onVote={() => setShowClueModal(true)}
+                    tableMobileView={tableMobileView}
+                    setTableMobileView={setTableMobileView}
+                    isHost={isHost}
+                  />
+                )}
+              </div>
+            </main>
+
+            <PlayerHand 
+              gameState={gameState}
+              currentPlayer={currentPlayer}
+              selectedCard={selectedCard ? selectedCard.id.toString() : null}
+              onCardSelect={handleCardSelect}
+              onConfirmCard={() => setShowClueModal(true)}
+              layout={layout}
+              setLayout={setLayout}
+              isMobileScoreOpen={showScoreModal}
+              setIsMobileScoreOpen={setShowScoreModal}
+              hideHand={hideHand}
+              setHideHand={setHideHand}
+              shouldShowHand={shouldShowHand}
+              isNarrator={isNarrator}
+              hasChosenCard={hasChosenCardFn(playerId)}
+            />
+          </div>
+        </div>
+      </div>
 
       <MobileScoreModal 
         gameState={gameState}
@@ -347,6 +351,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           }}
           onNextCard={handleNextCard}
           onPrevCard={handlePrevCard}
+          isMine={
+            gameState.phase === GamePhase.VOTING
+              ? gameState.tableCards.find(tc => tc.card.id === selectedCard.id)?.isMine
+              : false
+          }
         />
       )}
 

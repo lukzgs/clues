@@ -11,6 +11,7 @@ interface ClueModalProps {
   onClose: () => void;
   onNextCard?: () => void; // Changed logic outside to handle table cards
   onPrevCard?: () => void;
+  isMine?: boolean;
 }
 
 export const ClueModal: React.FC<ClueModalProps> = ({
@@ -21,6 +22,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
   onClose,
   onNextCard,
   onPrevCard,
+  isMine,
 }) => {
   const [clue, setClue] = useState('');
   const { t } = useTranslation();
@@ -156,13 +158,22 @@ export const ClueModal: React.FC<ClueModalProps> = ({
 
                 <button
                   onClick={handleSubmit}
-                  className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3 sm:py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300 text-sm"
+                  disabled={mode === 'voter' && isMine}
+                  className={`w-full font-cinzel font-bold uppercase tracking-widest rounded-xl px-4 py-3 sm:py-3.5 flex items-center justify-center gap-2 transition-all duration-300 text-sm ${
+                    mode === 'voter' && isMine
+                      ? 'bg-white/5 text-white/10 border border-white/5 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-amber-200 to-amber-400 text-black hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]'
+                  }`}
                 >
-                  {mode === 'voter' ? t.modals.clue.confirmVote : t.modals.clue.confirmCard}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
+                  {mode === 'voter' 
+                    ? (isMine ? t.modals.clue.cannotVoteOwnCard : t.modals.clue.confirmVote) 
+                    : t.modals.clue.confirmCard}
+                  {!(mode === 'voter' && isMine) && (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  )}
                 </button>
               </>
             )}

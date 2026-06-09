@@ -120,6 +120,7 @@ export const translations = {
         submitCardAndClue: 'Submit Card & Clue',
         confirmVote: 'Confirm Vote',
         confirmCard: 'Confirm Card',
+        cannotVoteOwnCard: 'Your Card (Cannot Vote)',
       },
       leave: {
         title: 'Leave Match',
@@ -264,6 +265,7 @@ export const translations = {
         submitCardAndClue: 'Enviar Carta & Pista',
         confirmVote: 'Confirmar Voto',
         confirmCard: 'Confirmar Carta',
+        cannotVoteOwnCard: 'Sua Carta (Não pode votar)',
       },
       leave: {
         title: 'Sair da Partida',
