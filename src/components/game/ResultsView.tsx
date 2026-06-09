@@ -29,7 +29,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   return (
     <div className="flex flex-col items-center gap-10 md:gap-12 py-6 md:py-8 animate-fade-in w-full max-w-7xl mx-auto">
       {/* Pista */}
-      <div className="text-center bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.1)] px-10 py-6 rounded-2xl md:rounded-full max-w-xl">
+      <div className="text-center bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.1)] px-10 md:px-14 py-6 rounded-2xl md:rounded-[2rem] inline-flex flex-col items-center justify-center w-auto min-w-[280px] max-w-[90vw] mx-auto">
         <p className="text-amber-200/50 text-[10px] uppercase tracking-[0.25em] mb-2 font-sans font-bold">
           {t.results.theClueWas}
         </p>
@@ -95,6 +95,29 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   md:w-auto md:max-w-none
                 `}
               >
+                {/* Dono da carta */}
+                <div
+                  className={`px-4 py-2 z-10 w-[90%] md:w-auto text-center truncate rounded-full text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-xl ${
+                    isNarratorCard 
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50' 
+                      : 'bg-[#1A1A1A] text-white/70 border border-white/10'
+                  }`}
+                >
+                  {/* Indicador de cor do jogador (bolinha) */}
+                  <div 
+                    className="w-3 h-3 rounded-full shadow-inner shrink-0" 
+                    style={{ backgroundColor: owner?.color }}
+                  />
+                  
+                  <span className="truncate">{owner?.name}</span>
+                  {isNarratorCard && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 animate-pulse ml-1 shrink-0">
+                      <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
+                      <line x1="2" y1="19" x2="22" y2="19" />
+                    </svg>
+                  )}
+                </div>
+
                 <div className="relative w-full flex justify-center px-1">
                   <GameCard
                     card={tableCard.card}
@@ -104,32 +127,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                       md:!w-48 md:!h-72 lg:!w-56 lg:!h-84 md:!aspect-auto
                     `}
                   />
-                  
-                  {/* Absolute Badge para owner se for grid-2 (para caber melhor), senão embaixo */}
                 </div>
-
-                {/* Dono da carta */}
-                <div
-                  className={`px-4 py-2 mt-[-0.5rem] md:mt-2 z-10 w-[90%] md:w-auto text-center truncate rounded-full text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-xl ${
-                    isNarratorCard 
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50' 
-                      : 'bg-[#1A1A1A] text-white/70 border border-white/10'
-                  }`}
-                >
-                {/* Indicador de cor do jogador (bolinha) */}
-                <div 
-                  className="w-3 h-3 rounded-full shadow-inner" 
-                  style={{ backgroundColor: owner?.color }}
-                />
-                
-                {owner?.name}
-                {isNarratorCard && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 animate-pulse ml-1">
-                    <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
-                    <line x1="2" y1="19" x2="22" y2="19" />
-                  </svg>
-                )}
-              </div>
 
               {/* Votos recebidos */}
               {votesOnThis.length > 0 && (

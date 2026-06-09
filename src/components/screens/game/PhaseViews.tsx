@@ -57,7 +57,7 @@ export const OthersChoosingView: React.FC<OthersChoosingViewProps> = ({ gameStat
   return (
     <div className="flex flex-col items-center gap-6 md:gap-8 animate-fade-in w-full max-w-7xl z-20 pointer-events-auto">
       {/* Clue Card */}
-      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-8 py-5 md:py-7 rounded-2xl md:rounded-[2rem] text-center w-full max-w-lg flex flex-col items-center justify-center">
+      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_50px_rgba(245,158,11,0.15)] text-amber-300 px-10 md:px-14 py-5 md:py-7 rounded-2xl md:rounded-[2rem] text-center inline-flex flex-col items-center justify-center w-auto min-w-[280px] max-w-[90vw]">
         <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 md:mb-3 font-sans font-bold opacity-60">{t.game.theClueIs}</p>
         <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider leading-tight">
           "{gameState.currentClue}"
@@ -141,7 +141,8 @@ export const VotingView: React.FC<VotingViewProps> = ({
   return (
     <div className="flex flex-col items-center gap-6 animate-fade-in w-full max-w-7xl pointer-events-auto z-20">
       {/* Clue Card */}
-      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-10 py-5 rounded-3xl md:rounded-full text-center max-w-4xl mx-auto flex items-center justify-center">
+      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-10 md:px-14 py-5 md:py-6 rounded-[2rem] md:rounded-full text-center mx-auto inline-flex flex-col items-center justify-center w-auto min-w-[280px] max-w-[90vw]">
+        <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 font-sans font-bold opacity-60">{t.game.theClueIs}</p>
         <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider px-6 leading-tight">
           "{gameState.currentClue}"
         </h2>

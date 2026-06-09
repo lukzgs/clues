@@ -46,12 +46,12 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
           return (
             <div
               key={player.id}
-              className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${
+              className={`flex items-center gap-3 p-3 md:px-4 rounded-2xl border w-full overflow-hidden transition-all duration-300 ${
                 isCurrent 
-                  ? 'bg-amber-500/10 border-amber-500/30' 
+                  ? 'bg-amber-500/10 border-amber-500/30 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]' 
                   : isNarrator
                     ? 'bg-purple-500/10 border-purple-500/30'
-                    : 'bg-white/5 border-white/5'
+                    : 'bg-[#1A1A1A]/40 border-white/5 hover:bg-white/5'
               }`}
             >
               <div 
@@ -61,55 +61,71 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className={`font-cinzel font-bold text-sm truncate ${isCurrent ? 'text-amber-300' : 'text-white'}`}>
-                    {player.name}
+              <div className="flex-1 min-w-0 flex items-center gap-2">
+                <span className={`font-cinzel font-bold text-sm tracking-wider truncate ${isCurrent ? 'text-amber-100' : 'text-white'}`}>
+                  {player.name}
+                </span>
+                
+                {player.isHost && !isNarrator && (
+                  <div
+                    className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-amber-400 shrink-0"
+                    title="Host"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
+                      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
+                    </svg>
+                  </div>
+                )}
+                
+                {isNarrator && (
+                  <span className="bg-purple-500 text-white text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0">
+                    NARRADOR
                   </span>
-                  {isNarrator && (
-                    <span className="bg-purple-500 text-white text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.4)]">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                      NARRADOR
-                    </span>
-                  )}
-                  {player.isHost && !isNarrator && (
-                    <span className="bg-amber-500 text-black text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold shadow-[0_0_10px_rgba(245,158,11,0.4)]">
-                      Host
-                    </span>
-                  )}
-                  {!player.isConnected && !player.isBot && (
-                    <span className="bg-red-500/20 text-red-400 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold border border-red-500/30">
-                      Off
-                    </span>
-                  )}
-                </div>
-                <div className="text-white/50 text-[11px] font-sans tracking-wide mt-0.5 flex items-center gap-1.5">
-                  <span className="font-mono text-amber-300 font-medium">{player.score}</span> {t.lobby.points}
-                </div>
+                )}
+                
+                {!player.isConnected && !player.isBot && (
+                  <span className="bg-red-500/20 text-red-400 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold border border-red-500/30 shrink-0">
+                    Off
+                  </span>
+                )}
               </div>
 
               <div className="shrink-0 flex items-center gap-2">
-                <div className="flex flex-col items-end gap-1">
-                  {gameState.phase === GamePhase.OTHERS_CHOOSING && !isNarrator && (
-                    <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${chosen ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-white/30 border border-white/10'}`}>
-                      {chosen ? 'PRONTO' : 'ESCOLHENDO CARTA'}
-                    </div>
-                  )}
-                  {gameState.phase === GamePhase.VOTING && !isNarrator && (
-                    <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${voted ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-white/5 text-white/30 border border-white/10'}`}>
-                      {voted ? 'VOTOU' : 'VOTANDO'}
-                    </div>
-                  )}
-                </div>
                 {/* Host kick action */}
-                {isHost && player.id !== currentPlayer?.id && onKickPlayer && (
+                {isHost && !isCurrent && onKickPlayer && (
                   <button
                     onClick={() => onKickPlayer(player.id)}
-                    className="w-6 h-6 flex items-center justify-center rounded-md bg-white/5 text-white/20 hover:text-red-400 hover:bg-red-500/20 transition-colors"
-                    title="Remove player"
+                    className="w-6 h-6 flex items-center justify-center rounded-lg text-white/10 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                    title="Remover jogador"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
+                )}
+
+                {/* Score */}
+                <div className={`font-sans font-black text-xl tracking-tighter shrink-0 w-6 text-center ${isCurrent ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/80'}`}>
+                  {player.score}
+                </div>
+
+                {/* Status Indicator (Checkmark) */}
+                {((gameState.phase === GamePhase.OTHERS_CHOOSING && !isNarrator) || 
+                  (gameState.phase === GamePhase.VOTING && !isNarrator) || 
+                  (gameState.phase === GamePhase.NARRATOR_CHOOSING && isNarrator)) && (
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border transition-all duration-300 ${
+                    (gameState.phase === GamePhase.OTHERS_CHOOSING && chosen) || 
+                    (gameState.phase === GamePhase.VOTING && voted) || 
+                    (gameState.phase === GamePhase.NARRATOR_CHOOSING && chosen)
+                      ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.15)]'
+                      : 'bg-black/40 text-white/15 border-white/5'
+                  }`}>
+                    {(gameState.phase === GamePhase.OTHERS_CHOOSING && chosen) || 
+                     (gameState.phase === GamePhase.VOTING && voted) || 
+                     (gameState.phase === GamePhase.NARRATOR_CHOOSING && chosen) ? (
+                      <span className="leading-none mt-[-1px] font-bold text-[10px]">✓</span>
+                    ) : (
+                      <span className="leading-none opacity-30 text-[10px]">•</span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
