@@ -28,7 +28,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
   const spectators = gameState.players.filter(p => p.isSpectator);
 
   return (
-    <div className="hidden lg:flex w-80 bg-[#1A1A1A]/95 border-r border-white/10 flex-col h-full z-40 relative shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
+    <div className="hidden md:flex w-72 bg-[#1A1A1A]/30 border border-white/10 rounded-2xl flex-col h-fit max-h-full shrink-0 overflow-hidden">
       <div className="p-6 pb-2 shrink-0">
         <h2 className="text-white/40 text-[11px] uppercase tracking-[0.25em] font-sans font-bold flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
