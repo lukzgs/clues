@@ -58,7 +58,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-lg shrink-0 shadow-lg border border-white/10"
                 style={{ backgroundColor: player.color }}
               >
-                {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
+                {player.name.charAt(0).toUpperCase()}
               </div>
 
               <div className="flex-1 min-w-0">
