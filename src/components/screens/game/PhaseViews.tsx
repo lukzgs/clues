@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState, Player } from '../../../types';
 import { useTranslation } from '../../../i18n/index.tsx';
 import { GameCard } from '../../game/GameCard';
@@ -129,6 +129,14 @@ export const VotingView: React.FC<VotingViewProps> = ({
   setTableMobileView,
 }) => {
   const { t } = useTranslation();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-6 animate-fade-in w-full max-w-7xl pointer-events-auto z-20">
@@ -170,10 +178,10 @@ export const VotingView: React.FC<VotingViewProps> = ({
       {/* Cards on table (face up) */}
       <div className={`
         ${tableMobileView === 'row' 
-          ? 'w-full flex md:flex-wrap overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory px-4 py-8 md:p-0 md:justify-center md:gap-6' 
+          ? 'w-full flex md:flex-wrap overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory px-4 py-8 md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto' 
           : tableMobileView === 'grid-2'
-            ? 'w-full grid grid-cols-2 gap-4 px-4 overflow-y-auto max-h-[50vh] pb-8 hide-scrollbar'
-            : 'w-full flex flex-col items-center gap-6 px-4 overflow-y-auto max-h-[60vh] pb-8 hide-scrollbar'
+            ? 'w-full grid grid-cols-2 gap-4 px-4 overflow-y-auto max-h-[50vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto'
+            : 'w-full flex flex-col items-center gap-6 px-4 overflow-y-auto max-h-[60vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:flex-row md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto'
         }
       `}>
         {gameState.tableCards.map((tc) => {
@@ -182,27 +190,29 @@ export const VotingView: React.FC<VotingViewProps> = ({
             <div 
               key={tc.orderId}
               onClick={() => {
-                if (!isNarrator && !hasVoted) onCardSelect(tc.card.id.toString());
+                if (!isNarrator && !hasVoted && !tc.isMine) onCardSelect(tc.card.id.toString());
               }}
               className={`
                 transition-all duration-300 relative group shrink-0
                 ${tableMobileView === 'row' ? 'snap-center snap-always pr-6 md:pr-0 last:pr-0' : ''}
-                ${isNarrator || hasVoted ? 'cursor-default' : 'cursor-pointer hover:-translate-y-2'}
+                ${isNarrator || hasVoted || tc.isMine ? 'cursor-default' : 'cursor-pointer hover:-translate-y-2'}
                 ${isSelected ? 'z-20 scale-[1.02]' : 'z-10'}
               `}
             >
               <GameCard
                 card={tc.card}
-                size={tableMobileView === 'grid-2' ? 'sm' : tableMobileView === 'grid-1' ? 'lg' : 'table'}
+                size={!isMobile ? 'table' : (tableMobileView === 'grid-2' ? 'sm' : tableMobileView === 'grid-1' ? 'lg' : 'table')}
                 isSelected={isSelected}
-                disabled={isNarrator || hasVoted}
+                disabled={isNarrator || hasVoted || tc.isMine}
+                dimWhenDisabled={!tc.isMine}
                 className={`
-                  ${!isSelected && !isNarrator && !hasVoted && 'group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}
+                  ${tc.isMine ? 'ring-2 ring-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)]' : ''}
+                  ${!isSelected && !isNarrator && !hasVoted && !tc.isMine && 'group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}
                   ${isSelected ? 'shadow-[0_0_30px_rgba(245,158,11,0.5)]' : 'shadow-xl'}
                 `}
               />
               {/* Overlay on selected card (mobile grids) */}
-              {isSelected && tableMobileView !== 'row' && (
+              {isSelected && (!isMobile || tableMobileView !== 'row') && (
                 <div className="absolute inset-0 border-4 border-amber-400 rounded-2xl md:rounded-[1.75rem] pointer-events-none"></div>
               )}
             </div>
