@@ -24,6 +24,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   onStartGame,
   onUpdateSettings,
   onLeaveRoom,
+  onAddBot,
   onRemoveBot,
   onKickPlayer,
   onToggleSpectator,
@@ -93,6 +94,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
   const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
   const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS && activePlayers.length <= maxPlayersForDeck;
+  const canAddBot = !!(
+    GAME_CONFIG.ENABLE_BOTS &&
+    gameState.players.length < GAME_CONFIG.MAX_CONNECTIONS &&
+    activePlayers.length < maxPlayersForDeck &&
+    onAddBot
+  );
 
   const updateTimeout = (key: keyof PhaseTimeouts, value: number) => {
     setPhaseTimeouts(prev => ({ ...prev, [key]: Math.max(0, Math.min(120, value)) }));
@@ -146,6 +153,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   onToggleSpectator={onToggleSpectator}
                   onRequestPlay={onRequestPlay}
                   onLeaveRoom={onLeaveRoom}
+                  onAddBot={onAddBot}
+                  canAddBot={canAddBot}
                 />
               </div>
             </div>
@@ -176,6 +185,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   onToggleSpectator={onToggleSpectator}
                   onRequestPlay={onRequestPlay}
                   onLeaveRoom={onLeaveRoom}
+                  onAddBot={onAddBot}
+                  canAddBot={canAddBot}
                 />
               </div>
             </div>

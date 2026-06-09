@@ -79,16 +79,20 @@ export const PlayerList: React.FC<PlayerListProps> = ({
             <div className="flex items-center gap-1.5 shrink-0">
               {/* Crown for host card (shown to all players) */}
               {player.isHost && (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] shrink-0"
+                <div
+                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-amber-400 shrink-0"
                 >
-                  <title>Host</title>
-                  <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
-                </svg>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
+                  >
+                    <title>Host</title>
+                    <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
+                  </svg>
+                </div>
               )}
 
               {/* Host actions: toggle spectator + kick (not on self) */}

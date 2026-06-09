@@ -14,6 +14,8 @@ interface LobbyActionsProps {
   onToggleSpectator?: (targetId: string) => void;
   onRequestPlay?: () => void;
   onLeaveRoom: () => void;
+  onAddBot?: () => void;
+  canAddBot?: boolean;
 }
 
 export const LobbyActions: React.FC<LobbyActionsProps> = ({
@@ -27,6 +29,8 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
   onToggleSpectator,
   onRequestPlay,
   onLeaveRoom,
+  onAddBot,
+  canAddBot,
 }) => {
   const { t } = useTranslation();
   const [isToggling, setIsToggling] = useState(false);
@@ -87,6 +91,16 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 {currentPlayer.isSpectator ? (activePlayersCount < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull) : t.lobby.becomeSpectator}
+              </button>
+            )}
+
+            {canAddBot && onAddBot && (
+              <button
+                onClick={onAddBot}
+                className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 py-2 md:py-2.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-xs md:text-sm transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.01]"
+              >
+                <span className="text-lg leading-none mr-1 font-sans font-light">+</span>
+                {t.lobby.addBot}
               </button>
             )}
           </>
