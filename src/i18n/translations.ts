@@ -75,6 +75,10 @@ export const translations = {
       hand: 'Your Hand',
       tableCards: 'Table Cards',
       leaveRoom: 'Leave room',
+      phaseLabelLobby: 'LOBBY',
+      phaseLabelOthersChoosing: 'The clue is...',
+      phaseLabelResults: 'RESULTS',
+      phaseLabelGameOver: 'GAME OVER',
       // Narrator choosing phase
       youAreNarrator: 'You are the Narrator',
       narratorSubtitle: 'Choose a card and write a clue',
@@ -220,6 +224,10 @@ export const translations = {
       hand: 'Sua Mão',
       tableCards: 'Cartas na Mesa',
       leaveRoom: 'Sair da sala',
+      phaseLabelLobby: 'LOBBY',
+      phaseLabelOthersChoosing: 'A Pista é...',
+      phaseLabelResults: 'RESULTADOS',
+      phaseLabelGameOver: 'GAME OVER',
       // Narrator choosing phase
       youAreNarrator: 'Você é o Narrador',
       narratorSubtitle: 'Escolha uma carta e escreva uma pista',

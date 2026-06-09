@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GameState, GamePhase, Card, TableCard } from '../../types';
+import { useTranslation } from '../../i18n';
 import {
   ClueModal,
   ResultsView,
@@ -81,6 +82,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [hideHand, setHideHand] = useState(false);
   const [layout, setLayout] = useState<'row' | 'grid-1' | 'grid-2'>('row');
   const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
+  const { t } = useTranslation();
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -233,11 +235,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         roomCode={gameState.roomCode} 
         onLeaveRoom={() => setShowLeaveConfirm(true)} 
         phaseLabel={
-          gameState.phase === GamePhase.LOBBY ? 'LOBBY' :
-          gameState.phase === GamePhase.NARRATOR_CHOOSING ? (isNarrator ? 'Você é o Narrador' : 'Aguardando Narrador') :
-          gameState.phase === GamePhase.OTHERS_CHOOSING ? 'A Pista é...' :
-          gameState.phase === GamePhase.VOTING ? 'Fase de Votação' :
-          gameState.phase === GamePhase.RESULTS ? 'RESULTADOS' : 'GAME OVER'
+          gameState.phase === GamePhase.LOBBY ? t.game.phaseLabelLobby :
+          gameState.phase === GamePhase.NARRATOR_CHOOSING ? (isNarrator ? t.game.youAreNarrator : t.game.waitingForNarrator) :
+          gameState.phase === GamePhase.OTHERS_CHOOSING ? t.game.phaseLabelOthersChoosing :
+          gameState.phase === GamePhase.VOTING ? t.game.votingPhase :
+          gameState.phase === GamePhase.RESULTS ? t.game.phaseLabelResults : t.game.phaseLabelGameOver
         } 
       />
 
