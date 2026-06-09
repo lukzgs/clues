@@ -40,6 +40,8 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 
   if (!shouldShowHand || !currentPlayer) return null;
 
+
+
   return (
     <div className={`w-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 shrink-0 transition-all duration-300 ${isMobileScoreOpen ? 'invisible opacity-0' : 'visible opacity-100'} fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:border-0 md:p-0`}>
       {/* Mobile Handle */}

@@ -462,18 +462,20 @@ export default class GameServer implements Party.Server {
   }
 
   public broadcast(message: object) {
-    const json = JSON.stringify(message);
-    this.room.broadcast(json);
+    try {
+      const json = JSON.stringify(message);
+      this.room.broadcast(json);
+    } catch (error) {
+      console.error("[ERROR-SERVER] Erro ao transmitir mensagem (broadcast):", error);
+    }
   }
 
   public sendToConnection(conn: Party.Connection, message: object) {
-    if ((message as any).type === ServerMessageType.SYNC_STATE) {
-      console.log(`[DEBUG-SERVER] Enviando SYNC_STATE para conexão ${conn.id}:`, {
-        phase: (message as any).gameState?.phase,
-        playersWhoVoted: (message as any).gameState?.playersWhoVoted
-      });
+    try {
+      conn.send(JSON.stringify(message));
+    } catch (error) {
+      console.error(`[ERROR-SERVER] Erro ao enviar mensagem para conexão ${conn.id}:`, error);
     }
-    conn.send(JSON.stringify(message));
   }
 
   public sendError(conn: Party.Connection, message: string) {

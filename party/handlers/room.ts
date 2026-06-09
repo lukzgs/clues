@@ -54,11 +54,11 @@ export async function handleJoinRoom(
       server.broadcastState();
       
       // Send confirmation with player ID so client can restore local state
-      conn.send(JSON.stringify({
+      server.sendToConnection(conn, {
         type: ServerMessageType.SYNC_STATE,
         gameState: getPublicState(server.state, player.id),
         yourPlayerId: player.id
-      }));
+      });
       
       return;
     }

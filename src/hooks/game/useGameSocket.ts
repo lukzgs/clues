@@ -59,7 +59,7 @@ export function useGameSocket({
 
   useEffect(() => {
     if (!roomCode || !playerName) return;
-    console.log('[DEBUG] useGameSocket useEffect executando', { roomCode, playerName });
+
 
     let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
       if (!hasJoinedRef.current || !gameStateRef.current) {
@@ -121,10 +121,7 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.SYNC_STATE:
-            console.log('[DEBUG-CLIENT] SYNC_STATE recebido:', {
-              phase: msg.gameState?.phase,
-              playersWhoVoted: msg.gameState?.playersWhoVoted
-            });
+
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
@@ -133,6 +130,24 @@ export function useGameSocket({
               if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
                 connectionTimeout = null;
+              }
+            } else {
+              // Se não recebemos seu ID de jogador confirmado do servidor, mas nós temos
+              // um ID salvo (savedPlayerId) que não está na lista de jogadores conectados no gameState recebido,
+              // forçamos o re-join para garantir que a conexão atual seja associada a este jogador.
+              const mySavedId = savedPlayerIdRef.current;
+              const isMySavedIdConnected = mySavedId && msg.gameState?.players?.some((p: any) => p.id === mySavedId && p.isConnected);
+              
+              if (mySavedId && !isMySavedIdConnected) {
+                const result = JoinRoomSchema.safeParse({
+                  type: 'JOIN_ROOM',
+                  playerName,
+                  reconnectId: mySavedId,
+                });
+                if (result.success) {
+                  socket.send(JSON.stringify(result.data));
+                  hasJoinedRef.current = true;
+                }
               }
             }
             break;
@@ -170,7 +185,6 @@ export function useGameSocket({
     });
 
     return () => {
-      console.log('[DEBUG] useGameSocket useEffect CLEANUP executando');
       if (connectionTimeout) {
         clearTimeout(connectionTimeout);
       }
