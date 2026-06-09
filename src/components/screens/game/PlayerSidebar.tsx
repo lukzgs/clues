@@ -61,33 +61,44 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 {player.isBot ? 'B' : player.name.charAt(0).toUpperCase()}
               </div>
 
-              <div className="flex-1 min-w-0 flex items-center gap-2">
-                <span className={`font-cinzel font-bold text-sm tracking-wider truncate ${isCurrent ? 'text-amber-100' : 'text-white'}`}>
-                  {player.name}
-                </span>
-                
-                {player.isHost && !isNarrator && (
-                  <div
-                    className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-amber-400 shrink-0"
-                    title="Host"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
-                      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
-                    </svg>
-                  </div>
-                )}
-                
-                {isNarrator && (
-                  <span className="bg-purple-500 text-white text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0">
-                    NARRADOR
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className={`font-cinzel font-bold text-sm tracking-wider truncate ${isCurrent ? 'text-amber-100' : 'text-white'}`}>
+                    {player.name}
                   </span>
-                )}
+                  
+                  {player.isHost && !isNarrator && (
+                    <div
+                      className="w-6 h-6 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-amber-400 shrink-0"
+                      title="Host"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
+                        <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
+                      </svg>
+                    </div>
+                  )}
+                  
+                  {isNarrator && (
+                    <div
+                      className="w-6 h-6 flex items-center justify-center rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 shrink-0"
+                      title="Narrador"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_6px_rgba(168,85,247,0.5)]">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                      </svg>
+                    </div>
+                  )}
+                  
+                  {!player.isConnected && !player.isBot && (
+                    <span className="bg-red-500/20 text-red-400 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold border border-red-500/30 shrink-0">
+                      Off
+                    </span>
+                  )}
+                </div>
                 
-                {!player.isConnected && !player.isBot && (
-                  <span className="bg-red-500/20 text-red-400 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold border border-red-500/30 shrink-0">
-                    Off
-                  </span>
-                )}
+                <div className="text-white/50 text-[11px] font-sans tracking-wide mt-0.5 flex items-center gap-1.5">
+                  <span className="font-mono text-amber-300 font-bold">{player.score}</span> {t.lobby.points}
+                </div>
               </div>
 
               <div className="shrink-0 flex items-center gap-2">
@@ -102,28 +113,24 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                   </button>
                 )}
 
-                {/* Score */}
-                <div className={`font-sans font-black text-xl tracking-tighter shrink-0 w-6 text-center ${isCurrent ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'text-white/80'}`}>
-                  {player.score}
-                </div>
 
                 {/* Status Indicator (Checkmark) */}
                 {((gameState.phase === GamePhase.OTHERS_CHOOSING && !isNarrator) || 
                   (gameState.phase === GamePhase.VOTING && !isNarrator) || 
                   (gameState.phase === GamePhase.NARRATOR_CHOOSING && isNarrator)) && (
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 border transition-all duration-300 ${
-                    (gameState.phase === GamePhase.OTHERS_CHOOSING && chosen) || 
-                    (gameState.phase === GamePhase.VOTING && voted) || 
-                    (gameState.phase === GamePhase.NARRATOR_CHOOSING && chosen)
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
+                    ((gameState.phase === GamePhase.OTHERS_CHOOSING || gameState.phase === GamePhase.NARRATOR_CHOOSING) && chosen)
                       ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.15)]'
-                      : 'bg-black/40 text-white/15 border-white/5'
+                      : (gameState.phase === GamePhase.VOTING && voted)
+                        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 shadow-[0_0_8px_rgba(249,115,22,0.15)]'
+                        : 'bg-black/40 text-white/15 border-white/5'
                   }`}>
                     {(gameState.phase === GamePhase.OTHERS_CHOOSING && chosen) || 
                      (gameState.phase === GamePhase.VOTING && voted) || 
                      (gameState.phase === GamePhase.NARRATOR_CHOOSING && chosen) ? (
-                      <span className="leading-none mt-[-1px] font-bold text-[10px]">✓</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     ) : (
-                      <span className="leading-none opacity-30 text-[10px]">•</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                     )}
                   </div>
                 )}

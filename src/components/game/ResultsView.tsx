@@ -235,15 +235,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                 </div>
 
                 {/* Ready Indicator */}
-                <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-xs ml-3 shrink-0 border transition-all duration-300 ${
+                <div className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
                   (gameState.playersWhoReadied ?? []).includes(player.id)
-                    ? 'bg-green-500/20 text-green-400 border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.15)]'
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.15)]'
                     : 'bg-black/40 text-white/15 border-white/5'
                 }`}>
                   {(gameState.playersWhoReadied ?? []).includes(player.id) ? (
-                    <span className="leading-none mt-[-1px] font-bold text-[10px] md:text-xs">✓</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="md:w-3 md:h-3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   ) : (
-                    <span className="leading-none opacity-30 text-[10px]">•</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                   )}
                 </div>
               </div>
