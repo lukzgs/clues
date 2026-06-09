@@ -92,7 +92,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                 >
                   <GameCard
                     card={card}
-                    size={layout === 'grid-2' ? 'sm' : layout === 'grid-1' ? 'xl' : 'table'}
+                    size={layout === 'grid-2' ? 'sm' : layout === 'grid-1' ? 'table' : 'lg'}
                     isSelected={isSelected}
                     className={`shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-shadow duration-300 ${!isSelected && 'group-hover:shadow-[0_0_25px_rgba(245,158,11,0.25),0_20px_40px_rgba(0,0,0,0.6)]'}`}
                   />
