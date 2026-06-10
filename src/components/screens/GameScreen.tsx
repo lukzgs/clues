@@ -297,7 +297,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     hasVoted={hasVoted} 
                     selectedCard={selectedCard ? selectedCard.id.toString() : null}
                     onCardSelect={handleCardSelect}
-                    onVote={() => setShowClueModal(true)}
                     tableMobileView={tableMobileView}
                     setTableMobileView={setTableMobileView}
                     isHost={isHost}

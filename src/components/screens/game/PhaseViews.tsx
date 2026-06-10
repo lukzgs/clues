@@ -66,18 +66,18 @@ export const OthersChoosingView: React.FC<OthersChoosingViewProps> = ({ gameStat
 
       {/* Cards on table (face down) */}
       {gameState.tableCards.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-2 max-w-7xl mx-auto">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-2 w-full px-4 md:px-8 max-w-7xl mx-auto">
           {gameState.tableCards.map((tc, i) => (
             <div 
               key={tc.orderId} 
-              className="animate-zoom-in" 
+              className="animate-zoom-in shrink-0 w-[140px] sm:w-[160px] md:w-[calc(20%-1.2rem)] max-w-[224px]" 
               style={{ animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}
             >
               <GameCard
                 card={{ id: -1, imageUrl: '/cards/new/back_001.avif' }}
                 size="table"
                 disabled
-                className="shadow-2xl brightness-90 contrast-125"
+                className="shadow-2xl brightness-90 contrast-125 !w-full !h-auto aspect-[2/3]"
               />
             </div>
           ))}
@@ -112,7 +112,6 @@ interface VotingViewProps {
   hasVoted: boolean;
   selectedCard: string | null;
   onCardSelect: (cardId: string) => void;
-  onVote: () => void;
   tableMobileView: 'row' | 'grid-1' | 'grid-2';
   setTableMobileView: (layout: 'row' | 'grid-1' | 'grid-2') => void;
   isHost: boolean;
@@ -124,7 +123,6 @@ export const VotingView: React.FC<VotingViewProps> = ({
   hasVoted,
   selectedCard,
   onCardSelect,
-  onVote,
   tableMobileView,
   setTableMobileView,
 }) => {
@@ -141,7 +139,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
   return (
     <div className="flex flex-col items-center gap-6 animate-fade-in w-full max-w-7xl pointer-events-auto z-20">
       {/* Clue Card */}
-      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-10 md:px-14 py-5 md:py-6 rounded-[2rem] md:rounded-full text-center mx-auto inline-flex flex-col items-center justify-center w-auto min-w-[280px] max-w-[90vw]">
+      <div className="bg-black/40 backdrop-blur-2xl border border-amber-500/30 ring-1 ring-amber-500/10 shadow-[0_0_40px_rgba(245,158,11,0.15)] text-amber-300 px-10 md:px-14 py-5 md:py-6 rounded-2xl md:rounded-[2rem] text-center mx-auto inline-flex flex-col items-center justify-center w-auto min-w-[280px] max-w-[90vw]">
         <p className="text-amber-200/50 text-[8px] md:text-[10px] uppercase tracking-[0.4em] mb-2 font-sans font-bold opacity-60">{t.game.theClueIs}</p>
         <h2 className="text-2xl md:text-4xl font-cinzel font-bold tracking-wider px-6 leading-tight">
           "{gameState.currentClue}"
@@ -179,10 +177,10 @@ export const VotingView: React.FC<VotingViewProps> = ({
       {/* Cards on table (face up) */}
       <div className={`
         ${tableMobileView === 'row' 
-          ? 'w-full flex md:flex-wrap overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory px-4 py-8 md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto' 
+          ? 'w-full flex md:flex-wrap overflow-x-auto md:overflow-visible hide-scrollbar snap-x snap-mandatory px-4 py-8 md:p-0 md:justify-center md:gap-6 md:px-8 md:max-w-7xl md:mx-auto' 
           : tableMobileView === 'grid-2'
-            ? 'w-full grid grid-cols-2 gap-4 px-4 overflow-y-auto max-h-[50vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto'
-            : 'w-full flex flex-col items-center gap-6 px-4 overflow-y-auto max-h-[60vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:flex-row md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:max-w-[1056px] lg:max-w-[1216px] md:mx-auto'
+            ? 'w-full grid grid-cols-2 gap-4 px-4 overflow-y-auto max-h-[50vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:px-8 md:max-w-7xl md:mx-auto'
+            : 'w-full flex flex-col items-center gap-6 px-4 overflow-y-auto max-h-[60vh] pb-8 hide-scrollbar md:flex md:flex-wrap md:flex-row md:overflow-visible md:max-h-none md:p-0 md:justify-center md:gap-6 md:px-8 md:max-w-7xl md:mx-auto'
         }
       `}>
         {gameState.tableCards.map((tc) => {
@@ -198,6 +196,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
                 ${tableMobileView === 'row' ? 'snap-center snap-always pr-6 md:pr-0 last:pr-0' : ''}
                 ${isNarrator || hasVoted || tc.isMine ? 'cursor-default' : 'cursor-pointer hover:-translate-y-2'}
                 ${isSelected ? 'z-20 scale-[1.02]' : 'z-10'}
+                ${!isMobile || tableMobileView === 'row' ? 'w-[160px] md:w-[calc(20%-1.2rem)] max-w-[224px]' : 'w-full'}
               `}
             >
               <GameCard
@@ -210,6 +209,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
                   ${tc.isMine ? 'ring-2 ring-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)]' : ''}
                   ${!isSelected && !isNarrator && !hasVoted && !tc.isMine && 'group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}
                   ${isSelected ? 'shadow-[0_0_30px_rgba(245,158,11,0.5)]' : 'shadow-xl'}
+                  ${(!isMobile || tableMobileView === 'row') ? '!w-full !h-auto aspect-[2/3]' : ''}
                 `}
               />
               {/* Overlay on selected card (mobile grids) */}
@@ -221,29 +221,15 @@ export const VotingView: React.FC<VotingViewProps> = ({
         })}
       </div>
 
-      {/* Status or Vote button */}
+      {/* Status indicator */}
       <div className="text-center w-full max-w-sm px-4 pt-4 shrink-0">
-        {!isNarrator && !hasVoted ? (
-          <button
-            onClick={onVote}
-            disabled={!selectedCard}
-            className={`w-full py-3.5 px-6 rounded-xl font-cinzel font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-300 shadow-xl ${
-              selectedCard
-                ? 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-300 hover:to-blue-400 text-black shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-[1.02]'
-                : 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed'
-            }`}
-          >
-            {t.game.playersVoting}
-          </button>
-        ) : (
-          <p className="text-white/40 font-sans text-xs md:text-sm tracking-[0.2em] uppercase font-bold mt-4 flex items-center justify-center gap-2 bg-black/40 py-2.5 px-4 rounded-xl border border-white/5">
-            {hasVoted ? (
-              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg> VOTOU</>
-            ) : (
-              <><span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.8)]"></span> {t.game.playersVoting}</>
-            )}
-          </p>
-        )}
+        <div className="w-full py-3.5 px-6 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white/60 shadow-xl">
+          {hasVoted ? (
+            <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg> <span className="text-white">VOTOU</span></>
+          ) : (
+            <><span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.5)]"></span> {t.game.playersVoting}</>
+          )}
+        </div>
       </div>
     </div>
   );

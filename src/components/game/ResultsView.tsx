@@ -73,7 +73,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           ${mobileView === 'row' ? 'flex overflow-x-auto snap-x snap-mandatory pb-6 gap-6 hide-scrollbar -mx-4 px-8' : ''}
           ${mobileView === 'grid-2' ? 'grid grid-cols-2 gap-4 pb-4' : ''}
           ${mobileView === 'grid-1' ? 'flex flex-col gap-8 pb-4' : ''}
-          md:flex md:flex-wrap md:justify-center md:gap-10 md:w-full md:overflow-visible
+          md:flex md:flex-wrap md:justify-center md:gap-6 md:w-full md:overflow-visible md:px-8 md:max-w-7xl md:mx-auto
         `}>
           {gameState.tableCards.map((tableCard) => {
             const owner = gameState.players.find(p => p.id === tableCard.playerId);
@@ -92,7 +92,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                   ${mobileView === 'row' ? 'w-[75vw] max-w-[280px] snap-center snap-always' : ''}
                   ${mobileView === 'grid-2' ? 'w-full' : ''}
                   ${mobileView === 'grid-1' ? 'w-full max-w-[360px] mx-auto' : ''}
-                  md:w-auto md:max-w-none
+                  ${!mobileView || mobileView === 'row' ? 'md:w-[calc(20%-1.2rem)] max-w-[224px]' : 'md:w-[calc(20%-1.2rem)] max-w-[224px]'}
                 `}
               >
                 {/* Dono da carta */}
@@ -124,7 +124,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     size="full"
                     className={`
                       ${isNarratorCard ? "ring-1 ring-amber-500 shadow-[0_0_25px_rgba(245,158,11,0.4)]" : "opacity-80"}
-                      md:!w-48 md:!h-72 lg:!w-56 lg:!h-84 md:!aspect-auto
+                      ${mobileView !== 'row' ? '!w-full !h-auto aspect-[2/3]' : '!w-full !h-auto aspect-[2/3]'}
                     `}
                   />
                 </div>
