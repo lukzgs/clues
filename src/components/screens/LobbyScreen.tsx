@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GameState, Player, VictoryCondition, DeckOption, PhaseTimeouts } from '../../types';
+import { calculateMaxPlayers } from '../../utils/gameMath';
 import { GAME_CONFIG } from '../../constants';
 import { useTranslation } from '../../i18n/index.tsx';
 import { LanguageToggle } from '../ui/LanguageToggle';
@@ -92,7 +93,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     setDeckOptionState(option);
   };
 
-  const maxPlayersForDeck = deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
+  const maxPlayersForDeck = calculateMaxPlayers(deckOption, vc);
   const canStart = activePlayers.length >= GAME_CONFIG.MIN_PLAYERS && activePlayers.length <= maxPlayersForDeck;
   const canAddBot = !!(
     GAME_CONFIG.ENABLE_BOTS &&
@@ -136,6 +137,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                 deckOption={deckOption}
                 phaseTimeouts={phaseTimeouts}
                 timerEnabled={timerEnabled}
+                activePlayersCount={activePlayers.length}
                 updateVC={updateVC}
                 setDeckOption={setDeckOption}
                 updateTimeout={updateTimeout}
@@ -226,6 +228,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
               deckOption={deckOption}
               phaseTimeouts={phaseTimeouts}
               timerEnabled={timerEnabled}
+              activePlayersCount={activePlayers.length}
               updateVC={updateVC}
               setDeckOption={setDeckOption}
               updateTimeout={updateTimeout}
@@ -237,4 +240,3 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     </div>
   );
 };
-

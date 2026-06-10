@@ -1,5 +1,6 @@
 import React from 'react';
 import { VictoryCondition, DeckOption, PhaseTimeouts } from '../../../types';
+import { calculateMaxNarratorRounds } from '../../../utils/gameMath';
 import { GAME_CONFIG } from '../../../constants';
 import { useTranslation } from '../../../i18n/index.tsx';
 
@@ -13,6 +14,7 @@ interface GameOptionsProps {
   setDeckOption: (option: DeckOption) => void;
   updateTimeout: (key: keyof PhaseTimeouts, value: number) => void;
   setTimerEnabled: (enabled: boolean) => void;
+  activePlayersCount: number;
 }
 
 export const GameOptions: React.FC<GameOptionsProps> = ({
@@ -24,9 +26,12 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   updateVC,
   setDeckOption,
   updateTimeout,
-  setTimerEnabled
+  setTimerEnabled,
+  activePlayersCount
 }) => {
   const { t } = useTranslation();
+  
+  const maxRounds = calculateMaxNarratorRounds(deckOption, activePlayersCount);
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
@@ -150,14 +155,14 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                     <input
                       type="number"
                       min={1}
-                      max={5}
+                      max={maxRounds}
                       step={1}
                       value={vc.narratorRounds}
                       onChange={(e) => {
                         const v = Number(e.target.value);
                         if (!isNaN(v)) updateVC({ narratorRounds: v });
                       }}
-                      onBlur={() => updateVC({ narratorRounds: Math.max(1, Math.min(5, vc.narratorRounds)) })}
+                      onBlur={() => updateVC({ narratorRounds: Math.max(1, Math.min(maxRounds, vc.narratorRounds)) })}
                       className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
@@ -167,9 +172,9 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 <input
                   type="range"
                   min={1}
-                  max={5}
+                  max={maxRounds}
                   step={1}
-                  value={Math.max(1, Math.min(5, vc.narratorRounds))}
+                  value={Math.max(1, Math.min(maxRounds, vc.narratorRounds))}
                   onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
                   className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
                     [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
@@ -177,7 +182,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 />
                 <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
                   <span>1x</span>
-                  <span>5x</span>
+                  <span>{maxRounds}x</span>
                 </div>
               </div>
             )}
@@ -206,6 +211,16 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           <p className="text-white/30 text-[10px] md:text-[11px] text-center px-4 font-sans font-bold uppercase tracking-[0.15em] mt-3">
             {t.lobby.bothConditions}
           </p>
+        )}
+
+        {/* Warning about large player counts */}
+        {activePlayersCount >= 8 && (
+          <div className="mt-4 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 flex items-start gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <p className="text-amber-200/80 text-[10px] md:text-xs font-sans tracking-wide leading-relaxed">
+              Com <strong>{activePlayersCount} jogadores</strong> ativos, o máximo de opções foi automaticamente reduzido para garantir que o baralho tenha cartas suficientes para a partida inteira.
+            </p>
+          </div>
         )}
       </div>
 
