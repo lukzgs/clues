@@ -113,7 +113,7 @@ export function handleToggleSpectator(server: GameServer, requesterId: string, t
   if (target.isSpectator) {
     // Spectator → Player: check max active players
     const activePlayers = server.state.players.filter(p => !p.isSpectator);
-    const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption);
+    const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption, server.state.victoryCondition);
     if (activePlayers.length >= maxPlayers) return;
     target.isSpectator = false;
   } else {
@@ -134,7 +134,7 @@ export function handleRequestPlay(server: GameServer, playerId: string) {
 
   // Check max active players
   const activePlayers = server.state.players.filter(p => !p.isSpectator);
-  const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption);
+  const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption, server.state.victoryCondition);
   if (activePlayers.length >= maxPlayers) return;
 
   player.isSpectator = false;

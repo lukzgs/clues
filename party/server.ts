@@ -13,6 +13,7 @@ import {
 } from "../src/types";
 import { ClientMessageSchema } from "../src/schemas";
 import { getPublicState } from "./game-logic";
+import { calculateMaxPlayers } from "../src/utils/gameMath";
 import GAME_CONFIG from '../game.config.json';
 
 // Import local handlers
@@ -92,9 +93,9 @@ export default class GameServer implements Party.Server {
     };
   }
 
-  // [SPECTATOR] Returns max active players based on deck option
-  public getMaxPlayersForDeck(deckOption: DeckOption): number {
-    return deckOption === 'mixed' ? GAME_CONFIG.MAX_PLAYERS_MIXED : GAME_CONFIG.MAX_PLAYERS;
+  // [SPECTATOR] Returns max active players based on deck option and victory condition
+  public getMaxPlayersForDeck(deckOption: DeckOption, vc: ServerGameState['victoryCondition']): number {
+    return calculateMaxPlayers(deckOption, vc);
   }
 
   // ============================================

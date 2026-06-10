@@ -9,6 +9,12 @@ export function handleAddBot(server: GameServer, playerId: string) {
   if (!player?.isHost) return;
   if (server.state.phase !== GamePhase.LOBBY) return;
 
+  const activePlayersCount = server.state.players.filter(p => !p.isSpectator).length;
+  const maxActivePlayers = server.getMaxPlayersForDeck(server.state.deckOption, server.state.victoryCondition);
+  
+  if (server.state.players.length >= GAME_CONFIG.MAX_CONNECTIONS) return;
+  if (activePlayersCount >= maxActivePlayers) return;
+
   const usedColors = server.state.players.map(p => p.color);
   const bot = server.botManager.addBot(server.state.players, usedColors);
 

@@ -45,8 +45,6 @@ export class BotManager {
      * Adiciona um bot ao jogo
      */
     addBot(players: Player[], usedColors: string[]): Player | null {
-        // Limite de jogadores
-        if (players.length >= 8) return null;
 
         // Encontra cor disponível
         const availableColors = PLAYER_COLORS.filter(c => !usedColors.includes(c));

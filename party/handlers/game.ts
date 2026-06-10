@@ -34,8 +34,8 @@ export function handleStartGame(
     return;
   }
 
-  // [SPECTATOR] Verifica maximo de jogadores ativos para o deck selecionado
-  const maxPlayers = server.getMaxPlayersForDeck(deckOption);
+  // [SPECTATOR] Verifica maximo de jogadores ativos para o deck selecionado e condição de vitória
+  const maxPlayers = server.getMaxPlayersForDeck(deckOption, victoryCondition);
   if (activePlayers.length > maxPlayers) {
     return;
   }

@@ -7,8 +7,7 @@ import gameConfig from '../game.config.json';
 
 export const GAME_CONFIG = gameConfig as {
     readonly MIN_PLAYERS: number;
-    readonly MAX_PLAYERS: number;
-    readonly MAX_PLAYERS_MIXED: number;
+    readonly MAX_PLAYERS_ABSOLUTE: number;
     readonly MAX_CONNECTIONS: number;
     readonly HAND_SIZE: number;
     readonly WINNING_SCORE: number;
