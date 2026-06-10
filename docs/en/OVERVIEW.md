@@ -12,7 +12,7 @@
 | Real-time WebSocket sync | ✅ Complete |
 | Game phases (6 states) | ✅ Complete |
 | Scoring system | ✅ Complete |
-| Bot players | ✅ Complete |
+| Bot players | 🚫 Disabled (Configurable) |
 | Zod validation | ✅ Complete |
 | Rate limiting | ✅ Complete |
 | Internationalization | 🚧 Partial |
@@ -78,8 +78,8 @@ The client uses `VITE_PARTYKIT_HOST` to determine the WebSocket server address.
 
 ## Limits
 
-- **Active Players**: 6 (Original deck), 10 (Mixed deck)
-- **Total Connections**: 20 (Players + Spectators)
+- **Active Players**: Dynamically calculated based on deck size and narrator rounds (see `src/utils/gameMath.ts`), up to an absolute maximum of 10.
+- **Total Connections**: 20 (Max 10 active players, and remaining connections as spectators).
 
 ## Related Documentation
 

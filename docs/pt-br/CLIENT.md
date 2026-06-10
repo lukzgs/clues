@@ -88,7 +88,7 @@ Tela inicial para criar ou entrar em salas. Recentemente atualizada com o novo D
 | `onCancelInvite` | `(() => void) \| undefined` | Callback opcional para cancelar o modo de convite e retornar ao fluxo normal de Criação/Entrada de sala. |
 
 ### `LobbyScreen.tsx`
-Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada para mobile com um modal dedicado para configurações do host, interface localizada e lista de jogadores com rolagem interna para manter a consistência do layout em todos os dispositivos. Apresenta o sistema de design "Mythic" padronizado.
+Configurações do jogo, lista de jogadores e seleção de baralho. Otimizada para mobile com um modal dedicado para configurações do host, interface localizada e lista de jogadores com rolagem interna para manter a consistência do layout em todos os dispositivos. Apresenta o sistema de design "Mythic" padronizado e um banner de aviso exibido quando um grande número de jogadores restringe as configurações do lobby.
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
@@ -111,7 +111,7 @@ Espectadores podem voltar ao jogo usando o botão **"ENTRAR COMO JOGADOR"** no p
 
 
 ### `GameScreen.tsx`
-Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem. A pílula de código da sala é posicionada ao lado do seletor de idioma no desktop para manter alturas alinhadas, e no mobile permanece centralizada. O layout para dispositivos móveis manipula a altura total da viewport corretamente usando unidades dinâmicas (`100dvh`), garantindo que a mão do jogador permaneça visível na parte inferior da tela, independentemente das barras de ferramentas do navegador móvel.
+Interface principal do jogo com renderização baseada em fase. Apresenta um layout com placar flutuante lateral e disposição das cartas da mão em fileira única responsiva. Inclui um cabeçalho reformulado com grid de 3 colunas para centralização perfeita. O grid de cartas na mesa foi otimizado para acomodar até 5 cartas por linha em telas grandes, minimizando a necessidade de rolagem. A pílula de código da sala é posicionada ao lado do seletor de idioma no desktop para manter alturas alinhadas, e no mobile permanece centralizada. O layout para dispositivos móveis manipula a altura total da viewport corretamente usando unidades dinâmicas (`100dvh`), garantindo que a mão do jogador permaneça visível na parte inferior da tela, independentemente das barras de ferramentas do navegador móvel. Durante a Fase de Votação, a seleção de uma carta ativa automaticamente o ClueModal, e o indicador de votação foi estilizado para combinar com o tema e tipografia do jogo (Cinzel).
 
 ## Armazenamento Local e Reconexão
 O frontend salva os dados essenciais providos pelo backend no `localStorage` (sob a chave `story-weaver:active_session`, guardando `roomCode`, `playerName` e o UUID persistente `playerId`). Isso garante que os dados da sessão sobrevivam não apenas a atualizações de página (F5), mas também ao fechamento da aba ou do navegador.

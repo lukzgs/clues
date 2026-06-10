@@ -70,6 +70,7 @@ O tratamento de mensagens é delegado a módulos especializados no diretório `p
 | `resetInactivityTimer()` | Reseta o alarme de inatividade de 9 minutos |
 | `getPublicState(playerId)` | Filtra estado para jogador específico |
 | `calculateScores()` | Calcula pontuações da rodada |
+| `getMaxPlayersForDeck(deckOption, victoryCondition)` | Delega para `src/utils/gameMath.ts` para calcular dinamicamente o máximo de jogadores |
 
 ## Broadcasting
 

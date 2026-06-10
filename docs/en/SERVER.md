@@ -70,6 +70,7 @@ Message handling is delegated to specialized modules in the `party/handlers/` di
 | `resetInactivityTimer()` | Resets the 9-minute inactivity alarm |
 | `getPublicState(playerId)` | Filters state for specific player |
 | `calculateScores()` | Computes round scores |
+| `getMaxPlayersForDeck(deckOption, victoryCondition)` | Delegates to `src/utils/gameMath.ts` to compute max players dynamically |
 
 ## Broadcasting
 

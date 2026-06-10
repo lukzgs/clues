@@ -12,7 +12,7 @@
 | Sincronização WebSocket em tempo real | ✅ Completo |
 | Fases do jogo (6 estados) | ✅ Completo |
 | Sistema de pontuação | ✅ Completo |
-| Jogadores bot | ✅ Completo |
+| Jogadores bot | 🚫 Desabilitados (Configurável) |
 | Validação com Zod | ✅ Completo |
 | Rate limiting | ✅ Completo |
 | Internacionalização | 🚧 Parcial |
@@ -78,8 +78,8 @@ story-weaver/
 
 ## Limites
 
-- **Jogadores Ativos**: 6 (Baralho Original), 10 (Baralho Misto)
-- **Total de Conexões**: 20 (Jogadores + Espectadores)
+- **Jogadores Ativos**: Calculado dinamicamente com base no tamanho do baralho e rodadas de narrador (ver `src/utils/gameMath.ts`), até o limite máximo absoluto de 10.
+- **Total de Conexões**: 20 (Máximo de 10 jogadores ativos, sendo o restante espectadores).
 
 ## Documentação Relacionada
 
