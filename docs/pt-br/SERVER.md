@@ -62,6 +62,7 @@ O tratamento de mensagens é delegado a módulos especializados no diretório `p
 
 | Função | Descrição |
 |--------|-----------|
+| `sanitizeSettings(victoryCondition, phaseTimeouts)` | Restringe e valida as configurações do jogo e limites de tempo de fase para faixas válidas (DRY) |
 | `createDeck(option)` | Gera baralho dinamicamente com base na opção escolhida (`ORIGINAL`, `NEW`, ou `MIXED`) a partir de assets locais |
 | `shuffle(array)` | Embaralhamento Fisher-Yates |
 | `generatePlayerId()` | Cria ID único de jogador |

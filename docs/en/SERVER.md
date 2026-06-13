@@ -62,6 +62,7 @@ Message handling is delegated to specialized modules in the `party/handlers/` di
 
 | Function | Description |
 |----------|-------------|
+| `sanitizeSettings(victoryCondition, phaseTimeouts)` | Sanitizes and clamps game settings and phase timeouts to valid ranges (DRY) |
 | `createDeck(option)` | Generates dynamic deck based on selected option (`ORIGINAL`, `NEW`, or `MIXED`) from local assets |
 | `shuffle(array)` | Fisher-Yates shuffle |
 | `generatePlayerId()` | Creates unique player ID |
