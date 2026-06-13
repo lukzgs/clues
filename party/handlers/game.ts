@@ -5,6 +5,7 @@ import {
   calculateScores as calculateScoresPure,
   checkVictoryCondition,
 } from "../game-logic";
+import { sanitizeSettings } from "../settings-sanitizer";
 import GAME_CONFIG from '../../game.config.json';
 import type GameServer from "../server";
 
@@ -45,21 +46,10 @@ export function handleStartGame(
     return;
   }
 
-  // Apply victory condition from host
-  server.state.victoryCondition = {
-    scoreEnabled: victoryCondition.scoreEnabled,
-    targetScore: Math.max(10, Math.min(100, victoryCondition.targetScore)),
-    narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
-    narratorRounds: Math.max(1, Math.min(5, victoryCondition.narratorRounds)),
-  };
-
-  // Apply phase timeouts from host
-  server.state.phaseTimeouts = {
-    narrator: Math.max(0, Math.min(120, phaseTimeouts.narrator)),
-    othersChoosing: Math.max(0, Math.min(120, phaseTimeouts.othersChoosing)),
-    voting: Math.max(0, Math.min(120, phaseTimeouts.voting)),
-    results: Math.max(0, Math.min(120, phaseTimeouts.results)),
-  };
+  // Apply sanitized settings from host
+  const sanitized = sanitizeSettings(victoryCondition, phaseTimeouts);
+  server.state.victoryCondition = sanitized.victoryCondition;
+  server.state.phaseTimeouts = sanitized.phaseTimeouts;
 
   // Create and shuffle deck based on option
   server.state.deckOption = deckOption;
