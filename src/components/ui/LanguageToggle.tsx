@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
 
 interface LanguageToggleProps {
   className?: string;
@@ -7,6 +8,21 @@ interface LanguageToggleProps {
 
 export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "" }) => {
   const { lang, setLang } = useTranslation();
+
+  let accentText = 'text-amber-300';
+  let accentBg = 'bg-amber-500/15';
+  let accentBorder = 'border-amber-500/30';
+
+  try {
+    const { theme } = useTheme();
+    if (theme) {
+      accentText = theme.accentText;
+      accentBg = theme.accentBgLight;
+      accentBorder = theme.accentBorder;
+    }
+  } catch {
+    // Outside ThemeProvider fallback to amber
+  }
 
   const toggle = () => setLang(lang === 'pt' ? 'en' : 'pt');
 
@@ -23,31 +39,45 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "" }
         border border-white/10 rounded-xl
         shadow-lg h-10 px-1
         transition-all duration-300
-        hover:border-amber-500/40 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)]
+        hover:${accentBorder}
         cursor-pointer select-none
         ${basePosition}
         ${className}
       `}
     >
-      <LangPill label="PT" active={lang === 'pt'} />
-      <LangPill label="EN" active={lang === 'en'} />
+      <LangPill
+        label="PT"
+        active={lang === 'pt'}
+        accentText={accentText}
+        accentBg={accentBg}
+        accentBorder={accentBorder}
+      />
+      <LangPill
+        label="EN"
+        active={lang === 'en'}
+        accentText={accentText}
+        accentBg={accentBg}
+        accentBorder={accentBorder}
+      />
     </button>
   );
 };
 
-
-const LangPill: React.FC<{ label: string; active: boolean }> = ({
-  label,
-  active,
-}) => (
+const LangPill: React.FC<{
+  label: string;
+  active: boolean;
+  accentText: string;
+  accentBg: string;
+  accentBorder: string;
+}> = ({ label, active, accentText, accentBg, accentBorder }) => (
   <span
     className={`
       flex items-center justify-center
       w-10 h-[80%] rounded-lg
       font-cinzel font-bold text-[10px] tracking-[0.1em]
-      transition-all duration-200
+      transition-all duration-300
       ${active
-        ? 'text-amber-300 bg-amber-500/15 border border-amber-500/30'
+        ? `${accentText} ${accentBg} border ${accentBorder} shadow-sm`
         : 'text-white/30 bg-transparent border border-transparent'
       }
     `}

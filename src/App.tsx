@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { GamePhase } from './types';
 import { useGameRoom } from './hooks';
 import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
+import { DesignSystemScreen } from './components/design-system/DesignSystemScreen';
 import { useTranslation } from './i18n/index.tsx';
 import { GameSessionProvider, useGameSession } from './providers/GameSessionProvider';
 
@@ -16,6 +17,32 @@ function generateRoomCode(): string {
 const GameRouter: React.FC = () => {
   const { session, setSession, clearSession, urlRoomCode, clearUrlRoomCode } = useGameSession();
   const { t } = useTranslation();
+
+  // Verifica se o usuario acessou /design-system ou /sysd
+  const [isDesignSystem, setIsDesignSystem] = useState(() => {
+    const path = window.location.pathname.toLowerCase();
+    return path === '/design-system' || path === '/sysd';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      setIsDesignSystem(path === '/design-system' || path === '/sysd');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  if (isDesignSystem) {
+    return (
+      <DesignSystemScreen
+        onBackToApp={() => {
+          window.history.pushState({}, '', '/');
+          setIsDesignSystem(false);
+        }}
+      />
+    );
+  }
 
   const {
     gameState,

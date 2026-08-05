@@ -214,10 +214,26 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
         </div>
       </div>
 
-      <div className="fixed bottom-4 md:bottom-6 w-full text-center z-0 pointer-events-none" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' }}>
+      <div className="fixed bottom-4 md:bottom-6 w-full text-center z-10 flex flex-col items-center gap-1.5" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' }}>
         <p className="text-white/20 text-[10px] font-sans tracking-wide">
           {t.common.copyright}
         </p>
+        <button
+          onClick={() => {
+            window.history.pushState({}, '', '/design-system');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
+          className="text-amber-400/50 hover:text-amber-300 text-[10px] font-cinzel font-bold uppercase tracking-widest transition-colors flex items-center gap-1.5"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.71 1.7-1.63 0-.44-.18-.85-.46-1.15-.27-.3-.44-.72-.44-1.22 0-1.01.82-1.83 1.83-1.83H17c2.76 0 5-2.24 5-5 0-4.97-4.48-9-10-9z" />
+          </svg>
+          Design System & Guia de Estilo
+        </button>
       </div>
     </div>
   );
