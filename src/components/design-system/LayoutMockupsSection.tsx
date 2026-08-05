@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useTranslation } from '../../i18n/index.tsx';
+import { Button } from '../ui/Button';
 
 export const LayoutMockupsSection: React.FC = () => {
   const { theme } = useTheme();
   const { lang } = useTranslation();
-  const [activeMockupTab, setActiveMockupTab] = useState<'join' | 'lobby' | 'gameplay'>('join');
+  const [activeMockupTab, setActiveMockupTab] = useState<'join' | 'lobby' | 'gameplay'>('lobby');
   const [gamePhaseStep, setGamePhaseStep] = useState<'narrator' | 'others' | 'voting' | 'results'>('narrator');
+  const [deckOption, setDeckOption] = useState<'original' | 'new' | 'mixed'>('mixed');
+  const [scoreEnabled, setScoreEnabled] = useState(true);
 
   // Sample cards data for interactive preview
   const sampleHandCards = [
@@ -30,7 +33,7 @@ export const LayoutMockupsSection: React.FC = () => {
             Páginas Integradas & Previews de Layout Real
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Demonstração interativa dos momentos reais do jogo com a identidade visual do tema ativo <strong className={theme.accentText}>{theme.name[lang]}</strong>.
+            Demonstração interativa das telas do jogo e dos cards do Lobby com a combinação de cores do tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
           </p>
         </div>
 
@@ -76,16 +79,16 @@ export const LayoutMockupsSection: React.FC = () => {
           />
 
           <div className="w-full max-w-[380px] z-10">
-            <div className={`bg-black/50 backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 flex flex-col items-center ${theme.accentBorder}`}>
+            <div className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 flex flex-col items-center ${theme.cardBg} ${theme.accentBorder}`}>
               {/* Crown Icon */}
-              <div className={`mb-4 flex items-center justify-center w-12 h-12 rounded-full border border-white/20 bg-black/50 ring-1 ring-white/10 ${theme.glowShadow}`}>
+              <div className={`mb-4 flex items-center justify-center w-12 h-12 rounded-full border bg-black/50 ring-1 ring-white/10 ${theme.accentBgLight} ${theme.accentBorder} ${theme.glowShadow}`}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={theme.accentText}>
                   <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
                   <line x1="2" y1="19" x2="22" y2="19" />
                 </svg>
               </div>
 
-              <h3 className="text-3xl font-cinzel text-white mb-1">STORY WEAVER</h3>
+              <h3 className="text-3xl font-cinzel text-white mb-1 font-bold">STORY WEAVER</h3>
               <p className="text-[10px] font-sans text-white/40 uppercase tracking-[0.2em] mb-6">
                 DIXIT MULTIPLAYER ONLINE · {theme.badge}
               </p>
@@ -98,14 +101,14 @@ export const LayoutMockupsSection: React.FC = () => {
                 <input
                   type="text"
                   defaultValue="Narrador Místico"
-                  className={`w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3 text-white font-cinzel text-base focus:${theme.accentBorder} focus:outline-none`}
+                  className={`w-full rounded-xl px-4 py-3 font-cinzel text-base outline-none ${theme.inputBg}`}
                 />
               </div>
 
               {/* Action Buttons */}
-              <button className={`w-full font-cinzel font-bold uppercase tracking-widest rounded-xl py-3 text-sm hover:scale-[1.02] transition-transform mb-3 ${theme.primaryGradient} ${theme.glowShadow}`}>
+              <Button variant="primary" size="md" className="w-full mb-3">
                 + Criar Nova Sala
-              </button>
+              </Button>
 
               <div className="w-full flex items-center gap-3 my-2">
                 <div className="flex-1 h-px bg-white/10" />
@@ -118,100 +121,187 @@ export const LayoutMockupsSection: React.FC = () => {
                   type="text"
                   placeholder="CÓDIGO"
                   maxLength={6}
-                  className={`w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-3 py-2.5 text-white font-cinzel text-sm uppercase text-center focus:${theme.accentBorder} focus:outline-none`}
+                  className={`flex-1 rounded-xl px-3 py-2.5 font-cinzel text-sm uppercase text-center outline-none ${theme.inputBg}`}
                 />
-                <button className="bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest rounded-xl px-4 py-2.5 text-xs hover:bg-white/10 transition-colors shrink-0">
+                <Button variant="glass" size="sm" className="shrink-0 px-4">
                   Entrar →
-                </button>
+                </Button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* MOCKUP 2: LOBBY SCREEN */}
+      {/* MOCKUP 2: LOBBY SCREEN (CARDS & OPTIONS SHOWCASE) */}
       {activeMockupTab === 'lobby' && (
-        <div className="bg-black/40 border border-white/10 rounded-2xl p-6 md:p-8 relative overflow-hidden">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Options Panel */}
-            <div className="lg:w-1/2 bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                <h4 className={`font-cinzel text-lg font-bold ${theme.accentText}`}>
-                  Configurações da Sala
-                </h4>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
-                  HOST: VOCÊ
-                </span>
+        <div className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}>
+          
+          {/* Header Bar with Room Code */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center font-cinzel font-bold text-xl ${theme.accentBgLight} ${theme.accentBorder} ${theme.accentText}`}>
+                SW
               </div>
-
-              <div className="space-y-3 text-xs font-sans text-white/80">
-                <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
-                  <span>Modo do Baralho</span>
-                  <span className={`font-cinzel font-bold ${theme.accentText}`}>Misto (341 Cartas)</span>
-                </div>
-                <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
-                  <span>Pontuação Alvo para Vitória</span>
-                  <span className={`font-cinzel font-bold ${theme.accentText}`}>30 Pontos</span>
-                </div>
-                <div className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
-                  <span>Temporizador de Rodada</span>
-                  <span className="font-cinzel font-bold text-emerald-400">Ativo (60s)</span>
-                </div>
+              <div>
+                <h3 className="font-cinzel text-2xl font-bold text-white tracking-wide">
+                  Lobby da Sala
+                </h3>
+                <p className="text-xs font-sans text-white/50">
+                  Visualização em tempo real dos cards e paleta do tema <strong className={theme.accentText}>{theme.name[lang]}</strong>
+                </p>
               </div>
-
-              <button className={`w-full font-cinzel font-bold uppercase tracking-widest rounded-xl py-3 text-xs hover:scale-[1.01] transition-transform ${theme.primaryGradient} ${theme.glowShadow}`}>
-                Iniciar Partida Agora
-              </button>
             </div>
 
-            {/* Players Panel */}
-            <div className="lg:w-1/2 bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                <h4 className="font-cinzel text-lg text-white font-bold">
-                  Jogadores na Sala (4/8)
+            {/* Room Code Badge */}
+            <div className={`rounded-xl px-6 py-3 border text-center font-cinzel font-bold text-xl tracking-[0.2em] ${theme.innerCardBg} ${theme.accentText} ${theme.accentBorder}`}>
+              CÓDIGO: <span className="underline">ROOM99</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Panel: Game Options */}
+            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h4 className={`font-cinzel text-base font-bold tracking-wider ${theme.accentText}`}>
+                  Opções da Partida (GameOptions)
                 </h4>
-                <span className="text-[10px] font-sans text-emerald-400 uppercase tracking-widest">
-                  Prontos para Jogar
+                <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-lg border font-bold ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
+                  HOST
                 </span>
               </div>
 
-              <div className="space-y-2">
-                {[
-                  { name: 'Você (Narrador)', isHost: true, isBot: false, initial: 'V', color: `${theme.accentBgLight} ${theme.accentBorder} ${theme.accentText}` },
-                  { name: 'Sofia Mística', isHost: false, isBot: false, initial: 'S', color: 'bg-purple-500/20 border-purple-500/40 text-purple-300' },
-                  { name: 'Lucas_GS', isHost: false, isBot: false, initial: 'L', color: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' },
-                  { name: 'Bot Dixit Alpha', isHost: false, isBot: true, initial: 'B', color: 'bg-sky-500/20 border-sky-500/40 text-sky-300' },
-                ].map((player, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-black/40 border border-white/5 rounded-xl px-4 py-2.5">
-                    <div className="flex items-center gap-3">
-                      {player.isBot ? (
-                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 ${player.color}`}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="11" width="18" height="10" rx="2" />
-                            <circle cx="8.5" cy="16" r="1.5" />
-                            <circle cx="15.5" cy="16" r="1.5" />
-                            <path d="M12 2v9" />
-                          </svg>
-                        </div>
-                      ) : (
-                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-cinzel font-bold text-xs shrink-0 ${player.color}`}>
-                          {player.initial}
-                        </div>
-                      )}
-                      <span className="font-cinzel text-sm text-white font-semibold">{player.name}</span>
+              {/* Score condition card */}
+              <div className={`rounded-xl border p-3.5 space-y-3 transition-all duration-300 ${theme.innerCardBg} ${theme.accentBorder}`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-cinzel font-bold text-sm text-white">Por Pontuação Alvo</span>
+                  <button
+                    onClick={() => setScoreEnabled(!scoreEnabled)}
+                    className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${
+                      scoreEnabled ? theme.primaryGradient : 'bg-white/10'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
+                      scoreEnabled ? 'translate-x-5' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </div>
+                {scoreEnabled && (
+                  <div className="space-y-2 pt-1 border-t border-white/5">
+                    <div className="flex justify-between text-xs text-white/60 font-sans">
+                      <span>Primeiro a atingir 30 pontos</span>
+                      <span className={`font-mono font-bold ${theme.accentText}`}>30 PTS</span>
                     </div>
+                    <input
+                      type="range"
+                      min={10}
+                      max={100}
+                      defaultValue={30}
+                      className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                      style={{ accentColor: 'currentColor' }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Deck Selection Pills */}
+              <div className="space-y-2">
+                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">
+                  Seleção de Baralho (Deck Option)
+                </label>
+                <div className={`flex border rounded-xl p-1 relative z-0 transition-all duration-300 ${theme.innerCardBg}`}>
+                  <div
+                    className={`absolute inset-y-1 rounded-lg transition-all duration-300 z-[-1] ${theme.accentBgLight} border ${theme.accentBorder}`}
+                    style={{
+                      width: 'calc(33.333% - 4px)',
+                      left: deckOption === 'original' ? '4px' : deckOption === 'new' ? 'calc(33.333% + 2px)' : 'calc(66.666%)',
+                    }}
+                  />
+                  {(['original', 'new', 'mixed'] as const).map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => setDeckOption(option)}
+                      className={`flex-1 py-2 text-xs font-cinzel font-bold tracking-widest transition-colors uppercase rounded-lg ${
+                        deckOption === option ? theme.accentText : 'text-white/40 hover:text-white/80'
+                      }`}
+                    >
+                      {option === 'original' ? 'Original' : option === 'new' ? 'Novo' : 'Misto'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons using SysD Button */}
+              <div className="space-y-2.5 pt-2">
+                <Button variant="primary" size="md" className="w-full">
+                  Iniciar Partida Agora
+                </Button>
+                <Button variant="outline" size="md" className="w-full">
+                  + Adicionar Bot
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Panel: Player List Cards */}
+            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <h4 className="font-cinzel text-base font-bold text-white tracking-wider">
+                  Jogadores na Sala (Player Cards)
+                </h4>
+                <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                  4 / 8 Conectados
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { name: 'Você (Host)', isHost: true, isBot: false, isCurrent: true, color: '#f59e0b' },
+                  { name: 'Sofia Mística', isHost: false, isBot: false, isCurrent: false, color: '#a855f7' },
+                  { name: 'Lucas_GS', isHost: false, isBot: false, isCurrent: false, color: '#10b981' },
+                  { name: 'Bot Dixit Alpha', isHost: false, isBot: true, isCurrent: false, color: '#0ea5e9' },
+                ].map((player, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 shadow-sm ${
+                      player.isCurrent
+                        ? `${theme.accentBgLight} ${theme.accentBorder}`
+                        : `${theme.innerCardBg} border-white/10 hover:${theme.accentBorder}`
+                    }`}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-white font-cinzel font-bold text-sm shrink-0 shadow-lg border border-white/10"
+                      style={{ backgroundColor: player.color }}
+                    >
+                      {player.name.charAt(0)}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <span className={`font-cinzel font-bold text-xs block truncate ${player.isCurrent ? theme.accentText : 'text-white'}`}>
+                        {player.name}
+                      </span>
+                      <span className="text-white/40 text-[10px] font-sans uppercase tracking-wider block">
+                        {player.isBot ? 'Jogador Bot' : 'Conectado'}
+                      </span>
+                    </div>
+
                     {player.isHost && (
-                      <span className={`text-[9px] font-sans uppercase tracking-widest px-2 py-0.5 rounded border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
-                        Host
-                      </span>
-                    )}
-                    {player.isBot && (
-                      <span className="text-[9px] font-sans uppercase tracking-widest text-sky-300 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
-                        Bot
-                      </span>
+                      <div className={`w-6 h-6 flex items-center justify-center rounded-lg border ${theme.accentBgLight} ${theme.accentBorder} ${theme.accentText} shrink-0`}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
+                        </svg>
+                      </div>
                     )}
                   </div>
                 ))}
+              </div>
+
+              {/* Spectators Box */}
+              <div className="pt-2">
+                <div className={`border rounded-xl p-3 flex items-center justify-between ${theme.innerCardBg}`}>
+                  <span className="text-xs font-cinzel font-bold text-white/70">Espectadores (1)</span>
+                  <Button variant="ghost" size="xs">
+                    Tornar-se Espectador
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -267,11 +357,11 @@ export const LayoutMockupsSection: React.FC = () => {
                     value={clueText}
                     onChange={(e) => setClueText(e.target.value)}
                     placeholder="Digite uma frase ou expressão mística..."
-                    className={`flex-1 bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-3 text-white font-serif text-lg italic focus:outline-none focus:${theme.accentBorder}`}
+                    className={`flex-1 rounded-xl px-4 py-3 text-white font-cinzel text-lg italic outline-none ${theme.inputBg}`}
                   />
-                  <button className={`font-cinzel font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl hover:scale-[1.02] transition-transform shrink-0 ${theme.primaryGradient} ${theme.glowShadow}`}>
+                  <Button variant="primary" size="md" className="shrink-0">
                     Enviar Pista
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -320,9 +410,9 @@ export const LayoutMockupsSection: React.FC = () => {
                 {sampleHandCards.map(card => (
                   <div key={card.id} className={`h-44 rounded-2xl border border-white/10 bg-black/40 p-4 flex flex-col justify-between hover:${theme.accentBorder} hover:-translate-y-1 transition-all cursor-pointer`}>
                     <span className="text-[10px] font-mono text-white/40">Carta #{card.id}</span>
-                    <button className={`w-full font-cinzel font-bold text-xs uppercase tracking-wider py-2 rounded-xl transition-all ${theme.primaryGradient}`}>
+                    <Button variant="primary" size="sm" className="w-full">
                       Jogar Esta
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -345,9 +435,9 @@ export const LayoutMockupsSection: React.FC = () => {
                       <span className={`text-xs font-cinzel font-bold ${theme.accentText}`}>Opção {idx}</span>
                       <span className="text-[10px] font-sans text-white/30">Mesa</span>
                     </div>
-                    <button className={`w-full font-cinzel font-bold text-xs uppercase tracking-widest py-2.5 rounded-xl transition-all ${theme.primaryGradient}`}>
+                    <Button variant="primary" size="sm" className="w-full">
                       Votar Carta {idx}
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -362,13 +452,13 @@ export const LayoutMockupsSection: React.FC = () => {
                   <span className="text-[10px] font-sans uppercase tracking-[0.2em] text-emerald-400 font-medium">Resultado da Rodada</span>
                   <h4 className="text-lg font-cinzel font-bold text-white">2 Jogadores acertaram a carta do Narrador!</h4>
                 </div>
-                <button className={`font-cinzel font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-xl hover:scale-105 transition-transform ${theme.primaryGradient}`}>
+                <Button variant="primary" size="sm">
                   Próxima Rodada →
-                </button>
+                </Button>
               </div>
 
               {/* Leaderboard Table */}
-              <div className="bg-black/50 border border-white/10 rounded-2xl p-5 space-y-3">
+              <div className={`border rounded-2xl p-5 space-y-3 ${theme.innerCardBg}`}>
                 <h5 className={`text-xs font-cinzel font-bold uppercase tracking-wider ${theme.accentText}`}>
                   Placar Geral da Sala
                 </h5>
@@ -378,7 +468,7 @@ export const LayoutMockupsSection: React.FC = () => {
                     { rank: '2º', name: 'Você (Narrador)', pts: '15 pts', change: '+3 pts' },
                     { rank: '3º', name: 'Lucas_GS', pts: '12 pts', change: '+0 pts' },
                   ].map((row, i) => (
-                    <div key={i} className="flex items-center justify-between bg-[#1A1A1A]/40 border border-white/5 rounded-xl px-4 py-3 text-sm font-sans">
+                    <div key={i} className={`flex items-center justify-between border border-white/5 rounded-xl px-4 py-3 text-sm font-sans ${theme.innerCardBg}`}>
                       <div className="flex items-center gap-3">
                         <span className={`font-cinzel font-bold text-base ${theme.accentText}`}>{row.rank}</span>
                         <span className="text-white font-medium">{row.name}</span>

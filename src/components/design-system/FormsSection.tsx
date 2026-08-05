@@ -9,12 +9,14 @@ interface FormsSectionProps {
 export const FormsSection: React.FC<FormsSectionProps> = () => {
   const { theme } = useTheme();
   const { lang } = useTranslation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [inputText, setInputText] = useState('Narrador123');
-  const [selectValue, setSelectValue] = useState('mixed');
-  const [checkboxChecked, setCheckboxChecked] = useState(true);
-  const [radioSelected, setRadioSelected] = useState('score');
-  const [switchOn, setSwitchOn] = useState(true);
+  const [deckOption, setDeckOption] = useState<'original' | 'new' | 'mixed'>('mixed');
+  const [targetScore, setTargetScore] = useState(30);
+  const [scoreEnabled, setScoreEnabled] = useState(true);
+  const [timerEnabled, setTimerEnabled] = useState(true);
+  const [timeoutNarrator, setTimeoutNarrator] = useState(60);
   const [textareaValue, setTextareaValue] = useState('Uma pista misteriosa envolvendo sonhos e ilusões antigas...');
 
   return (
@@ -28,14 +30,14 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
             Formulários & Inputs
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Elementos de formulário adaptados ao tema ativo <strong className={theme.accentText}>{theme.name[lang]}</strong>, com estados de foco, sucesso e erro proeminentes.
+            Elementos de formulário e componentes de controle interativos fiéis ao Lobby e adaptados ao tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT COLUMN: TEXT INPUTS & VALIDATION STATES */}
-        <div className="bg-black/30 border border-white/10 rounded-2xl p-6 space-y-6">
+        <div className={`border rounded-2xl p-6 space-y-6 transition-all duration-500 ${theme.innerCardBg}`}>
           <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
             1. Entradas de Texto & Validação
           </h3>
@@ -50,7 +52,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Digite seu apelido..."
-              className={`w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:${theme.accentBorder} focus:bg-[#1A1A1A]/80 focus:ring-1 transition-all font-cinzel text-lg`}
+              className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
             />
           </div>
 
@@ -63,7 +65,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 defaultValue="Clues2026Secret"
-                className={`w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl pl-4 pr-11 py-3.5 text-white placeholder-white/20 focus:outline-none focus:${theme.accentBorder} focus:ring-1 transition-all font-cinzel text-lg`}
+                className={`w-full rounded-xl pl-4 pr-11 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
               />
               <button
                 type="button"
@@ -86,6 +88,24 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
             </div>
           </div>
 
+          {/* Textarea for Clue */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center pl-1">
+              <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
+                Pista do Narrador (Textarea)
+              </label>
+              <span className="text-[10px] font-mono text-white/40">
+                {textareaValue.length}/100
+              </span>
+            </div>
+            <textarea
+              rows={3}
+              value={textareaValue}
+              onChange={(e) => setTextareaValue(e.target.value.slice(0, 100))}
+              className={`w-full rounded-xl p-3.5 text-sm font-sans outline-none ring-1 ring-white/5 resize-none transition-all ${theme.inputBg}`}
+            />
+          </div>
+
           {/* Success Validation State */}
           <div className="space-y-1.5">
             <label className="block text-emerald-400/80 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
@@ -102,140 +122,146 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                 ✓
               </span>
             </div>
-            <p className="text-[10px] text-emerald-400/90 font-sans tracking-wide pl-1">
-              Código verificado e disponível para entrada.
-            </p>
-          </div>
-
-          {/* Error Validation State */}
-          <div className="space-y-1.5">
-            <label className="block text-red-400/80 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
-              Código da Sala (Estado de Erro)
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                readOnly
-                value="INVALID"
-                className="w-full bg-red-950/30 border border-red-500/60 rounded-xl px-4 py-3.5 text-red-200 font-cinzel text-lg focus:outline-none ring-1 ring-red-500/40"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-400 font-bold">
-                ✕
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 text-red-400 text-[10px] uppercase tracking-[0.15em] font-sans font-medium pl-1 pt-0.5">
-              <span>Código de sala inválido ou inexistente.</span>
-            </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: SELECT, CHECKBOX, RADIO, TEXTAREA & SWITCH */}
-        <div className="bg-black/30 border border-white/10 rounded-2xl p-6 space-y-6">
+        {/* RIGHT COLUMN: REAL LOBBY COMPONENTS & CONTROLS */}
+        <div className={`border rounded-2xl p-6 space-y-6 transition-all duration-500 ${theme.innerCardBg}`}>
           <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
-            2. Controles de Seleção & Opções
+            2. Controles de Seleção & Opções do Lobby
           </h3>
 
-          {/* Select Dropdown */}
-          <div className="space-y-1.5">
+          {/* Deck Selection Pills Switcher */}
+          <div className="space-y-2">
             <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
-              Modo do Baralho (Custom Select)
+              Seleção de Baralho (Pill Switcher)
             </label>
-            <select
-              value={selectValue}
-              onChange={(e) => setSelectValue(e.target.value)}
-              className={`w-full bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-4 py-3.5 text-white font-cinzel text-base focus:outline-none focus:${theme.accentBorder}`}
-            >
-              <option value="mixed" className="bg-[#1A1A1A] text-white">Baralho Misto (341 Cartas)</option>
-              <option value="classic" className="bg-[#1A1A1A] text-white">Edição Clássica Dixit</option>
-              <option value="surreal" className="bg-[#1A1A1A] text-white">Expansão Surrealismo</option>
-            </select>
-          </div>
-
-          {/* Textarea with Character Counter */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center pl-1">
-              <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
-                Pista do Narrador (Textarea)
-              </label>
-              <span className="text-[10px] font-mono text-white/40">
-                {textareaValue.length}/100
-              </span>
+            <div className={`flex border rounded-xl p-1 relative z-0 transition-all duration-300 ${theme.innerCardBg}`}>
+              <div
+                className={`absolute inset-y-1 rounded-lg transition-all duration-300 z-[-1] ${theme.accentBgLight} border ${theme.accentBorder}`}
+                style={{
+                  width: 'calc(33.333% - 4px)',
+                  left: deckOption === 'original' ? '4px' : deckOption === 'new' ? 'calc(33.333% + 2px)' : 'calc(66.666%)',
+                }}
+              />
+              {(['original', 'new', 'mixed'] as const).map((option) => (
+                <button
+                  key={option}
+                  onClick={() => setDeckOption(option)}
+                  className={`flex-1 py-2 text-[10px] md:text-xs font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg ${
+                    deckOption === option ? theme.accentText : 'text-white/40 hover:text-white/80'
+                  }`}
+                >
+                  {option === 'original' ? 'Original' : option === 'new' ? 'Novo' : 'Misto'}
+                </button>
+              ))}
             </div>
-            <textarea
-              rows={3}
-              value={textareaValue}
-              onChange={(e) => setTextareaValue(e.target.value.slice(0, 100))}
-              className={`w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl p-3.5 text-white text-sm font-sans focus:outline-none focus:${theme.accentBorder} resize-none`}
-            />
           </div>
 
-          {/* Radio Buttons & Checkboxes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Radio Group */}
-            <div className="space-y-2">
-              <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
-                Condição de Vitória (Radio)
-              </span>
-              <div className="space-y-2 bg-black/40 border border-white/5 rounded-xl p-3">
-                <label className="flex items-center gap-2.5 text-xs text-white/80 cursor-pointer font-sans">
-                  <input
-                    type="radio"
-                    name="victoryCond"
-                    value="score"
-                    checked={radioSelected === 'score'}
-                    onChange={() => setRadioSelected('score')}
-                    className="focus:ring-0 bg-black/60 border-white/20"
-                  />
-                  Pontuação Alvo (30 pts)
-                </label>
-                <label className="flex items-center gap-2.5 text-xs text-white/80 cursor-pointer font-sans">
-                  <input
-                    type="radio"
-                    name="victoryCond"
-                    value="rounds"
-                    checked={radioSelected === 'rounds'}
-                    onChange={() => setRadioSelected('rounds')}
-                    className="focus:ring-0 bg-black/60 border-white/20"
-                  />
-                  Limite de Rodadas
-                </label>
+          {/* Condition Card with Switch & Range Slider */}
+          <div className="space-y-2">
+            <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+              Card de Regra com Switch & Range Slider
+            </label>
+            <div className={`rounded-2xl border transition-all duration-300 ${
+              scoreEnabled ? `${theme.innerCardBg} ${theme.accentBorder}` : 'bg-black/20 border-white/5 opacity-50'
+            }`}>
+              <div className="flex items-center justify-between p-3 pb-2">
+                <span className={`text-xs md:text-sm font-cinzel font-bold tracking-wider ${scoreEnabled ? 'text-white' : 'text-white/30'}`}>
+                  Por Pontuação Alvo
+                </span>
+                <button
+                  onClick={() => setScoreEnabled(!scoreEnabled)}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${
+                    scoreEnabled ? theme.primaryGradient : 'bg-white/10'
+                  }`}
+                  aria-label="Toggle score condition"
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-lg transition-transform duration-300 ${
+                    scoreEnabled ? 'translate-x-5' : 'translate-x-0'
+                  }`} />
+                </button>
               </div>
-            </div>
 
-            {/* Checkbox & Switch */}
-            <div className="space-y-2">
-              <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
-                Toggles & Opções
-              </span>
-              <div className="space-y-3 bg-black/40 border border-white/5 rounded-xl p-3">
-                <label className="flex items-center justify-between text-xs text-white/80 cursor-pointer font-sans">
-                  <span>Permitir Bots</span>
+              {scoreEnabled && (
+                <div className="px-3 pb-3 pt-0.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-sans font-bold">Primeiro a Atingir</span>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        min={10}
+                        max={100}
+                        step={5}
+                        value={targetScore}
+                        onChange={(e) => setTargetScore(Number(e.target.value))}
+                        className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none`}
+                      />
+                      <span className="text-white/30 text-[9px] font-sans font-bold uppercase">PTS</span>
+                    </div>
+                  </div>
                   <input
-                    type="checkbox"
-                    checked={checkboxChecked}
-                    onChange={(e) => setCheckboxChecked(e.target.checked)}
-                    className="rounded focus:ring-0 bg-black/60 border-white/20"
+                    type="range"
+                    min={10}
+                    max={100}
+                    step={5}
+                    value={targetScore}
+                    onChange={(e) => setTargetScore(Number(e.target.value))}
+                    className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                    style={{ accentColor: 'currentColor' }}
                   />
-                </label>
-
-                <div className="flex items-center justify-between text-xs text-white/80 font-sans border-t border-white/5 pt-2">
-                  <span>Temporizador Ativo</span>
-                  <button
-                    type="button"
-                    onClick={() => setSwitchOn(!switchOn)}
-                    className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-colors duration-300 ${
-                      switchOn ? `${theme.primaryGradient}` : 'bg-white/10'
-                    }`}
-                  >
-                    <div
-                      className={`bg-black w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
-                        switchOn ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
                 </div>
-              </div>
+              )}
             </div>
+          </div>
+
+          {/* Phase Timeout Control Card */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between pl-1">
+              <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
+                Temporizador de Fase (Card + Slider)
+              </label>
+              <button
+                onClick={() => setTimerEnabled(!timerEnabled)}
+                className={`relative w-9 h-4.5 rounded-full transition-colors duration-300 ${
+                  timerEnabled ? theme.primaryGradient : 'bg-white/10'
+                }`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow transition-transform duration-300 ${
+                  timerEnabled ? 'translate-x-4' : 'translate-x-0'
+                }`} />
+              </button>
+            </div>
+
+            {timerEnabled && (
+              <div className={`border rounded-xl p-3 space-y-2 transition-all duration-300 ${theme.innerCardBg}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-cinzel font-bold text-white/80">Fase 1: Escolha do Narrador</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min={0}
+                      max={120}
+                      step={1}
+                      value={timeoutNarrator}
+                      onChange={(e) => setTimeoutNarrator(Number(e.target.value))}
+                      className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none`}
+                    />
+                    <span className="text-white/30 text-[9px] font-sans font-bold uppercase">SEG</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={120}
+                  step={1}
+                  value={timeoutNarrator}
+                  onChange={(e) => setTimeoutNarrator(Number(e.target.value))}
+                  className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                  style={{ accentColor: 'currentColor' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

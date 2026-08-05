@@ -93,7 +93,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
         {statsData.map((stat, idx) => (
           <div
             key={idx}
-            className={`bg-black/30 border border-white/10 rounded-2xl p-5 hover:${theme.accentBorder} transition-all duration-300 flex flex-col justify-between group`}
+            className={`border rounded-2xl p-5 hover:${theme.accentBorder} transition-all duration-500 flex flex-col justify-between group ${theme.innerCardBg}`}
           >
             <div>
               <div className="flex items-center justify-between mb-3">

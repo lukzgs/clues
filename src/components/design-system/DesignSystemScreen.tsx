@@ -8,6 +8,7 @@ import { FeedbackSection } from './FeedbackSection';
 import { LayoutMockupsSection } from './LayoutMockupsSection';
 import { ThemeProvider, useTheme, THEMES, ThemeId } from '../../providers/ThemeProvider';
 import { LanguageToggle } from '../ui/LanguageToggle';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { useTranslation } from '../../i18n/index.tsx';
 
 interface ToastMessage {
@@ -165,8 +166,9 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
             })}
           </div>
 
-          {/* Header Actions: Language Switcher + Return to App */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Header Actions: Theme Switcher + Language Switcher + Return to App */}
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            <ThemeToggle className="relative! top-auto! right-auto! z-auto!" />
             <LanguageToggle className="relative! top-auto! right-auto! z-auto!" />
 
             <button
