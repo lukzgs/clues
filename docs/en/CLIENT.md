@@ -28,6 +28,37 @@ A React context provider that manages browser session storage and URL query para
 
 ---
 
+### `ThemeProvider` (`src/providers/ThemeProvider.tsx`)
+
+A React context provider that manages the active visual theme preset across the application.
+
+**Key Responsibilities:**
+- Provides 5 distinct theme presets: **Mystic Gold**, **Transparent Crystal**, **Violet Eclipse**, **Deep Crimson**, and **Ethereal Mist**.
+- Supports bilingual theme names and descriptions (`pt` and `en`) synchronized with the `LanguageToggle` state.
+- Exposes `useTheme()` hook for dynamic color, glow, and border adaptations across UI components.
+
+---
+
+## Design System & Showcase Page
+
+### `DesignSystemScreen` (`src/components/design-system/DesignSystemScreen.tsx`)
+
+Interactive Design System and Style Showcase accessible via `/design-system` or `/sysd`.
+
+**Features:**
+- **Live Theme Selector Bar**: Allows instant switching between all 5 themes with real-time adaptation of cards, buttons, inputs, and background ambient lighting.
+- **Header Language Toggle**: Dynamically switches all text, theme names, and section titles between Portuguese (PT-BR) and English (EN-US).
+- **7 Complete Sections**:
+  1. *Colors & Surfaces*: Swatches with HEX, RGB, and Tailwind classes.
+  2. *Typography*: Live interactive phrase tester.
+  3. *Button System*: Matrix and interactive playground.
+  4. *Form Controls*: Text inputs, password eye toggle, custom selects, textareas, checkboxes, radio buttons, and switches.
+  5. *Data Cards & Metrics*: Statistical metric cards and interactive glass modal dialogs.
+  6. *Notifications & Feedback*: Static inline alerts and dynamic floating toast triggers.
+  7. *Real Layout Previews*: Interactive mockups for Join Screen, Lobby Screen, and all 4 Dixit gameplay phases.
+
+---
+
 ## Hooks
 
 ### `useGameRoom` (`src/hooks/useGameRoom.ts`)

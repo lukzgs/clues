@@ -28,6 +28,37 @@ Provedor de contexto React que gerencia o armazenamento de sessões no navegador
 
 ---
 
+### `ThemeProvider` (`src/providers/ThemeProvider.tsx`)
+
+Provedor de contexto React que gerencia o tema visual ativo em toda a aplicação.
+
+**Responsabilidades Principais:**
+- Prove 5 predefinições de temas distintos: **Ouro Místico**, **Cristal Transparente**, **Eclipse Violeta**, **Carmim Profundo** e **Névoa Etérea**.
+- Suporta nomes e descrições bilingues de temas (`pt` e `en`) sincronizados com o estado do `LanguageToggle`.
+- Expõe o hook `useTheme()` para adaptação dinâmica de cores, brilhos e bordas nos componentes de UI.
+
+---
+
+## Design System & Showcase Page
+
+### `DesignSystemScreen` (`src/components/design-system/DesignSystemScreen.tsx`)
+
+Página interativa de documentação e showcase do Design System e Guia de Estilo, acessível via `/design-system` ou `/sysd`.
+
+**Funcionalidades:**
+- **Seletor de Temas ao Vivo**: Permite a troca instantânea entre os 5 temas com reatividade em tempo real de cards, botões, inputs e iluminação ambiente.
+- **Alternador de Idioma no Cabeçalho**: Traduz dinamicamente todos os textos, nomes de temas e seções entre Português (PT-BR) e Inglês (EN-US).
+- **7 Seções Completas**:
+  1. *Cores & Superfícies*: Swatches com classes HEX, RGB e Tailwind.
+  2. *Tipografia*: Testador interativo de frases em tempo real.
+  3. *Sistema de Botões*: Matriz completa e playground interativo.
+  4. *Controles de Formulário*: Entradas de texto, alternância de exibição de senha, selects customizados, textareas, checkboxes, radio buttons e switches.
+  5. *Cards & Métricas*: Cards de estatísticas e modais de confirmação em vidro.
+  6. *Notificações & Feedback*: Alertas estáticos e disparadores de toasts flutuantes.
+  7. *Previews de Layout Real*: Previews das telas de Join, Lobby e as 4 fases do jogo Dixit.
+
+---
+
 ## Hooks
 
 ### `useGameRoom` (`src/hooks/useGameRoom.ts`)
