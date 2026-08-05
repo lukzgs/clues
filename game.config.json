@@ -8,5 +8,5 @@
     "NEW_DECK_SIZE": 341,
     "DEFAULT_NARRATOR_ROUNDS": 2,
     "PHASE_TIMEOUT_MS": 60000,
-    "ENABLE_BOTS": true
+    "ENABLE_BOTS": false
 }

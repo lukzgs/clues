@@ -13,6 +13,7 @@ import {
   VoteSchema, 
   RemoveBotSchema 
 } from '../../schemas/messages';
+import { GAME_CONFIG } from '../../constants';
 
 interface UseGameActionsProps {
   send: (message: object) => void;
@@ -97,10 +98,12 @@ export function useGameActions({ send, setError, socketRef }: UseGameActionsProp
 
   // [BOT] Ações de bots
   const addBot = useCallback(() => {
+    if (!GAME_CONFIG.ENABLE_BOTS) return;
     send({ type: ClientMessageType.ADD_BOT });
   }, [send]);
 
   const removeBot = useCallback((botId: string) => {
+    if (!GAME_CONFIG.ENABLE_BOTS) return;
     const result = RemoveBotSchema.safeParse({
       type: 'REMOVE_BOT',
       botId
