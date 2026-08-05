@@ -43,7 +43,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
       <p className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-4 pl-2 font-sans font-semibold shrink-0">
         {t.lobby.players} ({activePlayers.length}/{maxPlayersForDeck}){spectators.length > 0 && <span className="text-white/25"> · {spectators.length} {spectators.length !== 1 ? t.lobby.spectators : t.lobby.spectator_one}</span>}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-2 pb-2 custom-scrollbar">
         {gameState.players.map((player) => (
           <div
             key={player.id}

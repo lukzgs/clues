@@ -36,7 +36,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   const maxRounds = calculateMaxNarratorRounds(deckOption, activePlayersCount);
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full">
+    <div className="flex-1 min-h-0 overflow-y-auto pr-2 pb-2 custom-scrollbar">
       <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-3 font-sans font-bold shrink-0">
         {t.lobby.gameOptions}
       </p>
