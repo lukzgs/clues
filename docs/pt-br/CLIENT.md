@@ -33,9 +33,27 @@ Provedor de contexto React que gerencia o armazenamento de sessões no navegador
 Provedor de contexto React que gerencia o tema visual ativo em toda a aplicação.
 
 **Responsabilidades Principais:**
-- Prove 5 predefinições de temas distintos: **Ouro Místico**, **Cristal Transparente**, **Eclipse Violeta**, **Carmim Profundo** e **Névoa Etérea**.
-- Suporta nomes e descrições bilingues de temas (`pt` e `en`) sincronizados com o estado do `LanguageToggle`.
+- Provê 5 predefinições de temas distintos: **Ouro Místico**, **Cristal Transparente**, **Eclipse Violeta**, **Carmim Profundo** e **Névoa Etérea**.
+- Configura os tokens dinâmicos de tema incluindo `bgCanvas`, `ambientOrb`, `cardBg` (`backdrop-blur-2xl`), `innerCardBg` (`backdrop-blur-xl`), `inputBg`, `secondaryBtnBg`, `primaryGradient`, `accentText`, `accentBorder` e `glowShadow`.
 - Expõe o hook `useTheme()` para adaptação dinâmica de cores, brilhos e bordas nos componentes de UI.
+- Alimenta o fundo de iluminação ambiente fixo (`w-[700px] h-[700px] top-[20%] z-0`) que brilha através dos painéis de vidro fosco translúcido em todas as telas.
+
+---
+
+## Sistema de Componentes de UI
+
+### `Button` (`src/components/ui/Button.tsx`)
+
+Fonte única da verdade para todos os botões da aplicação, espelhando diretamente as 5 variantes do SysD.
+
+**Variantes:**
+- `primary`: Botão principal com gradiente do tema ativo (dourado/âmbar ou equivalente).
+- `glass`: Botão translúcido com glassmorfismo (`bg-white/5 border-white/10 hover:bg-white/10`).
+- `outline`: Botão contornado com texto e bordas na cor de acento do tema ativo.
+- `destructive`: Botão estilo carmim/rubi em vidro para ações destrutivas ou de saída/expulsão.
+- `ghost`: Botão transparente sem bordas para ações secundárias.
+
+**Tamanhos:** `xs`, `sm`, `md`, `lg`. Suporta `isLoading`, `icon`, `iconPosition` e atributos nativos de botão HTML.
 
 ---
 
@@ -51,11 +69,11 @@ Página interativa de documentação e showcase do Design System e Guia de Estil
 - **7 Seções Completas**:
   1. *Cores & Superfícies*: Swatches com classes HEX, RGB e Tailwind.
   2. *Tipografia*: Testador interativo de frases em tempo real.
-  3. *Sistema de Botões*: Matriz completa e playground interativo.
+  3. *Sistema de Botões*: Matriz completa e playground interativo usando `<Button>`.
   4. *Controles de Formulário*: Entradas de texto, alternância de exibição de senha, selects customizados, textareas, checkboxes, radio buttons e switches.
   5. *Cards & Métricas*: Cards de estatísticas e modais de confirmação em vidro.
   6. *Notificações & Feedback*: Alertas estáticos e disparadores de toasts flutuantes.
-  7. *Previews de Layout Real*: Previews das telas de Join, Lobby e as 4 fases do jogo Dixit.
+  7. *Previews de Layout Real*: Previews interativos das telas de Join, Lobby completo (com cards de opções, seletor de baralho e lista de jogadores) e as 4 fases do jogo Dixit.
 
 ---
 

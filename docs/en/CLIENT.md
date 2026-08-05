@@ -34,8 +34,26 @@ A React context provider that manages the active visual theme preset across the 
 
 **Key Responsibilities:**
 - Provides 5 distinct theme presets: **Mystic Gold**, **Transparent Crystal**, **Violet Eclipse**, **Deep Crimson**, and **Ethereal Mist**.
-- Supports bilingual theme names and descriptions (`pt` and `en`) synchronized with the `LanguageToggle` state.
+- Configures dynamic theme tokens including `bgCanvas`, `ambientOrb`, `cardBg` (`backdrop-blur-2xl`), `innerCardBg` (`backdrop-blur-xl`), `inputBg`, `secondaryBtnBg`, `primaryGradient`, `accentText`, `accentBorder`, and `glowShadow`.
 - Exposes `useTheme()` hook for dynamic color, glow, and border adaptations across UI components.
+- Powers the fixed ambient lighting background (`w-[700px] h-[700px] top-[20%] z-0`) shining through frosted glass panels across all screens.
+
+---
+
+## UI Components System
+
+### `Button` (`src/components/ui/Button.tsx`)
+
+Single source of truth for all buttons in the application, directly mirroring the 5 SysD variants.
+
+**Variants:**
+- `primary`: Amber/gold or theme primary gradient CTA button.
+- `glass`: Translucent glassmorphism button (`bg-white/5 border-white/10 hover:bg-white/10`).
+- `outline`: Bordered button with active theme accent text.
+- `destructive`: Crimson red glass button for leave/kick/destructive actions.
+- `ghost`: Transparent borderless button for secondary actions.
+
+**Sizes:** `xs`, `sm`, `md`, `lg`. Supports `isLoading`, `icon`, `iconPosition`, and standard HTML button attributes.
 
 ---
 
@@ -51,11 +69,11 @@ Interactive Design System and Style Showcase accessible via `/design-system` or 
 - **7 Complete Sections**:
   1. *Colors & Surfaces*: Swatches with HEX, RGB, and Tailwind classes.
   2. *Typography*: Live interactive phrase tester.
-  3. *Button System*: Matrix and interactive playground.
+  3. *Button System*: Matrix and interactive playground using `<Button>`.
   4. *Form Controls*: Text inputs, password eye toggle, custom selects, textareas, checkboxes, radio buttons, and switches.
   5. *Data Cards & Metrics*: Statistical metric cards and interactive glass modal dialogs.
   6. *Notifications & Feedback*: Static inline alerts and dynamic floating toast triggers.
-  7. *Real Layout Previews*: Interactive mockups for Join Screen, Lobby Screen, and all 4 Dixit gameplay phases.
+  7. *Real Layout Previews*: Interactive mockups for Join Screen, full Lobby Screen (with options cards, deck selector, and player list), and all 4 Dixit gameplay phases.
 
 ---
 
