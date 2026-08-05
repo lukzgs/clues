@@ -7,9 +7,10 @@ import { DataCardsSection } from './DataCardsSection';
 import { FeedbackSection } from './FeedbackSection';
 import { LayoutMockupsSection } from './LayoutMockupsSection';
 import { ThemeProvider, useTheme, THEMES, ThemeId } from '../../providers/ThemeProvider';
+import { ToastProvider } from '../../providers/ToastProvider';
 import { LanguageToggle } from '../ui/LanguageToggle';
-import { ThemeToggle } from '../ui/ThemeToggle';
 import { useTranslation } from '../../i18n/index.tsx';
+import { Button } from '../ui/Button';
 
 interface ToastMessage {
   id: string;
@@ -68,19 +69,19 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
   ];
 
   const sectionsList = [
-    { id: 'cores', title: `01. ${t.sysd.sec1Title}` },
-    { id: 'tipografia', title: `02. ${t.sysd.sec2Title}` },
-    { id: 'botoes', title: `03. ${t.sysd.sec3Title}` },
-    { id: 'formularios', title: `04. ${t.sysd.sec4Title}` },
-    { id: 'cards-metricas', title: `05. ${t.sysd.sec5Title}` },
-    { id: 'feedback-alertas', title: `06. ${t.sysd.sec6Title}` },
-    { id: 'mockups-layout', title: `07. ${t.sysd.sec7Title}` },
+    { id: 'cores', title: '01. Cores & Superfícies' },
+    { id: 'tipografia', title: '02. Tipografia' },
+    { id: 'botoes', title: '03. Botões & Ações' },
+    { id: 'formularios', title: '04. Formulários & Inputs' },
+    { id: 'cards-metricas', title: '05. Cards Reais das Telas' },
+    { id: 'feedback-alertas', title: '06. Feedback & Toasts' },
+    { id: 'mockups-layout', title: '07. Previews de Layout' },
   ];
 
   return (
     <div
       style={{ backgroundColor: theme.bgCanvas }}
-      className="min-h-screen text-white font-sans selection:bg-amber-500 selection:text-black relative pb-20 transition-colors duration-500"
+      className="min-h-screen text-white font-sans selection:bg-amber-500 selection:text-black relative pb-20 transition-colors duration-500 custom-scrollbar"
     >
       {/* AMBIENT LIGHTING BACKGROUND */}
       <div
@@ -117,9 +118,9 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
         ))}
       </div>
 
-      {/* 1. STICKY HEADER WITH LIVE THEME SELECTOR & LANGUAGE SWITCHER */}
-      <header className="sticky top-0 z-40 bg-black/70 backdrop-blur-2xl border-b border-white/10 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* 1. REORGANIZED STICKY HEADER WITH RESTRUCTURED THEME SELECTOR & LANGUAGE SWITCHER */}
+      <header className="sticky top-0 z-40 bg-black/75 backdrop-blur-2xl border-b border-white/10 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* Logo Crown */}
             <div className={`w-10 h-10 rounded-full border border-white/20 bg-black/50 ring-1 ring-white/10 flex items-center justify-center shadow-lg shrink-0 ${theme.glowShadow}`}>
@@ -144,8 +145,11 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
             </div>
           </div>
 
-          {/* THEME PRESET SELECTOR BUTTONS WITH LOCALIZED NAMES */}
-          <div className="flex items-center gap-1.5 bg-black/60 border border-white/10 p-1 rounded-xl overflow-x-auto max-w-full">
+          {/* DOCK UNIFICADO DE SELEÇÃO DE TEMAS */}
+          <div className="flex items-center gap-1.5 bg-black/60 border border-white/10 p-1.5 rounded-2xl overflow-x-auto max-w-full custom-scrollbar">
+            <span className="text-[9px] font-sans uppercase tracking-widest text-white/40 font-bold px-2 hidden sm:inline">
+              Tema:
+            </span>
             {(Object.keys(THEMES) as ThemeId[]).map(id => {
               const themeItem = THEMES[id];
               const isActive = activeThemeId === id;
@@ -154,38 +158,34 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
                   key={id}
                   onClick={() => setTheme(id)}
                   title={themeItem.description[lang]}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-cinzel font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-xl text-[10px] font-cinzel font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 ${
                     isActive
-                      ? `${themeItem.primaryGradient} shadow-md scale-[1.03]`
+                      ? `${themeItem.primaryGradient} shadow-md scale-[1.02]`
                       : 'text-white/60 hover:text-white hover:bg-white/5'
                   }`}
                 >
+                  <span className={`w-2 h-2 rounded-full border border-white/20 ${isActive ? 'bg-white' : 'bg-white/40'}`} />
                   {themeItem.name[lang]}
                 </button>
               );
             })}
           </div>
 
-          {/* Header Actions: Theme Switcher + Language Switcher + Return to App */}
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
-            <ThemeToggle className="relative! top-auto! right-auto! z-auto!" />
+          {/* Controles de Idioma e Retorno */}
+          <div className="flex items-center gap-2 shrink-0">
             <LanguageToggle className="relative! top-auto! right-auto! z-auto!" />
-
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={onBackToApp || (() => window.location.href = '/')}
-              className={`font-cinzel font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${theme.primaryGradient} ${theme.glowShadow}`}
             >
               <span>{t.sysd.returnToApp}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* 2. QUICK-JUMP NAVIGATION BAR */}
-        <div className="bg-black/40 border-t border-white/5 overflow-x-auto hide-scrollbar">
+        <div className="bg-black/50 border-t border-white/5 overflow-x-auto custom-scrollbar">
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-2 flex items-center gap-2 whitespace-nowrap">
             {sectionsList.map(sec => (
               <button
@@ -215,7 +215,7 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
               {t.sysd.title}
             </h2>
             <p className="text-sm font-sans text-white/70 leading-relaxed">
-              {theme.description[lang]}.
+              {theme.description[lang]}. Todos os componentes, tipografias, inputs, botões, modais e cards estáticos estão unificados e atualizados nesta fonte de verdade.
             </p>
           </div>
 
@@ -262,7 +262,7 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
           </div>
         </section>
 
-        {/* SECTION 2: TIPOGRAFIA */}
+        {/* SECTION 2: TIPOGRAFIA & FONTES */}
         <TypographySection onCopy={handleCopy} />
 
         {/* SECTION 3: BOTÕES & AÇÕES */}
@@ -271,13 +271,13 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
         {/* SECTION 4: FORMULÁRIOS & INPUTS */}
         <FormsSection onCopy={handleCopy} />
 
-        {/* SECTION 5: CARDS & MÉTRICAS */}
+        {/* SECTION 5: CARDS REAIS DAS TELAS */}
         <DataCardsSection onCopy={handleCopy} />
 
-        {/* SECTION 6: FEEDBACK & ALERTAS */}
+        {/* SECTION 6: FEEDBACK & TOAST SYSTEM */}
         <FeedbackSection onTriggerToast={addToast} />
 
-        {/* SECTION 7: MOCKUPS DE LAYOUT REAL */}
+        {/* SECTION 7: PREVIEWS DE LAYOUT REAL */}
         <LayoutMockupsSection />
 
       </main>
@@ -299,7 +299,9 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({ onBackToApp })
 export const DesignSystemScreen: React.FC<DesignSystemScreenProps> = (props) => {
   return (
     <ThemeProvider>
-      <DesignSystemContent {...props} />
+      <ToastProvider>
+        <DesignSystemContent {...props} />
+      </ToastProvider>
     </ThemeProvider>
   );
 };

@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useToast } from '../../providers/ToastProvider';
 
 interface FeedbackSectionProps {
-  onTriggerToast: (type: 'success' | 'warning' | 'error' | 'info', message: string) => void;
+  onTriggerToast?: (type: 'success' | 'warning' | 'error' | 'info', message: string) => void;
 }
 
-export const FeedbackSection: React.FC<FeedbackSectionProps> = ({ onTriggerToast }) => {
+export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
   const { theme } = useTheme();
   const { lang } = useTranslation();
+  const { addToast } = useToast();
   const [dismissedAlerts, setDismissedAlerts] = useState<Record<string, boolean>>({});
 
   const toggleDismiss = (id: string) => {
     setDismissedAlerts(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleTrigger = (type: 'success' | 'warning' | 'error' | 'info', message: string, title?: string) => {
+    addToast(type, message, title);
   };
 
   return (
@@ -23,17 +29,17 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({ onTriggerToast
             Seção 06
           </span>
           <h2 className="text-3xl font-cinzel text-white font-bold tracking-wide mt-1">
-            Notificações, Alertas & Feedback Visual
+            Notificações, Alertas & Feedback Visual (Toast System)
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Sinais visuais de estado da aplicação e disparadores de toasts flutuantes harmonizados com o tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
+            Sinais visuais de estado da aplicação, componentes de toast estáticos e disparadores flutuantes centralizados na base da tela.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* INLINE ALERT BANNERS */}
-        <div className="bg-black/30 border border-white/10 rounded-2xl p-6 space-y-4">
+        <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
           <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
             1. Banners de Alerta Estáticos (Inline Alerts)
           </h3>
@@ -48,7 +54,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({ onTriggerToast
                 </svg>
                 <div>
                   <h4 className="font-cinzel font-bold text-sm text-emerald-300">
-                    Sucesso — Partida Conectada
+                    Sucesso — Conexão Estabelecida
                   </h4>
                   <p className="text-xs font-sans text-emerald-200/80 mt-0.5">
                     Sua conexão com o servidor WebSocket da sala foi estabelecida com latência de 14ms.
@@ -72,10 +78,10 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({ onTriggerToast
                 </svg>
                 <div>
                   <h4 className="font-cinzel font-bold text-sm text-amber-300">
-                    Aviso — Tempo Restante
+                    Aviso — Inatividade da Sala
                   </h4>
                   <p className="text-xs font-sans text-amber-200/80 mt-0.5">
-                    Resta menos de 10 segundos para submeter sua jogada nesta fase.
+                    A sala fechará por inatividade se nenhuma ação for realizada nos próximos minutos.
                   </p>
                 </div>
               </div>
@@ -144,48 +150,120 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = ({ onTriggerToast
         </div>
 
         {/* DYNAMIC TOAST TRIGGERS */}
-        <div className="bg-black/30 border border-white/10 rounded-2xl p-6 flex flex-col justify-between space-y-4">
+        <div className={`border rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
           <div>
             <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
               2. Disparador de Notificações Flutuantes (Toasts)
             </h3>
             <p className="text-xs font-sans text-white/60 mt-2">
-              Clique nos botões abaixo para disparar notificações dinâmicas que empilham no canto superior da tela com temporizador automático.
+              Clique nos botões abaixo para disparar notificações dinâmicas que empilham no centro inferior da tela com temporizador automático.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
             <button
-              onClick={() => onTriggerToast('success', 'Ação concluída com sucesso!')}
+              onClick={() => handleTrigger('success', 'Conexão estabelecida com sucesso!', 'Conexão')}
               className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-emerald-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
-              ✓ Disparar Toast Sucesso
+              ✓ Toast Sucesso (Conexão)
             </button>
 
             <button
-              onClick={() => onTriggerToast('warning', 'Atenção: O tempo da rodada está acabando.')}
+              onClick={() => handleTrigger('warning', 'A sala fechará por inatividade em 2:00 minutos.', 'Inatividade da Sala')}
               className="bg-amber-950/40 border border-amber-500/40 text-amber-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-amber-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
-              ! Disparar Toast Alerta
+              ! Toast Alerta (Inatividade)
             </button>
 
             <button
-              onClick={() => onTriggerToast('error', 'Ops! Ocorreu um erro ao enviar sua jogada.')}
+              onClick={() => handleTrigger('error', 'Código de sala inválido ou inexistente.', 'Erro do Servidor')}
               className="bg-red-950/40 border border-red-500/40 text-red-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-red-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
-              ✕ Disparar Toast Erro
+              ✕ Toast Erro (Servidor)
             </button>
 
             <button
-              onClick={() => onTriggerToast('info', 'Dica: Você pode reordenar suas cartas na mão.')}
+              onClick={() => handleTrigger('info', 'Você é o narrador desta rodada!', 'Informação')}
               className="bg-sky-950/40 border border-sky-500/40 text-sky-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-sky-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
-              ℹ Disparar Toast Informação
+              ℹ Toast Informação
             </button>
           </div>
 
           <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-[11px] font-mono text-white/40">
-            Toast System · Auto-dismiss em 4s · Posicionamento z-50
+            Toast System · Auto-dismiss em 4.5s · Posicionamento Central Inferior (z-[9999])
+          </div>
+        </div>
+      </div>
+
+      {/* 3. STATIC TOAST CARDS SHOWCASE */}
+      <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+        <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
+          3. Matriz de Componentes Toast (Exibição Estática no SysD)
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Success Toast */}
+          <div className="bg-emerald-950/90 border border-emerald-500/40 text-emerald-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 shrink-0 mt-0.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <div>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-emerald-300">Conexão</h4>
+                <p className="text-xs font-sans font-medium mt-0.5">Conectado ao servidor!</p>
+              </div>
+            </div>
+            <span className="opacity-40 text-xs">✕</span>
+          </div>
+
+          {/* Warning Toast */}
+          <div className="bg-amber-950/90 border border-amber-500/40 text-amber-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0 mt-0.5">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <div>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-amber-300">Inatividade</h4>
+                <p className="text-xs font-sans font-medium mt-0.5">A sala fechará em breve.</p>
+              </div>
+            </div>
+            <span className="opacity-40 text-xs">✕</span>
+          </div>
+
+          {/* Error Toast */}
+          <div className="bg-red-950/90 border border-red-500/40 text-red-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+              <div>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-red-300">Servidor</h4>
+                <p className="text-xs font-sans font-medium mt-0.5">Erro na ação da sala.</p>
+              </div>
+            </div>
+            <span className="opacity-40 text-xs">✕</span>
+          </div>
+
+          {/* Info Toast */}
+          <div className="bg-sky-950/90 border border-sky-500/40 text-sky-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <div>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-sky-300">Informação</h4>
+                <p className="text-xs font-sans font-medium mt-0.5">Sua vez como narrador!</p>
+              </div>
+            </div>
+            <span className="opacity-40 text-xs">✕</span>
           </div>
         </div>
       </div>

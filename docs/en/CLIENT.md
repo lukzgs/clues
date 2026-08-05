@@ -117,15 +117,17 @@ The application features a custom lightweight i18n system located in `src/i18n/`
 - **Translations:** Stored in `src/i18n/translations.ts` containing `en` and `pt` dictionaries.
 - **Provider:** `LanguageProvider` in `src/i18n/index.tsx` wraps the app. It auto-detects the browser language (`navigator.language`) and persists the user's preference in `localStorage` under `story-weaver:lang`. It accepts an optional `initialLang` prop to force a specific language (useful for testing).
 - **Hook:** Components use the `useTranslation()` hook to access the current language (`lang`), a `setLang` function, and the translation dictionary (`t`).
-- **Toggle:** The `<LanguageToggle />` component allows users to switch between languages. It is integrated into the headers or top corners of all major screens.
+### `DesignSystemScreen.tsx`
+Single source of truth for the entire application style guide. Organized into 7 structured sections:
+1. **Color Tokens & Theme Swatches** (Hex, RGB, and Tailwind tokens for all 5 themes).
+2. **Typography & Fonts Hierarchy** (Cinzel, Playfair Display, Inter, font sizes, weights, and live sample testing).
+3. **Atomic UI Component Matrix** (Button System: Primary, Secondary Glass, Outline Theme, Destructive, Ghost, with interactive Playground).
+4. **Form Controls & Inputs** (TextInput with active borders, Password toggle, Textarea, Pill Option Switcher, Range Sliders, and Toggle Switches).
+5. **Real Screen Cards Matrix** (GameOptions Card, PlayerCard, DixitHand Card, TableVoting Card, ScoreboardRow Card, and WinnerPodium Card for direct color composition inspection).
+6. **Notification, Alerts & Toast System** (Static Toast Cards Matrix + floating interactive Toast triggers and confirmation modals).
+7. **Real Integrated Screen Layout Previews** (Interactive Join, Lobby with RoomCodeDisplay, and Gameplay screen mockups).
 
----
-
-## Screens
-
-Located in `src/components/screens/`:
-
-### `JoinScreen.tsx`
+Features a sticky header with a unified **Theme Selector Dock** and a custom glassmorphic scrollbar (`custom-scrollbar`).
 
 Initial screen for creating or joining rooms. Recently updated to feature the new deep-black, glassmorphism-heavy "Story Weaver" Design System with "Mythic Buttons".
 

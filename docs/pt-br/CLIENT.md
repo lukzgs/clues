@@ -117,13 +117,24 @@ A aplicação possui um sistema de i18n customizado e leve, localizado em `src/i
 - **Traduções:** Armazenadas em `src/i18n/translations.ts`, contendo os dicionários `en` e `pt`.
 - **Provider:** `LanguageProvider` em `src/i18n/index.tsx` envolve o app. Ele auto-detecta o idioma do navegador (`navigator.language`) e persiste a preferência do usuário no `localStorage` sob a chave `story-weaver:lang`. Ele aceita uma prop opcional `initialLang` para forçar um idioma específico (útil para testes).
 - **Hook:** Os componentes utilizam o hook `useTranslation()` para acessar o idioma atual (`lang`), a função `setLang`, e o dicionário de tradução (`t`).
-- **Toggle:** O componente `<LanguageToggle />` permite aos usuários alternar entre idiomas. Ele está integrado aos cabeçalhos (headers) ou cantos superiores de todas as telas principais.
 
 ---
 
 ## Telas
 
 Localizadas em `src/components/screens/`:
+
+### `DesignSystemScreen.tsx`
+Fonte única de verdade para todo o guia de estilo da aplicação. Organizado em 7 seções estruturadas:
+1. **Cores & Superfícies de Temas** (Tokens Hex, RGB e Tailwind para todos os 5 temas).
+2. **Tipografia & Hierarquia de Fontes** (Cinzel, Playfair Display, Inter, tamanhos de fonte, pesos e teste de texto em tempo real).
+3. **Matriz de Componentes Atômicos** (Sistema de Botões: Primary, Secondary Glass, Outline Theme, Destructive, Ghost, com Playground interativo).
+4. **Formulários & Inputs** (TextInput com bordas ativas, alternância de senha, Textarea, Seletor de Abas/Baralho em Pílulas, Range Sliders e Switches).
+5. **Matriz de Cards Reais das Telas** (Cards de GameOptions, PlayerCard, DixitHand, TableVoting, ScoreboardRow e WinnerPodium para inspeção direta da composição de cores).
+6. **Notificações, Alertas & Toast System** (Matriz Estática de Cards de Toast + disparadores flutuantes e modais de confirmação).
+7. **Previews de Layout Real das Telas** (Mockups interativos das telas de Join, Lobby com RoomCodeDisplay e Gameplay).
+
+Apresenta um cabeçalho fixo com um **Dock Unificado de Seleção de Temas** e barras de rolagem de vidro fosco translúcido (`custom-scrollbar`).
 
 ### `JoinScreen.tsx`
 

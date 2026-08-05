@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useTranslation } from '../../i18n/index.tsx';
+import { Button } from '../ui/Button';
 
 interface DataCardsSectionProps {
   onCopy: (value: string, label: string) => void;
@@ -10,59 +11,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
   const { theme } = useTheme();
   const { lang } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const statsData = [
-    {
-      title: 'Taxa de Acerto do Narrador',
-      value: '68.4%',
-      change: '+12.5%',
-      isPositive: true,
-      category: 'Estatística de Gameplay',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={theme.accentText}>
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Pontuação Média da Sala',
-      value: '24.8 pts',
-      change: '+4.2%',
-      isPositive: true,
-      category: 'Desempenho Geral',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={theme.accentText}>
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Tempo Médio por Rodada',
-      value: '38s',
-      change: '-8.1%',
-      isPositive: false,
-      category: 'Velocidade de Jogo',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={theme.accentText}>
-          <path d="M22 12A10 10 0 1 1 12 2v10z" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Partidas Concluídas',
-      value: '1,420',
-      change: '+24.0%',
-      isPositive: true,
-      category: 'Métrica de Uso',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={theme.accentText}>
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-        </svg>
-      ),
-    },
-  ];
+  const [selectedHandCard, setSelectedHandCard] = useState<number | null>(42);
 
   return (
     <section id="cards-metricas" className="scroll-mt-28 space-y-6">
@@ -72,68 +21,219 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
             Seção 05
           </span>
           <h2 className="text-3xl font-cinzel text-white font-bold tracking-wide mt-1">
-            Exibição de Dados & Cards de Métricas
+            Exibição de Dados & Cards de Métricas (Composição de Telas)
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Cartões de métricas estatísticas e diálogos modais de confirmação estilizados com o tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
+            Exibição completa dos cards utilizados nas telas da aplicação para inspecionar fontes, tamanhos, componentes e harmonia de cores no tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
           </p>
         </div>
 
         {/* Trigger Modal Preview */}
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={() => setIsModalOpen(true)}
-          className={`font-cinzel font-bold text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl hover:scale-[1.02] transition-all shrink-0 ${theme.primaryGradient} ${theme.glowShadow}`}
+          className="shrink-0"
         >
           Testar Modal ({theme.name[lang]})
-        </button>
+        </Button>
       </div>
 
-      {/* STAT CARDS GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsData.map((stat, idx) => (
-          <div
-            key={idx}
-            className={`border rounded-2xl p-5 hover:${theme.accentBorder} transition-all duration-500 flex flex-col justify-between group ${theme.innerCardBg}`}
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-sans uppercase tracking-[0.2em] text-white/40 font-medium">
-                  {stat.category}
-                </span>
-                <div className={`w-9 h-9 rounded-full ${theme.accentBgLight} border ${theme.accentBorder} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  {stat.icon}
-                </div>
+      {/* SHOWCASE GRID 1: REAL SCREEN CARDS FOR COLOR & TYPOGRAPHY INSPECTION */}
+      <div className="space-y-6">
+        <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-bold border-b border-white/5 pb-2 ${theme.accentText}`}>
+          1. Matriz de Cards Principais do Aplicativo
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* CARD 1: Game Options Card (Lobby) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: GameOptions (Lobby)
+              </span>
+              <span className={`text-[9px] font-mono px-2 py-0.5 rounded border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
+                Host Only
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-cinzel font-bold text-sm text-white">Pontuação Alvo</span>
+                <span className={`font-mono font-bold text-xs ${theme.accentText}`}>30 PTS</span>
               </div>
+              <input
+                type="range"
+                min={10}
+                max={100}
+                defaultValue={30}
+                className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                style={{ accentColor: 'currentColor' }}
+              />
+            </div>
 
-              <h4 className="text-sm font-sans font-medium text-white/80 line-clamp-1">
-                {stat.title}
-              </h4>
+            <Button variant="primary" size="sm" className="w-full">
+              Salvar Ajustes
+            </Button>
+          </div>
 
-              <div className="text-3xl font-cinzel font-bold text-white tracking-wide mt-2">
-                {stat.value}
+          {/* CARD 2: Player Card (Lobby / Sidebar) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: PlayerCard (Lobby)
+              </span>
+              <span className="text-[9px] font-sans uppercase tracking-widest text-emerald-400">
+                Ativo
+              </span>
+            </div>
+
+            <div className={`flex items-center gap-3 p-3 rounded-xl border ${theme.accentBgLight} ${theme.accentBorder}`}>
+              <div className="w-9 h-9 rounded-full bg-amber-500 flex items-center justify-center text-black font-cinzel font-bold text-sm shrink-0 shadow-lg">
+                N
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className={`font-cinzel font-bold text-xs block truncate ${theme.accentText}`}>
+                  Narrador Místico
+                </span>
+                <span className="text-white/40 text-[10px] font-sans uppercase tracking-wider block">
+                  Host da Sala
+                </span>
+              </div>
+              <div className={`w-6 h-6 flex items-center justify-center rounded-lg border ${theme.accentBgLight} ${theme.accentBorder} ${theme.accentText} shrink-0`}>
+                👑
               </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
-              <span
-                className={`inline-flex items-center text-xs font-sans font-bold px-2 py-0.5 rounded-full border ${
-                  stat.isPositive
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                }`}
-              >
-                {stat.isPositive ? '↑' : '↓'} {stat.change}
-              </span>
-
-              <button
-                onClick={() => onCopy(`${stat.title}: ${stat.value} (${stat.change})`, 'Card de Métrica')}
-                className={`text-[9px] font-sans uppercase tracking-widest text-white/30 hover:${theme.accentText} transition-colors`}
-              >
-                Copiar
-              </button>
+            <div className="flex gap-2">
+              <Button variant="glass" size="xs" className="flex-1">
+                Tornar Espectador
+              </Button>
+              <Button variant="destructive" size="xs" className="shrink-0">
+                Expulsar
+              </Button>
             </div>
           </div>
-        ))}
+
+          {/* CARD 3: Dixit Hand Card (Gameplay) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: DixitHand (Mão do Jogo)
+              </span>
+              <span className="text-[9px] font-mono text-white/40">#CARD_042</span>
+            </div>
+
+            <div
+              onClick={() => setSelectedHandCard(selectedHandCard === 42 ? null : 42)}
+              className={`h-40 rounded-xl border bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-900 p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 ${
+                selectedHandCard === 42
+                  ? `${theme.accentBorder} ring-2 ring-white/40 -translate-y-1 ${theme.glowShadow}`
+                  : 'border-white/10 hover:border-white/30'
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-mono text-white/60">Carta #42</span>
+                {selectedHandCard === 42 && (
+                  <span className={`font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider ${theme.primaryGradient}`}>
+                    Selecionada
+                  </span>
+                )}
+              </div>
+              <span className={`font-cinzel text-sm font-bold tracking-wide ${theme.accentText}`}>
+                O Guardião das Sombras
+              </span>
+            </div>
+
+            <Button variant="outline" size="sm" className="w-full">
+              Confirmar Escolha
+            </Button>
+          </div>
+
+          {/* CARD 4: Table Voting Card (Voting Phase) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: TableVoting (Mesa)
+              </span>
+              <span className="text-[9px] font-sans uppercase text-sky-300">Votação</span>
+            </div>
+
+            <div className="h-36 rounded-xl border border-white/20 bg-gradient-to-b from-[#1E1E1E] to-[#0A0A0A] p-4 flex flex-col justify-between shadow-lg">
+              <div className="flex justify-between items-center">
+                <span className={`text-xs font-cinzel font-bold ${theme.accentText}`}>Carta da Mesa 2</span>
+                <span className="text-[10px] font-sans text-white/40">Embaralhada</span>
+              </div>
+              <span className="text-xs font-serif italic text-white/70">"Pista: Onde os relógios derretem"</span>
+            </div>
+
+            <Button variant="primary" size="sm" className="w-full">
+              Votar Nesta Carta
+            </Button>
+          </div>
+
+          {/* CARD 5: Leaderboard Row Card (Results Phase) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: ScoreboardRow (Placar)
+              </span>
+              <span className="text-[9px] font-mono text-emerald-400 font-bold">+3 PTS</span>
+            </div>
+
+            <div className="space-y-2">
+              {[
+                { rank: '1º', name: 'Sofia Mística', pts: '18 pts', isMe: false },
+                { rank: '2º', name: 'Você (Narrador)', pts: '15 pts', isMe: true },
+              ].map((row, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    row.isMe ? `${theme.accentBgLight} ${theme.accentBorder}` : `${theme.innerCardBg} border-white/10`
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`font-cinzel font-bold text-sm ${theme.accentText}`}>{row.rank}</span>
+                    <span className="text-xs font-cinzel font-bold text-white">{row.name}</span>
+                  </div>
+                  <span className="font-cinzel font-bold text-xs text-white">{row.pts}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button variant="glass" size="xs" className="w-full">
+              Ver Detalhes dos Votos
+            </Button>
+          </div>
+
+          {/* CARD 6: Winner Podium Card (Game Over) */}
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                Card: WinnerPodium (GameOver)
+              </span>
+              <span className={`text-[9px] font-cinzel font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
+                Vencedor
+              </span>
+            </div>
+
+            <div className={`p-4 rounded-xl border text-center space-y-2 ${theme.accentBgLight} ${theme.accentBorder}`}>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-200 to-amber-400 text-black mx-auto flex items-center justify-center font-cinzel font-bold text-xl shadow-lg">
+                🥇
+              </div>
+              <h4 className={`font-cinzel font-bold text-base ${theme.accentText}`}>
+                Sofia Mística
+              </h4>
+              <p className="text-xs font-sans text-white/70">
+                Campeã da Partida com <strong>32 Pontos</strong>
+              </p>
+            </div>
+
+            <Button variant="primary" size="sm" className="w-full">
+              Jogar Novamente
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* SAMPLE MODAL PREVIEW (OVERLAY) */}
@@ -165,18 +265,22 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
 
             {/* Modal Actions */}
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
+                variant="glass"
+                size="md"
                 onClick={() => setIsModalOpen(false)}
-                className="flex-1 bg-white/5 border border-white/10 text-white font-cinzel font-bold text-xs uppercase tracking-widest py-3 rounded-xl hover:bg-white/10 transition-colors"
+                className="flex-1"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
                 onClick={() => setIsModalOpen(false)}
-                className={`flex-1 font-cinzel font-bold text-xs uppercase tracking-widest py-3 rounded-xl hover:scale-[1.02] transition-transform ${theme.primaryGradient} ${theme.glowShadow}`}
+                className="flex-1"
               >
                 Confirmar
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useTranslation } from '../../i18n/index.tsx';
 import { Button } from '../ui/Button';
+import { RoomCodeDisplay } from '../screens/lobby/RoomCodeDisplay';
 
 export const LayoutMockupsSection: React.FC = () => {
   const { theme } = useTheme();
@@ -136,26 +137,9 @@ export const LayoutMockupsSection: React.FC = () => {
       {activeMockupTab === 'lobby' && (
         <div className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}>
           
-          {/* Header Bar with Room Code */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center font-cinzel font-bold text-xl ${theme.accentBgLight} ${theme.accentBorder} ${theme.accentText}`}>
-                SW
-              </div>
-              <div>
-                <h3 className="font-cinzel text-2xl font-bold text-white tracking-wide">
-                  Lobby da Sala
-                </h3>
-                <p className="text-xs font-sans text-white/50">
-                  Visualização em tempo real dos cards e paleta do tema <strong className={theme.accentText}>{theme.name[lang]}</strong>
-                </p>
-              </div>
-            </div>
-
-            {/* Room Code Badge */}
-            <div className={`rounded-xl px-6 py-3 border text-center font-cinzel font-bold text-xl tracking-[0.2em] ${theme.innerCardBg} ${theme.accentText} ${theme.accentBorder}`}>
-              CÓDIGO: <span className="underline">ROOM99</span>
-            </div>
+          {/* Real Lobby Room Code Display */}
+          <div className="border-b border-white/10 pb-4 mb-6">
+            <RoomCodeDisplay roomCode="ROOM99" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
