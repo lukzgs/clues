@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
 import { LanguageToggle } from '../ui/LanguageToggle';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { Button } from '../ui/Button';
 
 interface JoinScreenProps {
   onCreateRoom: (playerName: string) => void;
@@ -17,6 +20,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
   onCancelInvite,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const isInviteMode = !!prefillRoomCode;
 
   const [playerName, setPlayerName] = useState('');
@@ -44,26 +48,40 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
     onJoinRoom(code.toUpperCase(), playerName.trim());
   };
 
+  const arrowRightIcon = (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
-      <LanguageToggle />
+    <div
+      style={{ backgroundColor: theme.bgCanvas }}
+      className="relative min-h-screen flex items-center justify-center p-3 md:p-4 transition-colors duration-500 text-white font-sans"
+    >
+      <div className="fixed top-4 right-4 z-[300] flex items-center gap-2">
+        <ThemeToggle className="relative! top-auto! right-auto! z-auto!" />
+        <LanguageToggle className="relative! top-auto! right-auto! z-auto!" />
+      </div>
+
       {/* Ambient Lighting */}
       <div
-        className="fixed inset-0 pointer-events-none z-[-1]"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
       />
       <div
-        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+        className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`}
       />
-      
+
       <div className="w-full max-w-[420px] z-10">
         <div
-          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center"
+          className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
         >
           {/* Logo icon (Crown) */}
-          <div className="mb-5 md:mb-6 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full border border-amber-500/30 bg-black/50 ring-1 ring-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200 md:w-6 md:h-6">
+          <div className={`mb-5 md:mb-6 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full border bg-black/50 ring-1 ring-white/10 transition-all duration-500 ${theme.accentBgLight} ${theme.accentBorder} ${theme.glowShadow}`}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`w-5 h-5 md:w-6 md:h-6 transition-colors duration-500 ${theme.accentText}`}>
               <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
               <line x1="2" y1="19" x2="22" y2="19" />
             </svg>
@@ -77,8 +95,8 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                 <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 md:mb-3 font-sans font-medium">
                   {t.join.joiningRoom}
                 </p>
-                <div className="bg-[#1A1A1A]/50 rounded-xl px-5 md:px-6 py-3 md:py-4 inline-block border border-white/10">
-                  <span className="text-2xl md:text-3xl font-cinzel font-bold text-amber-300 tracking-wider">
+                <div className={`rounded-xl px-5 md:px-6 py-3 md:py-4 inline-block border transition-all duration-300 ${theme.innerCardBg}`}>
+                  <span className={`text-2xl md:text-3xl font-cinzel font-bold tracking-wider ${theme.accentText}`}>
                     {prefillRoomCode}
                   </span>
                 </div>
@@ -95,11 +113,11 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleJoinRoom(); }}
                   placeholder={t.join.namePlaceholder}
-                  className="w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all font-cinzel text-lg"
+                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
                   maxLength={20}
                   autoFocus
                 />
-                
+
                 {/* Error floating below input */}
                 <div className={`absolute top-full left-0 w-full pt-1.5 flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
                   <span>{error}</span>
@@ -108,27 +126,29 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
               {/* Join button */}
               <div className="w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both' }}>
-                <button
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={arrowRightIcon}
+                  iconPosition="right"
                   onClick={handleJoinRoom}
-                  className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300"
+                  className="w-full py-3.5"
                 >
                   {t.join.joinRoom}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
+                </Button>
               </div>
 
               {/* Back button */}
               {onCancelInvite && (
                 <div className="w-full mt-4 text-center" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="xs"
                     onClick={onCancelInvite}
-                    className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
+                    className="w-full border-none"
                   >
                     {t.connecting.back}
-                  </button>
+                  </Button>
                 </div>
               )}
             </>
@@ -137,7 +157,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
             <>
               {/* Title */}
               <div className="text-center mb-8 md:mb-10 w-full" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
-                <h1 className="text-4xl md:text-5xl tracking-tight text-white mb-3 font-cinzel">
+                <h1 className="text-4xl md:text-5xl tracking-tight text-white mb-3 font-cinzel font-bold">
                   {t.join.title}
                 </h1>
                 <p className="text-[10px] font-sans text-white/40 uppercase tracking-[0.2em]">
@@ -156,11 +176,11 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   onChange={(e) => { setPlayerName(e.target.value); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleCreateRoom(); }}
                   placeholder={t.join.namePlaceholder}
-                  className="w-full bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all font-cinzel text-lg"
+                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
                   maxLength={20}
                   autoFocus
                 />
-                
+
                 {/* Error floating below input */}
                 <div className={`absolute top-full left-0 w-full pt-1.5 flex items-center justify-center gap-1.5 text-red-500/90 text-[10px] uppercase tracking-[0.15em] font-sans font-medium transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}>
                   <span>{error}</span>
@@ -169,13 +189,16 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
 
               {/* Create Room button */}
               <div className="w-full mb-6 md:mb-8" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both' }}>
-                <button
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={<span className="text-lg leading-none font-sans font-light">+</span>}
+                  iconPosition="left"
                   onClick={handleCreateRoom}
-                  className="w-full font-cinzel font-bold uppercase tracking-widest bg-gradient-to-r from-amber-200 to-amber-400 text-black rounded-xl px-4 py-3.5 flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] transition-all duration-300"
+                  className="w-full py-3.5"
                 >
-                  <span className="text-lg leading-none mr-2 font-sans font-light">+</span>
                   {t.join.newRoom}
-                </button>
+                </Button>
               </div>
 
               {/* Divider */}
@@ -195,45 +218,30 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   onChange={(e) => { setRoomCode(e.target.value.toUpperCase()); setError(''); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleJoinRoom(); }}
                   placeholder={t.join.roomIdPlaceholder}
-                  className="flex-1 bg-[#1A1A1A]/50 border border-white/10 rounded-xl px-4 py-3.5 text-white text-lg font-cinzel uppercase placeholder-white/20 focus:outline-none focus:border-amber-500/50 focus:bg-[#1A1A1A]/80 focus:ring-1 focus:ring-amber-500/30 transition-all min-w-0"
+                  className={`flex-1 rounded-xl px-4 py-3.5 text-lg font-cinzel uppercase outline-none ring-1 ring-white/5 transition-all min-w-0 ${theme.inputBg}`}
                   maxLength={6}
                 />
-                <button
+                <Button
+                  variant="glass"
+                  size="md"
+                  icon={arrowRightIcon}
+                  iconPosition="right"
                   onClick={handleJoinRoom}
-                  className="shrink-0 bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest rounded-xl px-6 py-3.5 flex items-center justify-center gap-2 hover:bg-white/10 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all duration-300"
+                  className="shrink-0 px-6 py-3.5"
                 >
                   {t.join.joinButton}
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 ml-1">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </button>
+                </Button>
               </div>
             </>
           )}
         </div>
       </div>
 
+      {/* FOOTER */}
       <div className="fixed bottom-4 md:bottom-6 w-full text-center z-10 flex flex-col items-center gap-1.5" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' }}>
         <p className="text-white/20 text-[10px] font-sans tracking-wide">
           {t.common.copyright}
         </p>
-        <button
-          onClick={() => {
-            window.history.pushState({}, '', '/design-system');
-            window.dispatchEvent(new PopStateEvent('popstate'));
-          }}
-          className="text-amber-400/50 hover:text-amber-300 text-[10px] font-cinzel font-bold uppercase tracking-widest transition-colors flex items-center gap-1.5"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.71 1.7-1.63 0-.44-.18-.85-.46-1.15-.27-.3-.44-.72-.44-1.22 0-1.01.82-1.83 1.83-1.83H17c2.76 0 5-2.24 5-5 0-4.97-4.48-9-10-9z" />
-          </svg>
-          Design System & Guia de Estilo
-        </button>
       </div>
     </div>
   );

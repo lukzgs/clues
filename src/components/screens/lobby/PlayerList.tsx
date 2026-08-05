@@ -2,6 +2,7 @@ import React from 'react';
 import { GameState, Player } from '../../../types';
 import { GAME_CONFIG } from '../../../constants';
 import { useTranslation } from '../../../i18n/index.tsx';
+import { useTheme } from '../../../providers/ThemeProvider';
 
 interface PlayerListProps {
   gameState: GameState;
@@ -21,8 +22,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({
   onRemoveBot,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [isToggling, setIsToggling] = React.useState(false);
-  
+
   const handleToggleSpectator = (targetId: string) => {
     if (isToggling || !onToggleSpectator) return;
     setIsToggling(true);
@@ -31,7 +33,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
       setIsToggling(false);
     }, 800);
   };
-  
+
   const activePlayers = gameState.players.filter(p => !p.isSpectator);
   const spectators = gameState.players.filter(p => p.isSpectator);
   const isHost = currentPlayer?.isHost ?? false;
@@ -47,10 +49,10 @@ export const PlayerList: React.FC<PlayerListProps> = ({
             key={player.id}
             className={`flex items-center gap-2.5 p-2 px-3 rounded-xl border transition-all duration-300 h-[56px] md:h-[62px] shadow-sm ${
               player.id === currentPlayer?.id
-                ? 'bg-amber-500/10 border-amber-500/30 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)]'
+                ? `${theme.accentBgLight} ${theme.accentBorder}`
                 : player.isSpectator
-                ? 'bg-[#1A1A1A]/60 border-white/5 opacity-60'
-                : 'bg-[#1A1A1A]/60 border-white/10 hover:border-white/30 hover:bg-[#1A1A1A]/80'
+                ? `${theme.innerCardBg} opacity-50`
+                : `${theme.innerCardBg} hover:${theme.accentBorder}`
             }`}
           >
             <div
@@ -80,14 +82,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({
               {/* Crown for host card (shown to all players) */}
               {player.isHost && (
                 <div
-                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-amber-400 shrink-0"
+                  className={`w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 shrink-0 ${theme.accentText}`}
                 >
                   <svg
                     width="14"
                     height="14"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
                   >
                     <title>Host</title>
                     <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />

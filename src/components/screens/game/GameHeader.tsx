@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { LanguageToggle } from '../../ui/LanguageToggle';
+import { ThemeToggle } from '../../ui/ThemeToggle';
+import { useTheme } from '../../../providers/ThemeProvider';
 
 interface GameHeaderProps {
   roomCode: string;
@@ -8,6 +10,7 @@ interface GameHeaderProps {
 }
 
 export const GameHeader: React.FC<GameHeaderProps> = ({ roomCode, onLeaveRoom, phaseLabel }) => {
+  const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
@@ -29,18 +32,18 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ roomCode, onLeaveRoom, p
   };
 
   return (
-    <div className="w-full bg-black/40 backdrop-blur-2xl border-b border-white/10 p-3 md:px-6 flex items-center justify-between shrink-0 shadow-lg gap-2 md:gap-4 select-none relative">
+    <div className={`w-full backdrop-blur-2xl border-b border-white/10 p-3 md:px-6 flex items-center justify-between shrink-0 shadow-lg gap-2 md:gap-4 select-none relative ${theme.cardBg}`}>
       {/* Left section: Logo + Game Phase */}
       <div className="flex items-center gap-2.5 md:gap-3.5 md:w-[304px] md:shrink-0">
         {/* Logo (Hidden on mobile) */}
-        <div className="hidden sm:flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border border-amber-500/30 bg-black/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] shrink-0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200 md:w-5 md:h-5">
+        <div className={`hidden sm:flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border ${theme.accentBorder} ${theme.accentBgLight} shrink-0`}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`${theme.accentText} md:w-5 md:h-5`}>
             <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
             <line x1="2" y1="19" x2="22" y2="19" />
           </svg>
         </div>
 
-        {/* Game Phase Description (No card, just text) */}
+        {/* Game Phase Description */}
         <span className="text-white font-cinzel font-bold text-xs xs:text-sm md:text-lg tracking-wider capitalize leading-none truncate max-w-[120px] xs:max-w-[180px] sm:max-w-none select-text">
           {phaseLabel}
         </span>
@@ -48,7 +51,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ roomCode, onLeaveRoom, p
 
       {/* Center section: Room Code + Copy Link Button */}
       <div className="flex-1 flex items-center justify-center gap-1.5 md:gap-2">
-        <div className="bg-white/5 rounded-xl border border-white/15 w-28 h-10 flex items-center justify-center font-cinzel font-bold text-sm md:text-base text-amber-300 tracking-[0.15em] shrink-0 leading-none">
+        <div className={`rounded-xl border border-white/15 w-28 h-10 flex items-center justify-center font-cinzel font-bold text-sm md:text-base ${theme.accentText} tracking-[0.15em] shrink-0 leading-none ${theme.innerCardBg}`}>
           {roomCode}
         </div>
 
@@ -57,7 +60,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ roomCode, onLeaveRoom, p
           className={`w-10 h-10 rounded-xl transition-all duration-300 border shadow-sm shrink-0 flex items-center justify-center ${
             copied
               ? 'text-green-400 border-green-500/30 bg-green-500/10 scale-105'
-              : 'text-white/40 border-white/10 bg-white/5 hover:text-amber-300 hover:border-white/20 hover:bg-white/10 hover:scale-105'
+              : `text-white/40 border-white/10 ${theme.innerCardBg} hover:${theme.accentText} hover:border-white/20 hover:scale-105`
           }`}
           title="Copiar link da sala"
           aria-label="Copiar link da sala"
@@ -75,8 +78,9 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ roomCode, onLeaveRoom, p
         </button>
       </div>
 
-      {/* Right section: Language Switch + Exit Button */}
+      {/* Right section: Theme Switch + Language Switch + Exit Button */}
       <div className="flex items-center gap-2 md:gap-3 shrink-0 flex-row md:absolute md:right-6">
+        <ThemeToggle className="relative !static !top-auto !right-auto shadow-none flex-shrink-0" />
         <LanguageToggle className="relative !static !top-auto !right-auto shadow-none flex-shrink-0" />
         
         <button

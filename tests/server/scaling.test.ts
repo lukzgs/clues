@@ -78,8 +78,8 @@ describe('Scaling Test - 10 Players', () => {
       victoryCondition: {
         scoreEnabled: true,
         targetScore: 30,
-        narratorRoundsEnabled: false,
-        narratorRounds: 2
+        narratorRoundsEnabled: true,
+        narratorRounds: 5
       },
       deckOption: 'original',
       phaseTimeouts: {

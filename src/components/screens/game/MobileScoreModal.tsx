@@ -1,6 +1,7 @@
 import React from 'react';
 import { GameState, Player, GamePhase } from '../../../types';
 import { useTranslation } from '../../../i18n/index.tsx';
+import { useTheme } from '../../../providers/ThemeProvider';
 
 interface MobileScoreModalProps {
   gameState: GameState;
@@ -24,6 +25,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
   hasVoted,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   if (!isMobileScoreOpen) return null;
 
   const activePlayers = gameState.players.filter(p => !p.isSpectator).sort((a, b) => b.score - a.score);
@@ -32,9 +34,9 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
   return (
     <div className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-auto">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsMobileScoreOpen(false)}></div>
-      <div className="bg-black/60 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col relative shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div className={`backdrop-blur-2xl border ring-1 ring-white/10 rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col relative shadow-2xl animate-in fade-in zoom-in-95 duration-200 transition-all ${theme.cardBg} ${theme.accentBorder}`}>
         <div className="flex items-center justify-between p-5 border-b border-white/10 shrink-0">
-          <h2 className="text-amber-300 font-cinzel font-bold text-lg tracking-widest uppercase flex items-center gap-2">
+          <h2 className={`font-cinzel font-bold text-lg tracking-widest uppercase flex items-center gap-2 ${theme.accentText}`}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             {t.lobby.players}
           </h2>
@@ -58,10 +60,10 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                 key={player.id}
                 className={`flex items-center gap-3 p-3 rounded-xl border ${
                   isCurrent 
-                    ? 'bg-amber-500/10 border-amber-500/30' 
+                    ? `${theme.innerCardBg} ${theme.accentBorder}` 
                     : isNarrator
                       ? 'bg-purple-500/10 border-purple-500/30'
-                      : 'bg-[#1A1A1A]/80 border-white/5'
+                      : `${theme.innerCardBg} border-white/5`
                 }`}
               >
                 <div 
@@ -73,7 +75,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`font-cinzel font-bold text-base truncate ${isCurrent ? 'text-amber-300' : 'text-white'}`}>
+                    <span className={`font-cinzel font-bold text-base truncate ${isCurrent ? theme.accentText : 'text-white'}`}>
                       {player.name}
                     </span>
                     {isNarrator && (
@@ -83,7 +85,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                       </span>
                     )}
                     {player.isHost && !isNarrator && (
-                      <span className="bg-amber-500 text-black text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold shadow-[0_0_10px_rgba(245,158,11,0.4)] shrink-0">
+                      <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-md font-bold border shrink-0 ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
                         Host
                       </span>
                     )}
@@ -94,7 +96,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                     )}
                   </div>
                   <div className="text-white/50 text-xs font-sans tracking-wide mt-1 flex items-center gap-1.5">
-                    <span className="font-mono text-amber-300 font-medium text-sm">{player.score}</span> {t.lobby.points}
+                    <span className={`font-mono font-medium text-sm ${theme.accentText}`}>{player.score}</span> {t.lobby.points}
                   </div>
                 </div>
 
@@ -134,7 +136,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
               </h3>
               <div className="flex flex-wrap gap-2 px-1">
                 {spectators.map(spec => (
-                  <div key={spec.id} className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 flex items-center gap-2">
+                  <div key={spec.id} className={`border rounded-lg px-2.5 py-1.5 flex items-center gap-2 ${theme.innerCardBg}`}>
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: spec.color }} />
                     <span className="text-white/60 text-[11px] font-sans truncate max-w-[100px]">{spec.name}</span>
                   </div>

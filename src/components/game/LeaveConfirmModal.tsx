@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
+import { Button } from '../ui/Button';
 
 interface LeaveConfirmModalProps {
   onConfirm: () => void;
@@ -11,9 +13,11 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
   onCancel,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in"
       onClick={onCancel}
     >
       {/* Backdrop */}
@@ -21,7 +25,7 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
 
       {/* Modal */}
       <div
-        className="relative bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 max-w-[380px] w-full animate-in fade-in zoom-in-95 duration-200"
+        className={`relative backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 max-w-[380px] w-full animate-zoom-in transition-all duration-300 ${theme.cardBg} ${theme.accentBorder}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Warning icon */}
@@ -47,18 +51,22 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
+          <Button
+            variant="glass"
+            size="md"
             onClick={onCancel}
-            className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 order-2 sm:order-1"
+            className="flex-1 order-2 sm:order-1"
           >
             {t.modals.leave.cancel}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="destructive"
+            size="md"
             onClick={onConfirm}
-            className="flex-1 py-3 md:py-3.5 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-sm md:text-base transition-all duration-200 bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-red-300 order-1 sm:order-2 shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+            className="flex-1 order-1 sm:order-2"
           >
             {t.modals.leave.leave}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

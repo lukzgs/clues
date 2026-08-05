@@ -5,6 +5,9 @@ import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 import { DesignSystemScreen } from './components/design-system/DesignSystemScreen';
 import { useTranslation } from './i18n/index.tsx';
 import { GameSessionProvider, useGameSession } from './providers/GameSessionProvider';
+import { ThemeProvider, useTheme } from './providers/ThemeProvider';
+import { LanguageToggle } from './components/ui/LanguageToggle';
+import { ThemeToggle } from './components/ui/ThemeToggle';
 
 // Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
@@ -17,6 +20,7 @@ function generateRoomCode(): string {
 const GameRouter: React.FC = () => {
   const { session, setSession, clearSession, urlRoomCode, clearUrlRoomCode } = useGameSession();
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   // Verifica se o usuario acessou /design-system ou /sysd
   const [isDesignSystem, setIsDesignSystem] = useState(() => {
@@ -134,24 +138,31 @@ const GameRouter: React.FC = () => {
   // Tela de conexão
   if (!gameState || !playerId) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center p-3 md:p-4">
+      <div
+        style={{ backgroundColor: theme.bgCanvas }}
+        className="relative min-h-screen flex items-center justify-center p-3 md:p-4 transition-colors duration-500 text-white font-sans"
+      >
+        <div className="fixed top-4 right-4 z-[300] flex items-center gap-2">
+          <ThemeToggle className="relative! top-auto! right-auto! z-auto!" />
+          <LanguageToggle className="relative! top-auto! right-auto! z-auto!" />
+        </div>
+
         <div
-          className="fixed inset-0 pointer-events-none z-[-1]"
+          className="fixed inset-0 pointer-events-none z-0"
           style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
         />
         <div
-          className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+          className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`}
         />
 
         <div className="w-full max-w-[420px] z-10">
           <div
-            className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center"
+            className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}
             style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
           >
-            <div className="mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-2 border-amber-500/20" />
-              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-400 animate-spin" />
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-200/60 md:w-5 md:h-5">
+            <div className={`mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full border bg-black/50 ring-1 ring-white/10 ${theme.accentBgLight} ${theme.accentBorder} ${theme.glowShadow}`}>
+              <div className={`absolute inset-0 rounded-full border-2 border-transparent border-t-current animate-spin ${theme.accentText}`} />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`md:w-5 md:h-5 transition-colors duration-300 ${theme.accentText}`}>
                 <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
                 <line x1="2" y1="19" x2="22" y2="19" />
               </svg>
@@ -160,8 +171,8 @@ const GameRouter: React.FC = () => {
             <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">
               {t.connecting.label}
             </p>
-            <div className="bg-[#1A1A1A]/50 rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border border-white/10 mb-2">
-              <span className="text-lg md:text-xl font-cinzel font-bold text-amber-300 tracking-wider">
+            <div className={`rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border mb-2 transition-all duration-300 ${theme.accentBorder} ${theme.accentBgLight}`}>
+              <span className={`text-lg md:text-xl font-cinzel font-bold tracking-wider ${theme.accentText}`}>
                 {session.roomCode}
               </span>
             </div>
@@ -288,9 +299,11 @@ const GameRouter: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <GameSessionProvider>
-      <GameRouter />
-    </GameSessionProvider>
+    <ThemeProvider>
+      <GameSessionProvider>
+        <GameRouter />
+      </GameSessionProvider>
+    </ThemeProvider>
   );
 };
 

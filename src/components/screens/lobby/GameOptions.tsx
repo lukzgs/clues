@@ -3,6 +3,7 @@ import { VictoryCondition, DeckOption, PhaseTimeouts } from '../../../types';
 import { calculateMaxNarratorRounds } from '../../../utils/gameMath';
 import { GAME_CONFIG } from '../../../constants';
 import { useTranslation } from '../../../i18n/index.tsx';
+import { useTheme } from '../../../providers/ThemeProvider';
 
 interface GameOptionsProps {
   isHost: boolean;
@@ -30,7 +31,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   activePlayersCount
 }) => {
   const { t } = useTranslation();
-  
+  const { theme } = useTheme();
+
   const maxRounds = calculateMaxNarratorRounds(deckOption, activePlayersCount);
 
   return (
@@ -44,8 +46,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         {isHost ? (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.scoreEnabled
-              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3 pb-2">
               <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
@@ -54,7 +56,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               <button
                 onClick={() => updateVC({ scoreEnabled: !vc.scoreEnabled })}
                 className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
-                  vc.scoreEnabled ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-white/10'
+                  vc.scoreEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
                 aria-label="Toggle score condition"
               >
@@ -80,8 +82,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                         if (!isNaN(v)) updateVC({ targetScore: v });
                       }}
                       onBlur={() => updateVC({ targetScore: Math.max(10, Math.min(100, vc.targetScore)) })}
-                      className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
-                        [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all
+                        [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                     />
                     <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.points}</span>
                   </div>
@@ -93,9 +95,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                   step={5}
                   value={Math.max(10, Math.min(100, vc.targetScore))}
                   onChange={(e) => updateVC({ targetScore: Number(e.target.value) })}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
-                    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                  className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                  style={{ accentColor: 'currentColor' }}
                 />
                 <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
                   <span>10</span>
@@ -107,15 +108,15 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         ) : (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.scoreEnabled
-              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3">
               <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.scoreEnabled ? 'text-white' : 'text-white/30'}`}>
                 {t.lobby.byScore}
               </span>
               {vc.scoreEnabled && (
-                <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                <span className={`w-12 h-7 md:w-14 md:h-8 flex items-center justify-center ${theme.innerCardBg} border border-white/10 rounded-lg ${theme.accentText} font-cinzel font-bold text-sm md:text-base tabular-nums`}>
                   {vc.targetScore}
                 </span>
               )}
@@ -127,8 +128,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         {isHost ? (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.narratorRoundsEnabled
-              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3 pb-2">
               <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
@@ -137,7 +138,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               <button
                 onClick={() => updateVC({ narratorRoundsEnabled: !vc.narratorRoundsEnabled })}
                 className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
-                  vc.narratorRoundsEnabled ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-white/10'
+                  vc.narratorRoundsEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
                 aria-label="Toggle rounds condition"
               >
@@ -163,8 +164,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                         if (!isNaN(v)) updateVC({ narratorRounds: v });
                       }}
                       onBlur={() => updateVC({ narratorRounds: Math.max(1, Math.min(maxRounds, vc.narratorRounds)) })}
-                      className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all
-                        [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all
+                        [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                     />
                     <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.times}</span>
                   </div>
@@ -176,9 +177,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                   step={1}
                   value={Math.max(1, Math.min(maxRounds, vc.narratorRounds))}
                   onChange={(e) => updateVC({ narratorRounds: Number(e.target.value) })}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
-                    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                  className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                  style={{ accentColor: 'currentColor' }}
                 />
                 <div className="flex justify-between text-[10px] md:text-[11px] text-white/30 mt-2 font-sans font-medium">
                   <span>1x</span>
@@ -190,15 +190,15 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         ) : (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.narratorRoundsEnabled
-              ? 'bg-[#1A1A1A]/50 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-              : 'bg-[#1A1A1A]/20 border-white/5 opacity-50'
+              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3">
               <span className={`text-xs md:text-base font-cinzel font-bold tracking-wider ${vc.narratorRoundsEnabled ? 'text-white' : 'text-white/30'}`}>
                 {t.lobby.byRounds}
               </span>
               {vc.narratorRoundsEnabled && (
-                <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                <span className={`w-12 h-7 md:w-14 md:h-8 flex items-center justify-center ${theme.innerCardBg} border border-white/10 rounded-lg ${theme.accentText} font-cinzel font-bold text-sm md:text-base tabular-nums`}>
                   {vc.narratorRounds}
                 </span>
               )}
@@ -215,9 +215,9 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
 
         {/* Warning about large player counts */}
         {activePlayersCount >= 8 && (
-          <div className="mt-4 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 flex items-start gap-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0 mt-0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            <p className="text-amber-200/80 text-[10px] md:text-xs font-sans tracking-wide leading-relaxed">
+          <div className={`mt-4 p-3 rounded-xl border flex items-start gap-3 ${theme.accentBgLight} ${theme.accentBorder}`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${theme.accentText} shrink-0 mt-0.5`}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <p className="text-white/80 text-[10px] md:text-xs font-sans tracking-wide leading-relaxed">
               Com <strong>{activePlayersCount} jogadores</strong> ativos, o máximo de opções foi automaticamente reduzido para garantir que o baralho tenha cartas suficientes para a partida inteira.
             </p>
           </div>
@@ -229,9 +229,9 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-3 font-sans font-bold">
           {t.lobby.cardPool}
         </p>
-        <div className="flex bg-[#1A1A1A]/50 border border-white/10 rounded-xl p-1 relative z-0">
+        <div className={`flex border rounded-xl p-1 relative z-0 transition-all duration-300 ${theme.innerCardBg}`}>
           <div
-            className="absolute inset-y-1 bg-amber-500/20 border border-amber-500/30 rounded-lg transition-all duration-300 z-[-1] shadow-[0_0_10px_rgba(245,158,11,0.1)]"
+            className={`absolute inset-y-1 rounded-lg transition-all duration-300 z-[-1] ${theme.accentBgLight} border ${theme.accentBorder}`}
             style={{
               width: 'calc(33.333% - 4px)',
               left: deckOption === 'original' ? '4px' : deckOption === 'new' ? 'calc(33.333% + 2px)' : 'calc(66.666%)',
@@ -243,7 +243,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               onClick={() => isHost && setDeckOption(option)}
               disabled={!isHost}
               className={`flex-1 py-2 md:py-2.5 text-[10px] md:text-sm font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg
-                ${deckOption === option ? 'text-amber-300' : 'text-white/40 hover:text-white/80'}
+                ${deckOption === option ? theme.accentText : 'text-white/40 hover:text-white/80'}
                 ${!isHost && 'cursor-default'}
               `}
             >
@@ -264,7 +264,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               <button
                 onClick={() => setTimerEnabled(!timerEnabled)}
                 className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
-                  timerEnabled ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-white/10'
+                  timerEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
                 aria-label="Toggle phase timeouts"
               >
@@ -283,7 +283,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 { key: 'voting' as keyof PhaseTimeouts, label: t.lobby.phaseVoting },
                 { key: 'results' as keyof PhaseTimeouts, label: t.lobby.phaseResults },
               ].map(({ key, label }) => (
-                <div key={key} className="bg-[#1A1A1A]/30 border border-white/5 rounded-xl p-3">
+                <div key={key} className={`border rounded-xl p-3 transition-all duration-300 ${theme.innerCardBg}`}>
                   <div className={`flex items-center justify-between ${isHost ? 'mb-2' : ''}`}>
                     <span className="text-xs md:text-sm font-cinzel font-bold text-white/80">{label}</span>
                     {isHost ? (
@@ -301,12 +301,12 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                             }
                           }}
                           onBlur={() => updateTimeout(key, phaseTimeouts[key])}
-                          className="w-14 md:w-16 bg-[#1A1A1A]/80 border border-white/20 rounded-lg px-1.5 py-1 text-amber-300 font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/30 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                         />
                         <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">{t.lobby.sec}</span>
                       </div>
                     ) : (
-                      <span className="w-12 h-7 md:w-14 md:h-8 flex items-center justify-center bg-[#1A1A1A]/80 border border-white/10 rounded-lg text-amber-300 font-cinzel font-bold text-sm md:text-base tabular-nums">
+                      <span className={`w-12 h-7 md:w-14 md:h-8 flex items-center justify-center ${theme.innerCardBg} border border-white/10 rounded-lg ${theme.accentText} font-cinzel font-bold text-sm md:text-base tabular-nums`}>
                         {phaseTimeouts[key]}
                       </span>
                     )}
@@ -319,9 +319,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                       step={1}
                       value={phaseTimeouts[key]}
                       onChange={(e) => updateTimeout(key, Number(e.target.value))}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-amber-500
-                        [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-amber-500/40
-                        [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-amber-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+                      className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                      style={{ accentColor: 'currentColor' }}
                     />
                   )}
                 </div>

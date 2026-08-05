@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../../../i18n/index.tsx';
+import { useTheme } from '../../../providers/ThemeProvider';
 
 interface RoomCodeDisplayProps {
   roomCode: string;
@@ -7,6 +8,7 @@ interface RoomCodeDisplayProps {
 
 export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({ roomCode }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
@@ -34,8 +36,8 @@ export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({ roomCode }) =>
         {t.lobby.roomCode}
       </p>
       <div className="relative inline-flex items-center justify-center max-w-full">
-        <div className="bg-[#1A1A1A]/60 rounded-2xl px-4 sm:px-6 md:px-8 py-2 md:py-3 inline-flex items-center justify-center border border-white/10 shadow-inner">
-          <span className="text-xl sm:text-2xl md:text-3xl font-cinzel font-bold text-amber-300 tracking-[0.15em] ml-1">
+        <div className={`rounded-2xl px-4 sm:px-6 md:px-8 py-2 md:py-3 inline-flex items-center justify-center border shadow-inner transition-all duration-300 ${theme.accentBgLight} ${theme.accentBorder}`}>
+          <span className={`text-xl sm:text-2xl md:text-3xl font-cinzel font-bold tracking-[0.15em] ml-1 ${theme.accentText}`}>
             {roomCode}
           </span>
         </div>
@@ -45,7 +47,7 @@ export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({ roomCode }) =>
             className={`p-2 sm:p-2.5 md:p-3 rounded-xl transition-all duration-300 border shadow-sm ${
               copied
                 ? 'text-green-400 border-green-500/30 bg-green-500/10 scale-105'
-                : 'text-white/40 border-white/10 bg-[#1A1A1A]/60 hover:text-amber-300 hover:border-white/20 hover:bg-[#1A1A1A]/80 hover:scale-105'
+                : `text-white/60 ${theme.innerCardBg} hover:${theme.accentText} hover:${theme.accentBorder} hover:scale-105`
             }`}
             title="Copy room link"
             aria-label="Copy room link"

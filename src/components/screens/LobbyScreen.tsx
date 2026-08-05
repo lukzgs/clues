@@ -4,6 +4,8 @@ import { calculateMaxPlayers } from '../../utils/gameMath';
 import { GAME_CONFIG } from '../../constants';
 import { useTranslation } from '../../i18n/index.tsx';
 import { LanguageToggle } from '../ui/LanguageToggle';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { useTheme } from '../../providers/ThemeProvider';
 import { GameOptions, PlayerList, RoomCodeDisplay, LobbyActions } from './lobby';
 
 interface LobbyScreenProps {
@@ -35,6 +37,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const isHost = currentPlayer?.isHost ?? false;
 
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
 
@@ -111,26 +114,32 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   };
 
   return (
-    <div className="relative h-[100dvh] overflow-hidden flex items-center justify-center p-3 md:p-4">
-      <LanguageToggle />
+    <div 
+      style={{ backgroundColor: theme.bgCanvas }}
+      className="relative h-[100dvh] overflow-hidden flex items-center justify-center p-3 md:p-4 transition-colors duration-500"
+    >
+      <div className="fixed top-4 right-4 z-[300] flex items-center gap-2">
+        <ThemeToggle className="relative! top-auto! right-auto! z-auto!" />
+        <LanguageToggle className="relative! top-auto! right-auto! z-auto!" />
+      </div>
       {/* Ambient Lighting — same as JoinScreen */}
       <div
-        className="fixed inset-0 pointer-events-none z-[-1]"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
       />
       <div
-        className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]"
+        className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`}
       />
 
       <div className="w-full max-w-[1250px] z-10 h-full max-h-[95dvh] md:max-h-[90dvh] flex flex-col">
         <div
-          className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 flex flex-col flex-1 min-h-0"
+          className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 flex flex-col flex-1 min-h-0 transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 min-h-0">
             
             {/* Left Panel: Game Options (Desktop Only) */}
-            <div className="hidden lg:flex flex-col h-full min-h-0 bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 md:p-6" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+            <div className={`hidden lg:flex flex-col h-full min-h-0 border rounded-2xl p-4 md:p-6 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`} style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
               <GameOptions 
                 isHost={isHost}
                 vc={vc}
@@ -162,7 +171,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             </div>
 
             {/* Right Panel: Room Code & Players */}
-            <div className="flex flex-col h-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 md:p-6 min-h-0" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+            <div className={`flex flex-col h-full bg-[#1A1A1A]/30 border rounded-2xl p-4 md:p-6 min-h-0 transition-all duration-500 ${theme.accentBorder}`} style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               <RoomCodeDisplay roomCode={gameState.roomCode} />
 
               <PlayerList 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameState, GamePhase, Card, TableCard } from '../../types';
 import { useTranslation } from '../../i18n';
+import { useTheme } from '../../providers/ThemeProvider';
 import {
   ClueModal,
   ResultsView,
@@ -59,6 +60,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const [layout, setLayout] = useState<'row' | 'grid-1' | 'grid-2'>('row');
   const [tableMobileView, setTableMobileView] = useState<'row' | 'grid-1' | 'grid-2'>('grid-2');
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   const narrator = gameState.players[gameState.narratorIndex];
@@ -166,19 +168,26 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   if (gameState.phase === GamePhase.RESULTS) {
     return (
-      <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
-        <div className="fixed inset-0 pointer-events-none z-[-1]" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
-        <div className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]" />
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <ResultsView
-            gameState={gameState}
+      <div style={{ backgroundColor: theme.bgCanvas }} className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0 transition-colors duration-500">
+        <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
+        <div className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`} />
+        
+        <GameHeader 
+          roomCode={gameState.roomCode} 
+          onLeaveRoom={() => setShowLeaveConfirm(true)} 
+          phaseLabel={t.game.phaseLabelResults} 
+        />
+        <div className="flex-1 flex flex-col min-h-0 w-full p-3 md:p-4 overflow-hidden">
+          <ResultsView 
+            gameState={gameState} 
             playerId={playerId}
             onNextRound={onNextRound}
             onLeaveRoom={() => setShowLeaveConfirm(true)}
             onKickPlayer={onKickPlayer}
-            isHost={currentPlayer?.isHost ?? false}
+            isHost={isHost}
           />
         </div>
+
         {showLeaveConfirm && <LeaveConfirmModal onConfirm={handleLeaveConfirm} onCancel={() => setShowLeaveConfirm(false)} />}
       </div>
     );
@@ -186,9 +195,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   if (gameState.phase === GamePhase.GAME_OVER) {
     return (
-      <div className="relative h-[100dvh] flex flex-col overflow-hidden z-0">
-        <div className="fixed inset-0 pointer-events-none z-[-1]" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
-        <div className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]" />
+      <div style={{ backgroundColor: theme.bgCanvas }} className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0 transition-colors duration-500">
+        <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
+        <div className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`} />
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <GameOverView
             gameState={gameState}
@@ -203,9 +212,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0">
-      <div className="fixed inset-0 pointer-events-none z-[-1]" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
-      <div className="fixed top-[30%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[150px] rounded-full pointer-events-none z-[-1]" />
+    <div style={{ backgroundColor: theme.bgCanvas }} className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0 transition-colors duration-500">
+      <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }} />
+      <div className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`} />
       
       <GameHeader 
         roomCode={gameState.roomCode} 
