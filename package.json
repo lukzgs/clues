@@ -11,7 +11,9 @@
     "party:deploy": "partykit deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "metrics:local": "tsx scripts/fetch-metrics.ts",
+    "metrics:prod": "tsx scripts/fetch-metrics.ts --prod"
   },
   "dependencies": {
     "partysocket": "^1.1.10",
