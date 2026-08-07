@@ -135,8 +135,149 @@ interface ServerGameState {
 }
 ```
 
+## Telemetry & Metrics System
+
+The server incorporates an in-memory telemetry and global registry system to track server-wide and room-specific technical metrics, error rates, and reconnection lifecycle events.
+
+### Architecture
+
+1. **Room Telemetry (`party/telemetry.ts`)**: Each `GameServer` instance maintains counters and a 20-entry ring buffer of recent events (`RECONNECT_SUCCESS`, `RECONNECT_FAILED`, `GHOST_SOCKET_KICK`, `RATE_LIMIT_EXCEEDED`, `VALIDATION_ERROR`, `UNCAUGHT_ERROR`).
+2. **Global Registry (`party/registry.ts`)**: A single-instance PartyKit Durable Object server (`RegistryServer`) that indexes all active rooms, aggregates global CCU (Concurrent Connected Users), human/bot/spectator totals, and server-wide telemetry counters.
+3. **HTTP PULL Endpoints**: Protected HTTP GET endpoints for metric scraping.
+
+### Security Guards
+
+- **Authentication Guard**: All metric endpoints require `Authorization: Bearer <METRICS_SECRET_TOKEN>`. Returns `401 Unauthorized` if missing or invalid.
+- **HTTP Method Guard**: Strict `GET` method enforcement. Returns `405 Method Not Allowed` for other methods.
+- **CORS Guard**: Set to `Access-Control-Allow-Origin: null` to prevent unauthorized cross-origin browser reads.
+- **Data Sanitization**: Sensitive values (reconnect tokens, user IP addresses) are sanitized or excluded.
+
+---
+
+### HTTP API & JSON Payloads
+
+#### 1. Global Metrics Endpoint (`GET /parties/registry/global/metrics`)
+
+Returns aggregated metrics across all active game instances.
+
+##### JSON Response Specification:
+
+```json
+{
+  "timestamp": "2026-08-07T13:40:00.000Z",
+  "uptimeSeconds": 1420,
+  "activeRoomsCount": 2,
+  "globalCCU": 8,
+  "totalHumanPlayers": 6,
+  "totalBotPlayers": 2,
+  "totalSpectators": 0,
+  "phaseDistribution": {
+    "LOBBY": 1,
+    "VOTING": 1
+  },
+  "aggregatedCounters": {
+    "reconnectsTotal": 5,
+    "reconnectsSuccessful": 4,
+    "reconnectsFailedInvalidId": 1,
+    "ghostSocketKicks": 2,
+    "rateLimitViolations": 0,
+    "schemaValidationErrors": 1,
+    "uncaughtErrors": 0
+  },
+  "rooms": [
+    {
+      "roomCode": "HVQZQA",
+      "phase": "LOBBY",
+      "activeConnectionsCount": 3,
+      "totalPlayersCount": 3,
+      "humanPlayersCount": 2,
+      "botPlayersCount": 1,
+      "spectatorsCount": 0,
+      "uptimeSeconds": 120,
+      "counters": {
+        "reconnectsTotal": 1,
+        "reconnectsSuccessful": 1,
+        "reconnectsFailedInvalidId": 0,
+        "ghostSocketKicks": 0,
+        "rateLimitViolations": 0,
+        "schemaValidationErrors": 0,
+        "uncaughtErrors": 0
+      },
+      "lastSeenTimestamp": 1786110000000
+    }
+  ]
+}
+```
+
+#### 2. Room Specific Endpoint (`GET /parties/main/:roomCode/metrics`)
+
+Returns detailed technical metrics and recent event logs for a single room.
+
+##### JSON Response Specification:
+
+```json
+{
+  "roomCode": "HVQZQA",
+  "uptimeSeconds": 120,
+  "createdTimestamp": "2026-08-07T13:38:00.000Z",
+  "counters": {
+    "reconnectsTotal": 1,
+    "reconnectsSuccessful": 0,
+    "reconnectsFailedInvalidId": 1,
+    "ghostSocketKicks": 0,
+    "rateLimitViolations": 0,
+    "schemaValidationErrors": 0,
+    "uncaughtErrors": 0
+  },
+  "roomSummary": {
+    "phase": "LOBBY",
+    "activeConnectionsCount": 1,
+    "totalPlayersCount": 1,
+    "humanPlayersCount": 1,
+    "botPlayersCount": 0,
+    "spectatorsCount": 0
+  },
+  "recentLogs": [
+    {
+      "timestamp": "2026-08-07T13:38:05.000Z",
+      "type": "RECONNECT_FAILED",
+      "message": "Reconnect failed: Invalid or expired reconnectId",
+      "details": {
+        "safeReconnectId": "abc1...xyz2"
+      }
+    }
+  ]
+}
+```
+
+---
+
+### Terminal CLI Usage
+
+Terminal metric scraping helper via `scripts/fetch-metrics.ts`:
+
+```bash
+# Global local server dashboard
+npm run metrics:local
+
+# Global deployed cloud dashboard
+npm run metrics:prod
+
+# Single room inspection (Local)
+npm run metrics:local -- --room HVQZQA
+
+# Single room inspection (Deployed Cloud)
+npm run metrics:prod -- --room HVQZQA
+
+# Raw JSON output
+npm run metrics:local -- --raw
+```
+
+---
+
 ## Related Documentation
 
 - [Message Types](./MESSAGES.md)
 - [State Machine](./STATE_MACHINE.md)
 - [Client Documentation](./CLIENT.md)
+- [Architecture Overview](./ARCHITECTURE.md)

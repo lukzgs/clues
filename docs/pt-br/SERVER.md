@@ -135,8 +135,149 @@ interface ServerGameState {
 }
 ```
 
+## Sistema de Telemetria e Métricas
+
+O servidor possui um sistema em memória de telemetria e registro global para monitorar métricas técnicas do servidor e de cada sala, taxas de erros e eventos de ciclo de vida de reconexão.
+
+### Arquitetura
+
+1. **Telemetria de Sala (`party/telemetry.ts`)**: Cada instância de `GameServer` mantém contadores e um buffer circular de 20 eventos recentes (`RECONNECT_SUCCESS`, `RECONNECT_FAILED`, `GHOST_SOCKET_KICK`, `RATE_LIMIT_EXCEEDED`, `VALIDATION_ERROR`, `UNCAUGHT_ERROR`).
+2. **Registro Global (`party/registry.ts`)**: Uma instância única do servidor PartyKit (`RegistryServer`) que indexa todas as salas ativas, agrega o total de usuários simultâneos (CCU Global), estatísticas de humanos/bots/espectadores e contadores de telemetria acumulados.
+3. **Endpoints HTTP PULL**: Endpoints HTTP GET protegidos para coleta de métricas.
+
+### Guards de Segurança
+
+- **Guard de Autenticação**: Todos os endpoints de métricas exigem o cabeçalho `Authorization: Bearer <METRICS_SECRET_TOKEN>`. Retorna `401 Unauthorized` se ausente ou inválido.
+- **Guard de Método HTTP**: Restrição estrita do método `GET`. Retorna `405 Method Not Allowed` para outros métodos.
+- **Guard de CORS**: Configurado como `Access-Control-Allow-Origin: null` para bloquear leitura via navegadores de terceiros.
+- **Sanitização de Dados**: Valores sensíveis (tokens de reconexão, endereços IP) são higienizados ou excluídos.
+
+---
+
+### API HTTP & Especiﬁcação dos JSONs
+
+#### 1. Endpoint de Métricas Globais (`GET /parties/registry/global/metrics`)
+
+Retorna as métricas agregadas de todas as instâncias de jogo ativas no servidor.
+
+##### Especificação da Resposta JSON:
+
+```json
+{
+  "timestamp": "2026-08-07T13:40:00.000Z",
+  "uptimeSeconds": 1420,
+  "activeRoomsCount": 2,
+  "globalCCU": 8,
+  "totalHumanPlayers": 6,
+  "totalBotPlayers": 2,
+  "totalSpectators": 0,
+  "phaseDistribution": {
+    "LOBBY": 1,
+    "VOTING": 1
+  },
+  "aggregatedCounters": {
+    "reconnectsTotal": 5,
+    "reconnectsSuccessful": 4,
+    "reconnectsFailedInvalidId": 1,
+    "ghostSocketKicks": 2,
+    "rateLimitViolations": 0,
+    "schemaValidationErrors": 1,
+    "uncaughtErrors": 0
+  },
+  "rooms": [
+    {
+      "roomCode": "HVQZQA",
+      "phase": "LOBBY",
+      "activeConnectionsCount": 3,
+      "totalPlayersCount": 3,
+      "humanPlayersCount": 2,
+      "botPlayersCount": 1,
+      "spectatorsCount": 0,
+      "uptimeSeconds": 120,
+      "counters": {
+        "reconnectsTotal": 1,
+        "reconnectsSuccessful": 1,
+        "reconnectsFailedInvalidId": 0,
+        "ghostSocketKicks": 0,
+        "rateLimitViolations": 0,
+        "schemaValidationErrors": 0,
+        "uncaughtErrors": 0
+      },
+      "lastSeenTimestamp": 1786110000000
+    }
+  ]
+}
+```
+
+#### 2. Endpoint Específico da Sala (`GET /parties/main/:roomCode/metrics`)
+
+Retorna métricas técnicas detalhadas e histórico recente de logs de eventos para uma sala específica.
+
+##### Especificação da Resposta JSON:
+
+```json
+{
+  "roomCode": "HVQZQA",
+  "uptimeSeconds": 120,
+  "createdTimestamp": "2026-08-07T13:38:00.000Z",
+  "counters": {
+    "reconnectsTotal": 1,
+    "reconnectsSuccessful": 0,
+    "reconnectsFailedInvalidId": 1,
+    "ghostSocketKicks": 0,
+    "rateLimitViolations": 0,
+    "schemaValidationErrors": 0,
+    "uncaughtErrors": 0
+  },
+  "roomSummary": {
+    "phase": "LOBBY",
+    "activeConnectionsCount": 1,
+    "totalPlayersCount": 1,
+    "humanPlayersCount": 1,
+    "botPlayersCount": 0,
+    "spectatorsCount": 0
+  },
+  "recentLogs": [
+    {
+      "timestamp": "2026-08-07T13:38:05.000Z",
+      "type": "RECONNECT_FAILED",
+      "message": "Reconnect failed: Invalid or expired reconnectId",
+      "details": {
+        "safeReconnectId": "abc1...xyz2"
+      }
+    }
+  ]
+}
+```
+
+---
+
+### Uso via Terminal (CLI)
+
+Utilitário de consulta via terminal em `scripts/fetch-metrics.ts`:
+
+```bash
+# Dashboard local do servidor
+npm run metrics:local
+
+# Dashboard do ambiente implantado na nuvem (Prod/Deployed)
+npm run metrics:prod
+
+# Inspeção de uma sala específica (Local)
+npm run metrics:local -- --room HVQZQA
+
+# Inspeção de uma sala específica (Nuvem / Deployed)
+npm run metrics:prod -- --room HVQZQA
+
+# Saída em JSON bruto
+npm run metrics:local -- --raw
+```
+
+---
+
 ## Documentação Relacionada
 
 - [Tipos de Mensagens](./MESSAGES.md)
 - [Máquina de Estados](./STATE_MACHINE.md)
 - [Documentação do Cliente](./CLIENT.md)
+- [Visão Geral da Arquitetura](./ARCHITECTURE.md)
