@@ -37,6 +37,7 @@ export async function handleJoinRoom(
         // Assume que a nova conexão (mesmo jogador) é a correta e derruba a antiga imediatamente.
         if (existingConnIdSaved) server.connections.delete(existingConnIdSaved);
         existingConn.close(1000, "Reconnected elsewhere");
+        server.telemetry.recordGhostSocketKick(player.id, player.name);
       }
 
       // Reclaim: map new connection to existing player
@@ -61,9 +62,11 @@ export async function handleJoinRoom(
         yourPlayerId: player.id
       });
       
+      server.telemetry.recordReconnectSuccess(player.name, reconnectId);
       return;
     }
     // reconnectId invalid — fall through to normal join
+    server.telemetry.recordReconnectFailed(reconnectId);
   }
 
   // Verifica fase — allow mid-game join as spectator

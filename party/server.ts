@@ -30,6 +30,10 @@ import {
 import { handleKickPlayer, handleToggleSpectator, handleRequestPlay } from "./handlers/spectator";
 import { getAfkPlayers, handleVoteKickAfk, checkPhaseProgression } from "./handlers/afk";
 import { handleAddBot, handleRemoveBot, triggerBotActions } from "./handlers/bot";
+import { ServerTelemetry } from "./telemetry";
+import RegistryServer, { globalRegistry } from "./registry";
+
+export { RegistryServer as registry };
 
 // [BOT] Import dinâmico - não falha se bots não existir
 let BotManagerClass: any = null;
@@ -55,11 +59,15 @@ export default class GameServer implements Party.Server {
   // [BOT] Gerenciador de bots (opcional)
   public botManager: any = null;
 
+  // [TELEMETRY] Coletor de telemetria e logs da sala
+  public telemetry: ServerTelemetry;
+
   // Rate limiting: connectionId -> { count, windowStart }
   private rateLimitData: Map<string, { count: number; windowStart: number }> = new Map();
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
+    this.telemetry = new ServerTelemetry();
     // [BOT] Inicializa gerenciador de bots se disponível
     if (BotManagerClass) {
       this.botManager = new BotManagerClass();
@@ -111,6 +119,7 @@ export default class GameServer implements Party.Server {
       gameState: this.getPublicState(null),
       yourPlayerId: '',
     });
+    this.notifyRegistry();
   }
 
   onClose(conn: Party.Connection) {
@@ -170,6 +179,8 @@ export default class GameServer implements Party.Server {
       });
 
       this.broadcastState();
+    } else {
+      this.notifyRegistry();
     }
   }
 
@@ -192,6 +203,7 @@ export default class GameServer implements Party.Server {
     }
 
     if (data.count >= MAX_MESSAGES) {
+      this.telemetry.recordRateLimitHit(connId);
       return false;
     }
 
@@ -215,6 +227,7 @@ export default class GameServer implements Party.Server {
       const parsed = ClientMessageSchema.safeParse(JSON.parse(message));
       if (!parsed.success) {
         console.warn('Mensagem inválida:', parsed.error.issues);
+        this.telemetry.recordValidationError(sender.id, JSON.stringify(parsed.error.issues));
         return; // Ignora silenciosamente
       }
       const msg = parsed.data;
@@ -287,7 +300,70 @@ export default class GameServer implements Party.Server {
       }
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
+      this.telemetry.recordUncaughtError(error instanceof Error ? error.message : String(error));
     }
+  }
+
+  // ============================================
+  // ENDPOINT HTTP DE TELEMETRIA (PULL MODEL)
+  // ============================================
+
+  async onRequest(req: Party.Request): Promise<Response> {
+    const url = new URL(req.url);
+
+    if (url.pathname === "/metrics" || url.pathname.endsWith("/metrics")) {
+      if (req.method !== "GET") {
+        return new Response("Method Not Allowed", { status: 405 });
+      }
+
+      // Guard de Autenticação (Bearer Token)
+      const authHeader = req.headers.get("Authorization");
+      const expectedToken =
+        (this.room.env as Record<string, string> | undefined)?.METRICS_SECRET_TOKEN ||
+        process.env.METRICS_SECRET_TOKEN ||
+        "dev-secret-token";
+
+      if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Return global server snapshot if room ID is 'global' or URL targets registry/global
+      const cleanPath = url.pathname.toLowerCase();
+      if (this.room.id.toLowerCase() === "global" || cleanPath.includes("/global/") || cleanPath.includes("registry")) {
+        const snapshot = globalRegistry.getGlobalSnapshot();
+        return new Response(JSON.stringify(snapshot, null, 2), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "null",
+          },
+        });
+      }
+
+      const roomSummary = {
+        phase: this.state.phase,
+        activeConnectionsCount: this.connections.size,
+        totalPlayersCount: this.state.players.length,
+        humanPlayersCount: this.state.players.filter(p => !p.isBot).length,
+        botPlayersCount: this.state.players.filter(p => p.isBot).length,
+        spectatorsCount: this.state.players.filter(p => p.isSpectator).length,
+      };
+
+      const metricsSnapshot = this.telemetry.getSnapshot(this.room.id, roomSummary);
+
+      return new Response(JSON.stringify(metricsSnapshot, null, 2), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "null",
+        },
+      });
+    }
+
+    return new Response("Not Found", { status: 404 });
   }
 
   public async resetInactivityTimer() {
@@ -321,6 +397,7 @@ export default class GameServer implements Party.Server {
       
       // Limpa storage
       await this.room.storage.deleteAll();
+      await this.notifyRegistry(true);
     }
   }
 
@@ -397,6 +474,7 @@ export default class GameServer implements Party.Server {
     this.state.phaseStartTime = Date.now();
     this.state.afkKickVotes = [];
     this.state.playersWhoReadied = [];
+    this.notifyRegistry();
   }
 
   public getAfkPlayers(): Player[] {
@@ -459,6 +537,38 @@ export default class GameServer implements Party.Server {
           yourPlayerId: playerId,
         });
       }
+    }
+    this.notifyRegistry();
+  }
+
+  public notifyRegistry(isUnregister: boolean = false) {
+    try {
+      if (isUnregister) {
+        globalRegistry.unregisterRoom(this.room.id);
+      } else {
+        const roomSummary = {
+          phase: this.state.phase,
+          activeConnectionsCount: this.room.getConnections ? Array.from(this.room.getConnections()).length : this.connections.size,
+          totalPlayersCount: this.state.players.length,
+          humanPlayersCount: this.state.players.filter(p => !p.isBot).length,
+          botPlayersCount: this.state.players.filter(p => p.isBot).length,
+          spectatorsCount: this.state.players.filter(p => p.isSpectator).length,
+        };
+        const snapshot = this.telemetry.getSnapshot(this.room.id, roomSummary);
+        globalRegistry.registerOrUpdateRoom({
+          roomCode: this.room.id,
+          phase: snapshot.roomSummary.phase,
+          activeConnectionsCount: snapshot.roomSummary.activeConnectionsCount,
+          totalPlayersCount: snapshot.roomSummary.totalPlayersCount,
+          humanPlayersCount: snapshot.roomSummary.humanPlayersCount,
+          botPlayersCount: snapshot.roomSummary.botPlayersCount,
+          spectatorsCount: snapshot.roomSummary.spectatorsCount,
+          uptimeSeconds: snapshot.uptimeSeconds,
+          counters: snapshot.counters,
+        });
+      }
+    } catch {
+      // Fail-safe: telemetry communication should never throw or disrupt game logic
     }
   }
 
