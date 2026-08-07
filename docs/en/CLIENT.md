@@ -33,8 +33,9 @@ A React context provider that manages browser session storage and URL query para
 A React context provider that manages the active visual theme preset across the application.
 
 **Key Responsibilities:**
-- Provides 5 distinct theme presets: **Mystic Gold**, **Transparent Crystal**, **Violet Eclipse**, **Deep Crimson**, and **Ethereal Mist**.
+- Provides 7 distinct theme presets: **Mystic Gold**, **Transparent Crystal**, **Violet Eclipse**, **Deep Crimson**, **Ethereal Mist**, **Illusion Mirror**, and **Hidden Guardian**.
 - Configures dynamic theme tokens including `bgCanvas`, `ambientOrb`, `cardBg` (`backdrop-blur-2xl`), `innerCardBg` (`backdrop-blur-xl`), `inputBg`, `secondaryBtnBg`, `primaryGradient`, `accentText`, `accentBorder`, and `glowShadow`.
+- Uses clean, neutral glass borders (`border-white/10`) for structural card containers while directing vibrant theme accents to buttons, badges, inputs, and active highlights.
 - Exposes `useTheme()` hook for dynamic color, glow, and border adaptations across UI components.
 - Powers the fixed ambient lighting background (`w-[700px] h-[700px] top-[20%] z-0`) shining through frosted glass panels across all screens.
 
@@ -44,7 +45,7 @@ A React context provider that manages the active visual theme preset across the 
 
 ### `Button` (`src/components/ui/Button.tsx`)
 
-Single source of truth for all buttons in the application, directly mirroring the 5 SysD variants.
+Single source of truth for all buttons in the application, directly mirroring the SysD variants.
 
 **Variants:**
 - `primary`: Amber/gold or theme primary gradient CTA button.
@@ -64,14 +65,14 @@ Single source of truth for all buttons in the application, directly mirroring th
 Interactive Design System and Style Showcase accessible via `/design-system` or `/sysd`.
 
 **Features:**
-- **Live Theme Selector Bar**: Allows instant switching between all 5 themes with real-time adaptation of cards, buttons, inputs, and background ambient lighting.
+- **Live Theme Selector Bar**: Allows instant switching between all 7 themes with real-time adaptation of cards, buttons, inputs, and background ambient lighting.
 - **Header Language Toggle**: Dynamically switches all text, theme names, and section titles between Portuguese (PT-BR) and English (EN-US).
 - **7 Complete Sections**:
   1. *Colors & Surfaces*: Swatches with HEX, RGB, and Tailwind classes.
-  2. *Typography*: Live interactive phrase tester.
+  2. *Typography*: Live interactive phrase tester. Standardized on Cinzel, Playfair Display, and Inter (`tabular-nums font-sans` for scores).
   3. *Button System*: Matrix and interactive playground using `<Button>`.
   4. *Form Controls*: Text inputs, password eye toggle, custom selects, textareas, checkboxes, radio buttons, and switches.
-  5. *Data Cards & Metrics*: Statistical metric cards and interactive glass modal dialogs.
+  5. *Data Cards & Metrics*: Statistical metric cards, real screen card previews, and interactive glass modal dialogs.
   6. *Notifications & Feedback*: Static inline alerts and dynamic floating toast triggers.
   7. *Real Layout Previews*: Interactive mockups for Join Screen, full Lobby Screen (with options cards, deck selector, and player list), and all 4 Dixit gameplay phases.
 

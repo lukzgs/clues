@@ -33,8 +33,9 @@ Provedor de contexto React que gerencia o armazenamento de sessões no navegador
 Provedor de contexto React que gerencia o tema visual ativo em toda a aplicação.
 
 **Responsabilidades Principais:**
-- Provê 5 predefinições de temas distintos: **Ouro Místico**, **Cristal Transparente**, **Eclipse Violeta**, **Carmim Profundo** e **Névoa Etérea**.
+- Provê 7 predefinições de temas distintos: **Ouro Místico**, **Cristal Transparente**, **Eclipse Violeta**, **Carmim Profundo**, **Névoa Etérea**, **Espelho da Ilusão** e **O Guardião Oculto**.
 - Configura os tokens dinâmicos de tema incluindo `bgCanvas`, `ambientOrb`, `cardBg` (`backdrop-blur-2xl`), `innerCardBg` (`backdrop-blur-xl`), `inputBg`, `secondaryBtnBg`, `primaryGradient`, `accentText`, `accentBorder` e `glowShadow`.
+- Utiliza bordas neutras e elegantes (`border-white/10`) para containers de cards estruturais, direcionando o acento de cor do tema para botões, badges, inputs e focos ativos.
 - Expõe o hook `useTheme()` para adaptação dinâmica de cores, brilhos e bordas nos componentes de UI.
 - Alimenta o fundo de iluminação ambiente fixo (`w-[700px] h-[700px] top-[20%] z-0`) que brilha através dos painéis de vidro fosco translúcido em todas as telas.
 
@@ -44,7 +45,7 @@ Provedor de contexto React que gerencia o tema visual ativo em toda a aplicaçã
 
 ### `Button` (`src/components/ui/Button.tsx`)
 
-Fonte única da verdade para todos os botões da aplicação, espelhando diretamente as 5 variantes do SysD.
+Fonte única da verdade para todos os botões da aplicação, espelhando diretamente as variantes do SysD.
 
 **Variantes:**
 - `primary`: Botão principal com gradiente do tema ativo (dourado/âmbar ou equivalente).
@@ -64,14 +65,14 @@ Fonte única da verdade para todos os botões da aplicação, espelhando diretam
 Página interativa de documentação e showcase do Design System e Guia de Estilo, acessível via `/design-system` ou `/sysd`.
 
 **Funcionalidades:**
-- **Seletor de Temas ao Vivo**: Permite a troca instantânea entre os 5 temas com reatividade em tempo real de cards, botões, inputs e iluminação ambiente.
+- **Seletor de Temas ao Vivo**: Permite a troca instantânea entre os 7 temas com reatividade em tempo real de cards, botões, inputs e iluminação ambiente.
 - **Alternador de Idioma no Cabeçalho**: Traduz dinamicamente todos os textos, nomes de temas e seções entre Português (PT-BR) e Inglês (EN-US).
 - **7 Seções Completas**:
   1. *Cores & Superfícies*: Swatches com classes HEX, RGB e Tailwind.
-  2. *Tipografia*: Testador interativo de frases em tempo real.
+  2. *Tipografia*: Testador interativo de frases em tempo real. Padronizado em Cinzel, Playfair Display e Inter (`tabular-nums font-sans` para numerais e placares).
   3. *Sistema de Botões*: Matriz completa e playground interativo usando `<Button>`.
   4. *Controles de Formulário*: Entradas de texto, alternância de exibição de senha, selects customizados, textareas, checkboxes, radio buttons e switches.
-  5. *Cards & Métricas*: Cards de estatísticas e modais de confirmação em vidro.
+  5. *Cards & Métricas*: Cards de estatísticas, previews de cards reais das telas e modais de confirmação em vidro.
   6. *Notificações & Feedback*: Alertas estáticos e disparadores de toasts flutuantes.
   7. *Previews de Layout Real*: Previews interativos das telas de Join, Lobby completo (com cards de opções, seletor de baralho e lista de jogadores) e as 4 fases do jogo Dixit.
 
