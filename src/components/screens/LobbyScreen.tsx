@@ -133,13 +133,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
       <div className="w-full max-w-[1250px] z-10 h-full max-h-[95dvh] md:max-h-[90dvh] flex flex-col">
         <div
-          className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 flex flex-col flex-1 min-h-0 transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}
+          className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 flex flex-col flex-1 min-h-0 transition-all duration-500 ${theme.cardBg}`}
           style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 min-h-0">
             
             {/* Left Panel: Game Options (Desktop Only) */}
-            <div className={`hidden lg:flex flex-col h-full min-h-0 border rounded-2xl p-4 md:p-6 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`} style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
+            <div className="hidden lg:flex flex-col h-full min-h-0 bg-black/25 border border-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 transition-all duration-500" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
               <GameOptions 
                 isHost={isHost}
                 vc={vc}
@@ -171,7 +171,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
             </div>
 
             {/* Right Panel: Room Code & Players */}
-            <div className={`flex flex-col h-full bg-[#1A1A1A]/30 border rounded-2xl p-4 md:p-6 min-h-0 transition-all duration-500 ${theme.accentBorder}`} style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
+            <div className="flex flex-col h-full bg-black/25 border border-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 min-h-0 transition-all duration-500" style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' }}>
               <RoomCodeDisplay roomCode={gameState.roomCode} />
 
               <PlayerList 

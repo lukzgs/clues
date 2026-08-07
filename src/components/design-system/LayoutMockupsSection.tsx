@@ -135,7 +135,7 @@ export const LayoutMockupsSection: React.FC = () => {
 
       {/* MOCKUP 2: LOBBY SCREEN (CARDS & OPTIONS SHOWCASE) */}
       {activeMockupTab === 'lobby' && (
-        <div className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}>
+        <div className={`backdrop-blur-2xl border border-white/10 ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-500 ${theme.cardBg}`}>
           
           {/* Real Lobby Room Code Display */}
           <div className="border-b border-white/10 pb-4 mb-6">
@@ -144,18 +144,18 @@ export const LayoutMockupsSection: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Panel: Game Options */}
-            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg}`}>
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
                 <h4 className={`font-cinzel text-base font-bold tracking-wider ${theme.accentText}`}>
                   Opções da Partida (GameOptions)
                 </h4>
-                <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-lg border font-bold ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}>
+                <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-lg border font-bold ${theme.accentBgLight} ${theme.accentText} border-white/10`}>
                   HOST
                 </span>
               </div>
 
               {/* Score condition card */}
-              <div className={`rounded-xl border p-3.5 space-y-3 transition-all duration-300 ${theme.innerCardBg} ${theme.accentBorder}`}>
+              <div className={`rounded-xl border p-3.5 space-y-3 transition-all duration-300 ${theme.innerCardBg}`}>
                 <div className="flex items-center justify-between">
                   <span className="font-cinzel font-bold text-sm text-white">Por Pontuação Alvo</span>
                   <button
@@ -226,7 +226,7 @@ export const LayoutMockupsSection: React.FC = () => {
             </div>
 
             {/* Right Panel: Player List Cards */}
-            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+            <div className={`border rounded-2xl p-5 md:p-6 space-y-5 transition-all duration-500 ${theme.innerCardBg}`}>
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
                 <h4 className="font-cinzel text-base font-bold text-white tracking-wider">
                   Jogadores na Sala (Player Cards)

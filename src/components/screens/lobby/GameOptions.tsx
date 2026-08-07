@@ -46,7 +46,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         {isHost ? (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.scoreEnabled
-              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              ? theme.innerCardBg
               : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3 pb-2">
@@ -108,7 +108,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         ) : (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.scoreEnabled
-              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              ? theme.innerCardBg
               : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3">
@@ -128,7 +128,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         {isHost ? (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.narratorRoundsEnabled
-              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              ? theme.innerCardBg
               : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3 pb-2">
@@ -190,7 +190,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         ) : (
           <div className={`rounded-2xl border transition-all duration-300 ${
             vc.narratorRoundsEnabled
-              ? `${theme.innerCardBg} ${theme.accentBorder}`
+              ? theme.innerCardBg
               : 'bg-black/20 border-white/5 opacity-50'
           }`}>
             <div className="flex items-center justify-between p-3">

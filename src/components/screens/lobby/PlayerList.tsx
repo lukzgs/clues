@@ -47,12 +47,12 @@ export const PlayerList: React.FC<PlayerListProps> = ({
         {gameState.players.map((player) => (
           <div
             key={player.id}
-            className={`flex items-center gap-2.5 p-2 px-3 rounded-xl border transition-all duration-300 h-[56px] md:h-[62px] shadow-sm ${
+            className={`flex items-center gap-2.5 p-2 px-3 rounded-xl border transition-all duration-300 h-[56px] md:h-[62px] ${
               player.id === currentPlayer?.id
-                ? `${theme.accentBgLight} ${theme.accentBorder}`
+                ? `${theme.innerCardBg} ${theme.accentBorder} ring-1 ring-white/15 shadow-md`
                 : player.isSpectator
                 ? `${theme.innerCardBg} opacity-50`
-                : `${theme.innerCardBg} hover:${theme.accentBorder}`
+                : `${theme.innerCardBg} hover:border-white/30`
             }`}
           >
             <div

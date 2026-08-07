@@ -39,7 +39,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* INLINE ALERT BANNERS */}
-        <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+        <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
           <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
             1. Banners de Alerta Estáticos (Inline Alerts)
           </h3>
@@ -150,7 +150,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
         </div>
 
         {/* DYNAMIC TOAST TRIGGERS */}
-        <div className={`border rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+        <div className={`border rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
           <div>
             <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
               2. Disparador de Notificações Flutuantes (Toasts)
@@ -197,7 +197,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
       </div>
 
       {/* 3. STATIC TOAST CARDS SHOWCASE */}
-      <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+      <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
         <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
           3. Matriz de Componentes Toast (Exibição Estática no SysD)
         </h3>

@@ -39,6 +39,107 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
         </Button>
       </div>
 
+      {/* BEFORE vs AFTER CARD STYLE COMPARISON PANEL */}
+      <div className="bg-gradient-to-br from-black/60 to-black/30 border border-white/15 rounded-2xl p-5 md:p-6 space-y-4 shadow-xl mb-8">
+        <div className="border-b border-white/10 pb-3">
+          <span className={`text-[10px] font-sans uppercase tracking-[0.2em] font-bold ${theme.accentText}`}>
+            Teste de Estilo Visual dos Cards
+          </span>
+          <h3 className="text-lg font-cinzel text-white font-semibold mt-0.5">
+            Comparação: Card Neutro (Antes) vs. Card com Toques dos Botões (Teste)
+          </h3>
+          <p className="text-xs font-sans text-white/60 mt-1">
+            Alterne o tema no topo da tela para observar como o gradiente do botão (<code className="text-white/80 font-mono text-[11px]">theme.primaryGradient</code>) e a cor de acento secundário influenciam o acabamento dos cards.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* LADO A: ESTILO ATUAL (NEUTRO) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-sans font-semibold text-white/60 uppercase tracking-wider">
+                Lado A — Estilo Neutro Atual
+              </span>
+              <span className="text-[10px] font-sans text-white/40">Borda cinza / Fundo de vidro</span>
+            </div>
+
+            <div className={`border border-white/10 rounded-2xl p-5 space-y-4 ${theme.innerCardBg}`}>
+              <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
+                  Opções da Partida
+                </span>
+                <span className="text-[9px] font-sans text-white/40 uppercase tracking-wider">
+                  Host Only
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-cinzel font-bold text-sm text-white">Pontuação Alvo</span>
+                  <span className={`tabular-nums font-sans font-bold text-sm ${theme.accentText}`}>30 PTS</span>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  defaultValue={30}
+                  className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                  style={{ accentColor: 'currentColor' }}
+                />
+              </div>
+
+              <Button variant="primary" size="sm" className="w-full">
+                Salvar Ajustes
+              </Button>
+            </div>
+          </div>
+
+          {/* LADO B: ESTILO TESTE (COM TONS DOS BOTÕES) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <span className={`text-xs font-sans font-semibold uppercase tracking-wider ${theme.accentText}`}>
+                Lado B — Teste (Toques de Cor dos Botões)
+              </span>
+              <span className="text-[10px] font-sans text-white/40">Filete + Cabeçalho Matizado</span>
+            </div>
+
+            <div className={`border border-white/15 rounded-2xl p-5 space-y-4 ${theme.innerCardBg} relative overflow-hidden shadow-lg`}>
+              {/* Filete Superior com Gradiente do Botão Primário */}
+              <div className={`absolute top-0 left-0 right-0 h-0.5 ${theme.primaryGradient}`} />
+
+              {/* Cabeçalho Matizado com Fundo do Tema */}
+              <div className={`flex items-center justify-between border-b border-white/10 pb-3 -mx-5 -mt-5 px-5 pt-4 rounded-t-2xl ${theme.accentBgLight}`}>
+                <span className={`text-xs font-cinzel font-bold tracking-wider ${theme.accentText}`}>
+                  Opções da Partida
+                </span>
+                <span className={`text-[9px] font-sans uppercase tracking-wider px-2 py-0.5 rounded-md font-bold ${theme.secondaryBtnBg}`}>
+                  Host Only
+                </span>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-cinzel font-bold text-sm text-white">Pontuação Alvo</span>
+                  <span className={`tabular-nums font-sans font-bold text-sm ${theme.accentText}`}>30 PTS</span>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  defaultValue={30}
+                  className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                  style={{ accentColor: 'currentColor' }}
+                />
+              </div>
+
+              <Button variant="primary" size="sm" className="w-full">
+                Salvar Ajustes
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* SHOWCASE GRID 1: REAL SCREEN CARDS FOR COLOR & TYPOGRAPHY INSPECTION */}
       <div className="space-y-6">
         <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-bold border-b border-white/5 pb-2 ${theme.accentText}`}>
@@ -47,7 +148,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* CARD 1: Game Options Card (Lobby) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: GameOptions (Lobby)
@@ -78,7 +179,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
           </div>
 
           {/* CARD 2: Player Card (Lobby / Sidebar) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: PlayerCard (Lobby)
@@ -116,7 +217,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
           </div>
 
           {/* CARD 3: Dixit Hand Card (Gameplay) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: DixitHand (Mão do Jogo)
@@ -151,7 +252,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
           </div>
 
           {/* CARD 4: Table Voting Card (Voting Phase) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: TableVoting (Mesa)
@@ -173,7 +274,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
           </div>
 
           {/* CARD 5: Leaderboard Row Card (Results Phase) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: ScoreboardRow (Placar)
@@ -207,7 +308,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
           </div>
 
           {/* CARD 6: Winner Podium Card (Game Over) */}
-          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg} ${theme.accentBorder}`}>
+          <div className={`border rounded-2xl p-5 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentText}`}>
                 Card: WinnerPodium (GameOver)
@@ -239,7 +340,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({ onCopy }) =>
       {/* SAMPLE MODAL PREVIEW (OVERLAY) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className={`w-full max-w-md border ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 relative space-y-5 animate-zoom-in ${theme.cardBg} ${theme.accentBorder}`}>
+          <div className={`w-full max-w-md border border-white/10 ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 relative space-y-5 animate-zoom-in ${theme.cardBg}`}>
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
