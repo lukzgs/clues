@@ -55,10 +55,10 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
       specs: 'Cinzel · 12px · Bold (700) · Glass Badge',
     },
     {
-      level: 'Código & Tokens (Monospace)',
+      level: 'Numerais & Dados Tabulares (Inter)',
       tag: 'code',
-      className: `font-mono text-xs ${theme.accentText} bg-black/60 border border-white/10 rounded-md px-3 py-1.5 inline-block`,
-      specs: 'Monospace · 12px · Code Token',
+      className: `tabular-nums font-sans text-xs ${theme.accentText} bg-black/60 border border-white/10 rounded-md px-3 py-1.5 inline-block font-semibold`,
+      specs: 'Inter (Tabular Nums) · 12px · Dados & Placar',
     },
   ];
 
@@ -105,7 +105,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
                 {item.level}
               </span>
               <div className="flex items-center gap-3">
-                <span className="text-[11px] font-mono text-white/40">
+                <span className="text-[11px] font-sans text-white/40">
                   {item.specs}
                 </span>
                 <button
@@ -129,3 +129,4 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
     </section>
   );
 };
+

@@ -96,7 +96,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                     )}
                   </div>
                   <div className="text-white/50 text-xs font-sans tracking-wide mt-1 flex items-center gap-1.5">
-                    <span className={`font-mono font-medium text-sm ${theme.accentText}`}>{player.score}</span> {t.lobby.points}
+                    <span className={`tabular-nums font-sans font-medium text-sm ${theme.accentText}`}>{player.score}</span> {t.lobby.points}
                   </div>
                 </div>
 

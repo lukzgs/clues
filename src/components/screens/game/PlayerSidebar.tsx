@@ -100,7 +100,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 </div>
                 
                 <div className="text-white/50 text-[11px] font-sans tracking-wide mt-0.5 flex items-center gap-1.5">
-                  <span className={`font-mono font-bold ${theme.accentText}`}>{player.score}</span> {t.lobby.points}
+                  <span className={`tabular-nums font-sans font-bold ${theme.accentText}`}>{player.score}</span> {t.lobby.points}
                 </div>
               </div>
 
