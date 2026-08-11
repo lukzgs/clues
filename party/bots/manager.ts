@@ -1,7 +1,5 @@
 /**
- * [BOT] Gerenciador de bots virtuais
- *
- * Para remover: rm -rf party/bots
+ * [BOT] Virtual bot manager for game server
  */
 
 import { PLAYER_COLORS } from '../../src/config';
@@ -11,12 +9,12 @@ import {
   type Player,
   type TableCard,
 } from '../../src/types';
-import { generateClue, pickRandom, pickRandomIndex } from './ai';
+import { generateClue, pickRandom } from './ai';
 
-// Nomes para bots
+// Bot names pool
 const BOT_NAMES = ['Luna', 'Orion', 'Nova', 'Atlas', 'Vega', 'Lyra', 'Draco'];
 
-// Estado interno do servidor (interface mínima necessária)
+// Minimum internal server state interface required for bot decisions
 interface ServerState {
   phase: GamePhase;
   players: Player[];
@@ -26,7 +24,7 @@ interface ServerState {
   deck: Card[];
 }
 
-// Callbacks para ações do jogo
+// Callbacks for executing bot game actions
 interface BotCallbacks {
   submitClue: (botId: string, cardId: number, clue: string) => void;
   playCard: (botId: string, cardId: number) => void;
@@ -34,23 +32,42 @@ interface BotCallbacks {
 }
 
 /**
- * Gerencia bots virtuais no jogo
+ * Manages virtual bots in game rooms
  */
 export class BotManager {
   private botCounter = 0;
+  private activeTimeouts: ReturnType<typeof setTimeout>[] = [];
 
   /**
-   * Verifica se funcionalidade de bots está disponível
+   * Checks if bot feature is available
    */
   static isAvailable(): boolean {
     return true;
   }
 
   /**
-   * Adiciona um bot ao jogo
+   * Cancels all scheduled bot timers when phase changes or game restarts
+   */
+  cancelAllTimeouts() {
+    for (const timer of this.activeTimeouts) {
+      clearTimeout(timer);
+    }
+    this.activeTimeouts = [];
+  }
+
+  private scheduleTimeout(fn: () => void, delayMs: number) {
+    const timer = setTimeout(() => {
+      this.activeTimeouts = this.activeTimeouts.filter((t) => t !== timer);
+      fn();
+    }, delayMs);
+    this.activeTimeouts.push(timer);
+  }
+
+  /**
+   * Adds a virtual bot to the room
    */
   addBot(players: Player[], usedColors: string[]): Player | null {
-    // Encontra cor disponível
+    // Find available color
     const availableColors = PLAYER_COLORS.filter(
       (c) => !usedColors.includes(c),
     );
@@ -58,7 +75,7 @@ export class BotManager {
       availableColors[0] ||
       PLAYER_COLORS[players.length % PLAYER_COLORS.length];
 
-    // Encontra nome disponível
+    // Find available name
     const usedNames = players.map((p) => p.name);
     let botName = BOT_NAMES.find((n) => !usedNames.includes(n));
     if (!botName) {
@@ -81,15 +98,15 @@ export class BotManager {
   }
 
   /**
-   * Remove um bot do jogo
+   * Removes a bot from the room
    */
   removeBot(players: Player[], botId: string): Player[] {
     return players.filter((p) => p.id !== botId);
   }
 
   /**
-   * Executa ações dos bots baseado na fase atual
-   * Retorna true se alguma ação foi executada
+   * Executes bot decisions for the current game phase
+   * Returns true if any bot action was scheduled
    */
   executeBotActions(state: ServerState, callbacks: BotCallbacks): boolean {
     const bots = state.players.filter((p) => p.isBot);
@@ -122,15 +139,15 @@ export class BotManager {
     const narrator = state.players[state.narratorIndex];
     if (!narrator?.isBot) return false;
 
-    // Escolhe carta aleatória
+    // Pick random card from hand
     const card = pickRandom(narrator.hand);
     if (!card) return false;
 
-    // Gera pista
+    // Generate clue text
     const clue = generateClue();
 
-    // Executa após pequeno delay para parecer mais natural
-    setTimeout(
+    // Schedule action with natural delay
+    this.scheduleTimeout(
       () => {
         callbacks.submitClue(narrator.id, card.id, clue);
       },
@@ -149,22 +166,22 @@ export class BotManager {
     let actionExecuted = false;
 
     for (const bot of bots) {
-      // Pula narrador
+      // Skip narrator
       if (bot.id === narrator?.id) continue;
 
-      // Verifica se já jogou
+      // Check if already played
       const alreadyPlayed = state.tableCards.some(
         (tc) => tc.playerId === bot.id,
       );
       if (alreadyPlayed) continue;
 
-      // Escolhe carta aleatória
+      // Pick random card
       const card = pickRandom(bot.hand);
       if (!card) continue;
 
-      // Delay variado para cada bot
+      // Schedule action with staggered delay
       const delay = 800 + Math.random() * 1500;
-      setTimeout(() => {
+      this.scheduleTimeout(() => {
         callbacks.playCard(bot.id, card.id);
       }, delay);
 
@@ -183,25 +200,25 @@ export class BotManager {
     let actionExecuted = false;
 
     for (const bot of bots) {
-      // Narrador não vota
+      // Narrator cannot vote
       if (bot.id === narrator?.id) continue;
 
-      // Verifica se já votou
+      // Check if already voted
       if (state.votes[bot.id] !== undefined) continue;
 
-      // Cartas válidas para votar (não a própria)
+      // Valid cards to vote for (cannot vote for own card)
       const validCards = state.tableCards.filter(
         (tc) => tc.playerId !== bot.id,
       );
       if (validCards.length === 0) continue;
 
-      // Escolhe carta aleatória
+      // Pick random valid card
       const card = pickRandom(validCards);
       if (!card) continue;
 
-      // Delay variado
+      // Schedule action with staggered delay
       const delay = 600 + Math.random() * 1200;
-      setTimeout(() => {
+      this.scheduleTimeout(() => {
         callbacks.vote(bot.id, card.orderId);
       }, delay);
 

@@ -177,9 +177,10 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                     isNarrator)) && (
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
-                      (gameState.phase === GamePhase.OTHERS_CHOOSING ||
-                        gameState.phase === GamePhase.NARRATOR_CHOOSING) &&
-                      chosen
+                      (
+                        gameState.phase === GamePhase.OTHERS_CHOOSING ||
+                          gameState.phase === GamePhase.NARRATOR_CHOOSING
+                      ) && chosen
                         ? 'bg-green-500/20 text-green-400 border-green-500/30'
                         : (gameState.phase === GamePhase.VOTING && voted)
                           ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'

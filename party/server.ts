@@ -67,6 +67,7 @@ export default class GameServer implements Party.Server {
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
+    this.ensureStateDefaults();
     this.telemetry = new ServerTelemetry();
     this.botManager = new BotManager();
   }
@@ -458,20 +459,7 @@ export default class GameServer implements Party.Server {
   // MÉTODOS DE ESTADO
   // ============================================
 
-  public changePhase(newPhase: GamePhase) {
-    this.state.phase = newPhase;
-    this.state.phaseStartTime = Date.now();
-    this.state.afkKickVotes = [];
-    this.state.playersWhoReadied = [];
-    this.notifyRegistry();
-  }
-
-  // ============================================
-  // UTILITÁRIOS DE COMUNICAÇÃO
-  // ============================================
-
-  public getPublicState(forPlayerId: string | null): GameState {
-    // Migração de estado interno ativa
+  public ensureStateDefaults() {
     if (!this.state.phaseTimeouts) {
       this.state.phaseTimeouts = {
         narrator: 60,
@@ -494,6 +482,22 @@ export default class GameServer implements Party.Server {
     if (this.state.timerEnabled === undefined) {
       this.state.timerEnabled = true;
     }
+  }
+
+  public changePhase(newPhase: GamePhase) {
+    this.botManager?.cancelAllTimeouts();
+    this.state.phase = newPhase;
+    this.state.phaseStartTime = Date.now();
+    this.state.afkKickVotes = [];
+    this.state.playersWhoReadied = [];
+    this.notifyRegistry();
+  }
+
+  // ============================================
+  // COMMUNICATION UTILITIES
+  // ============================================
+
+  public getPublicState(forPlayerId: string | null): GameState {
     return getPublicState(this.state, forPlayerId);
   }
 

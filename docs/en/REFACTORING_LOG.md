@@ -209,7 +209,7 @@ With the foundation clean, the following phases can proceed without introducing 
 - [x] **3.2** Configure ESLint/Biome (Biome 2.5.8 configured)
 - [x] **3.3** Create `.env.example`
 
-### Phase 4 — Architecture (Future)
-- [ ] **4.1** Cancel bot timeouts on phase change
-- [ ] **4.2** Move state migration out of `getPublicState()`
-- [ ] **4.3** Standardize comment language across the codebase
+### Phase 4 — Architecture (completed)
+- [x] **4.1** Cancel bot timeouts on phase change
+- [x] **4.2** Move state migration out of `getPublicState()`
+- [x] **4.3** Standardize comment language across the codebase
