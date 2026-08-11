@@ -1,94 +1,107 @@
-# Project Rules for AI Agents
+# Project Rules for AI Agents — Story Weaver / Clues
 
-> These rules are specific to the **Story Weaver** project.
+> These rules apply to all AI assistants and subagents working on the **Story Weaver / Clues** project.
 
-## Before Starting Any Work
+---
+
+## 1. Before Starting Any Work & Mandatory Workflow
 
 1. **Always read `.agent/CONTEXT.md` first** before making any changes or exploring the codebase.
-2. The CONTEXT.md file contains the project structure, documentation links, and mandatory update policies.
+   - `CONTEXT.md` contains the project structure, documentation links, key files, and mandatory update policies.
+2. **Language Policy**:
+   - **Communication with User**: Portuguese (PT-BR).
+   - **Code, Types, Comments, Documentation & Commit Messages**: English (EN) preferred for AI efficiency and code consistency.
+   - **No Emojis or Icons**: Do not use emojis or decorative icons in assistant responses, reports, console logs, or commit messages. Keep messages clean, direct, and technical.
+3. **Plan Before Executing**:
+   - For any complex task (touching >3 files or architectural changes), provide a brief explanation of the problem, how it will be solved, and which files will be changed — then wait for user approval before proceeding.
+   - Work incrementally so the user can observe progress and review changes as they are made.
+4. **Documentation Policy**:
+   - Documentation updates in `docs/en/` and `docs/pt-br/` MUST be done **ONLY when the user requests commits**.
+   - When the user asks to commit: update affected documentation in both `docs/en/` and `docs/pt-br/` FIRST, then proceed with the commits.
+5. **Commits & Destructive Commands Policy**:
+   - **Never commit automatically** without explicit user request.
+   - **Never execute destructive commands** (`git reset`, `git rebase`, deleting files/directories, dropping database state) without explicit user authorization.
+   - Do not use `git add .`. Organize commits by features with appropriate tags (`chore:`, `fix:`, `feat:`, etc.).
 
-## Documentation Policy
+---
 
-When the user requests commits:
-1. Update the affected documentation files in `docs/en/` and `docs/pt-br/` FIRST
-2. Then proceed with the commits
+## 2. Workspace & Operational Rules
 
-## Commits Policy
+### 2.1 Verification & Code Quality
+- **Mandatory Post-Edit Verification**: Never declare a task completed without building/compiling the code and running linters or tests to verify system functionality.
+- **Inspect Error Logs for Root Cause**: When facing a build or test error, read the full error log before proposing code changes. Base diagnoses strictly on empirical log evidence and root causes.
+- **No Superficial Symptom Patches**: Never swallow exceptions with empty `try/catch` blocks, disable linter warnings via comments (`eslint-disable`), comment out failing tests, or return dummy fallback values to hide errors.
 
-- Never commit automatically without user request
-- Do not use emojis in commit messages
-- Do not use `git add .`
-- Organize commits by features with appropriate tags (chore, fix, feature, etc.)
+### 2.2 Scope Control & Code Preservation
+- **Context First**: Read and understand relevant files before editing. Never guess file contents or structural logic.
+- **Surgical Changes**: Restrict code edits strictly to the files and functions required for the task. Avoid opportunistic refactoring of unrelated code.
+- **No Silent Functionality Removal**: Never remove existing features, routes, endpoints, components, or tests unless explicitly requested.
+- **Preserve Existing Documentation & Comments**: Keep existing docstrings, types, and comments intact unless directly invalidated by the changes.
 
-## Workflow Policy
+### 2.3 Architectural Integrity & Code Reuse
+- **Audit Existing Code**: Search the repository for pre-existing utility functions, helpers, or components before creating new ones.
+- **Maintain Contracts & Signatures**: If changing an exported function or type signature, find and update all invocation sites across the codebase.
+- **Conservative Dependency Management**: Do not add external packages without checking if the solution can be implemented natively or with already installed dependencies.
 
-- Do not execute all tasks at once; work incrementally so the user can observe progress and review changes as they are made
-- Always plan before executing: provide a brief explanation of the problem, how it will be solved, and which files will be changed — then wait for approval before proceeding
+### 2.4 Software Security
+- **Boundary Input Validation**: Validate and sanitize all user input and external API payloads at entry boundaries.
+- **Parameterized Queries & Path Validation**: Use parameterized database queries and validate absolute file paths to prevent SQL Injection and Path Traversal vulnerabilities.
+- **No Hardcoded Secrets**: Never place API keys, passwords, or tokens in source code. Use environment variables via `.env` files.
 
-## Language
+### 2.5 Protection of Configuration Files
+- **Authorization Required for Configs**: Never modify configuration files (`tsconfig.json`, `package.json`, `vite.config.ts`, `partykit.json`, `.env`, etc.) without explicit user permission.
 
-- Code and documentation: English preferred for AI efficiency
-- Communication with user: Portuguese (PT-BR)
+---
 
+## 3. Behavioral Guidelines (LLM Best Practices)
 
-# Guidelines
+Derived from Andrej Karpathy's observations on LLM coding pitfalls.
 
-Behavioral guidelines to reduce common LLM coding mistakes, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-## 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
+### 3.1 Think Before Coding
+- **Don't assume. Don't hide confusion. Surface tradeoffs.**
+- State assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
 
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
+### 3.2 Simplicity First
+- **Minimum code that solves the problem. Nothing speculative.**
+- No features beyond what was asked. No abstractions for single-use code.
 - No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+- If 200 lines could be 50, rewrite it. Ask: *"Would a senior engineer say this is overcomplicated?"*
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+### 3.3 Surgical Changes
+- **Touch only what you must. Clean up only your own mess.**
+- Match existing style. Don't refactor code that isn't broken.
+- When changes create orphans (unused imports/variables), remove them. Do not delete pre-existing dead code unless asked.
 
-## 3. Surgical Changes
+### 3.4 Goal-Driven Execution
+- **Define success criteria. Loop until verified.**
+- Transform tasks into verifiable goals (e.g., *"Write a test reproducing the bug, then make it pass"*).
+- For multi-step tasks, state a brief plan with verification steps.
 
-**Touch only what you must. Clean up only your own mess.**
+---
 
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
+## 4. Subagents Architecture & Specialization Guide
 
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
+The project utilizes specialized subagents to handle distinct architectural responsibilities as the codebase grows.
 
-The test: Every changed line should trace directly to the user's request.
+### 4.1 Subagents Guide Reference
+- Full details and sizing criteria are defined in [.agent/agents/SUBAGENTS_GUIDE.md](file:///home/lukz_gs/projects/clues/.agent/agents/SUBAGENTS_GUIDE.md).
+- Detailed prompt specifications for each role are located in [.agent/agents/subagents/](file:///home/lukz_gs/projects/clues/.agent/agents/subagents).
 
-## 4. Goal-Driven Execution
+### 4.2 Active Configuration (Medium Project Size)
+The **Story Weaver / Clues** project is currently classified as a **Medium Project** (50-300 files). The active 4-agent setup includes:
 
-**Define success criteria. Loop until verified.**
+1. **Frontend Specialist** ([`frontend-specialist.md`](file:///home/lukz_gs/projects/clues/.agent/agents/subagents/frontend-specialist.md)):
+   - Focus: React 19 UI components, state management, screen flows, styling, accessibility, and client-side validation.
+2. **Backend Specialist** ([`backend-specialist.md`](file:///home/lukz_gs/projects/clues/.agent/agents/subagents/backend-specialist.md)):
+   - Focus: PartyKit WebSocket server (`party/server.ts`), game state machine, scoring logic, bot logic, Zod validation schemas (`src/schemas/messages.ts`).
+3. **Test Specialist** ([`test-specialist.md`](file:///home/lukz_gs/projects/clues/.agent/agents/subagents/test-specialist.md)):
+   - Focus: Unit, integration, and E2E test suites. Covers happy path, edge cases, and error scenarios.
+4. **Reviewer & Auditor** ([`reviewer.md`](file:///home/lukz_gs/projects/clues/.agent/agents/subagents/reviewer.md)):
+   - Focus: Code review, security auditing, performance inspection, and adherence to `AGENTS.md`.
 
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+### 4.3 Sizing Scaling Matrix
+- **Small (<50 files)**: `dev-principal` + `guardian`
+- **Medium (50-300 files — *Active*)**: `frontend-specialist` + `backend-specialist` + `test-specialist` + `reviewer`
+- **Large (300+ files)**: Adds `devops-specialist`, `security-specialist` (dedicated), and `migration-specialist` (on-demand).

@@ -5,11 +5,11 @@ Estrutura e diretrizes de configuracao de agentes de IA para o projeto **Story W
 ## Estrutura
 
 ```
+AGENTS.md                  # Regras gerais e diretrizes globais do workspace (na raiz)
 .agent/agents/
-  AGENTS.md              # Regras gerais e diretrizes globais do workspace
-  README.md              # Visao geral e documentacao da pasta de agentes
-  SUBAGENTS_GUIDE.md     # Guia de subagentes e diagnostico de porte do projeto
-  subagents/             # Definicoes individuais de cada subagente especialista
+  README.md                # Visao geral e documentacao da pasta de agentes
+  SUBAGENTS_GUIDE.md       # Guia de subagentes e diagnostico de porte do projeto
+  subagents/               # Definicoes individuais de cada subagente especialista
     dev-principal.md
     guardian.md
     frontend-specialist.md
@@ -23,7 +23,7 @@ Estrutura e diretrizes de configuracao de agentes de IA para o projeto **Story W
 
 ## Como Usar no Projeto
 
-1. As regras globais de conduta para todos os agentes estao centralizadas em `AGENTS.md`.
+1. As regras globais de conduta para todos os agentes estao centralizadas no arquivo `AGENTS.md` na raiz do projeto.
 2. O arquivo `SUBAGENTS_GUIDE.md` contem o diagnostico atual do projeto (metricas de codigo, stack tecnica e pontos de complexidade), alem de determinar a configuracao de agentes ativa.
 3. As definicoes e responsabilidades individuais de cada agente especializado ficam na pasta `subagents/`.
 4. Dependendo do porte e momento do projeto, ativa-se o conjunto de agentes adequado:
