@@ -111,12 +111,21 @@ export function useGameSocket({
     socket.addEventListener('message', (event) => {
       if (socketRef.current !== socket) return;
       try {
-        const rawMsg = JSON.parse(event.data);
-        const msg: any = rawMsg;
+        const msg = JSON.parse(event.data) as {
+          type: string;
+          closeTime?: number;
+          gameState?: GameState;
+          yourPlayerId?: string;
+          yourReconnectSecret?: string;
+          message?: string;
+          playerId?: string;
+        };
 
         switch (msg.type) {
           case 'SERVER_CLOSING_WARNING':
-            setRoomCloseTime((msg as any).closeTime);
+            if (msg.closeTime !== undefined) {
+              setRoomCloseTime(msg.closeTime);
+            }
             break;
 
           case 'SERVER_CLOSING_CANCELLED':
@@ -130,7 +139,9 @@ export function useGameSocket({
 
           case ServerMessageType.SYNC_STATE:
 
-            setGameState(msg.gameState);
+            if (msg.gameState) {
+              setGameState(msg.gameState);
+            }
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
               onJoinSuccessRef.current(msg.yourPlayerId, msg.yourReconnectSecret);
@@ -144,7 +155,7 @@ export function useGameSocket({
               // um ID salvo (savedPlayerId) que não está na lista de jogadores conectados no gameState recebido,
               // forçamos o re-join para garantir que a conexão atual seja associada a este jogador.
               const mySavedId = savedPlayerIdRef.current;
-              const isMySavedIdConnected = mySavedId && msg.gameState?.players?.some((p: any) => p.id === mySavedId && p.isConnected);
+              const isMySavedIdConnected = mySavedId && msg.gameState?.players?.some(p => p.id === mySavedId && p.isConnected);
               
               if (mySavedId && !isMySavedIdConnected) {
                 const result = JoinRoomSchema.safeParse({
@@ -162,12 +173,14 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.ERROR:
-            setError(msg.message);
+            if (msg.message) {
+              setError(msg.message);
+            }
             hasJoinedRef.current = false;
             break;
 
           case ServerMessageType.PLAYER_KICKED:
-            if ((msg as any).playerId === playerIdRef.current || (msg as any).playerId === savedPlayerIdRef.current) {
+            if (msg.playerId === playerIdRef.current || msg.playerId === savedPlayerIdRef.current) {
               onKickedRef.current();
               setError('Você foi removido da sala');
               socket.close();

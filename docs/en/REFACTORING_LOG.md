@@ -198,11 +198,11 @@ With the foundation clean, the following phases can proceed without introducing 
 - [x] **1.2** Remove `"dev-secret-token"` fallback from the metrics endpoint
 - [x] **1.3** Fix CORS header on the metrics endpoint
 
-### Phase 2 — Code Quality
-- [ ] **2.1** Replace `require()` with typed dynamic `import()` (bot system)
-- [ ] **2.2** Remove duplicate `GAME_CONFIG` import in `game-logic.ts`
-- [ ] **2.3** Eliminate `any` in `App.tsx` and `useGameSocket.ts`
-- [ ] **2.4** Fix `globalRegistry` singleton typing
+### Phase 2 — Code Quality (completed)
+- [x] **2.1** Replace `require()` with typed ES import for `BotManager`
+- [x] **2.2** Remove duplicate `GAME_CONFIG` import in `game-logic.ts`
+- [x] **2.3** Eliminate `any` in `App.tsx` and `useGameSocket.ts`
+- [x] **2.4** Fix `globalRegistry` singleton typing
 
 ### Phase 3 — Tests & DX
 - [ ] **3.1** Fix failing test caused by CSS class coupling

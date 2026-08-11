@@ -202,7 +202,7 @@ const GameRouter: React.FC = () => {
     return (
       <LobbyScreen
         gameState={gameState}
-        currentPlayer={gameState.players.find((p: any) => p.id === playerId)}
+        currentPlayer={gameState.players.find(p => p.id === playerId)}
         onStartGame={startGame}
         onUpdateSettings={updateSettings}
         onLeaveRoom={handleLeaveRoom}

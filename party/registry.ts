@@ -183,4 +183,4 @@ export default class RegistryServer implements Party.Server {
   }
 }
 
-export const globalRegistry = new RegistryServer({ id: "global", env: {} } as any);
+export const globalRegistry = new RegistryServer({ id: "global", env: {} } as unknown as Party.Room);

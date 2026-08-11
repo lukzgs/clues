@@ -30,18 +30,9 @@ import { handleVoteKickAfk } from "./handlers/afk";
 import { handleAddBot, handleRemoveBot } from "./handlers/bot";
 import { ServerTelemetry } from "./telemetry";
 import RegistryServer, { globalRegistry } from "./registry";
+import { BotManager } from "./bots";
 
 export { RegistryServer as registry };
-
-// [BOT] Import dinâmico - não falha se bots não existir
-let BotManagerClass: any = null;
-try {
-  // @ts-ignore - import dinâmico
-  const bots = require('./bots');
-  BotManagerClass = bots.BotManager;
-} catch {
-  // Bots não disponíveis - continua normalmente
-}
 
 // ============================================
 // SERVIDOR DO JOGO
@@ -57,8 +48,8 @@ export default class GameServer implements Party.Server {
   // Mapeamento: playerId -> reconnectSecret
   public playerSecrets: Map<string, string> = new Map();
 
-  // [BOT] Gerenciador de bots (opcional)
-  public botManager: any = null;
+  // [BOT] Gerenciador de bots
+  public botManager: BotManager | null = null;
 
   // [TELEMETRY] Coletor de telemetria e logs da sala
   public telemetry: ServerTelemetry;
@@ -69,10 +60,7 @@ export default class GameServer implements Party.Server {
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
     this.telemetry = new ServerTelemetry();
-    // [BOT] Inicializa gerenciador de bots se disponível
-    if (BotManagerClass) {
-      this.botManager = new BotManagerClass();
-    }
+    this.botManager = new BotManager();
   }
 
   public createInitialState(): ServerGameState {

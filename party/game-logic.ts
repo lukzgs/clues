@@ -15,6 +15,7 @@ import {
   VictoryCondition,
   DeckOption,
 } from '../src/types';
+import GAME_CONFIG from '../game.config.json';
 
 // ============================================
 // DECK & UTILITY FUNCTIONS
@@ -186,8 +187,6 @@ export function checkVictoryCondition(
 // ============================================
 // PUBLIC STATE FILTERING
 // ============================================
-
-import GAME_CONFIG from '../game.config.json';
 
 /**
  * Creates a filtered view of the game state for a specific player.
