@@ -42,11 +42,19 @@ export function sanitizeSettings(
       scoreEnabled: victoryCondition.scoreEnabled,
       targetScore: clamp(victoryCondition.targetScore, SCORE_MIN, SCORE_MAX),
       narratorRoundsEnabled: victoryCondition.narratorRoundsEnabled,
-      narratorRounds: clamp(victoryCondition.narratorRounds, NARRATOR_ROUNDS_MIN, NARRATOR_ROUNDS_MAX),
+      narratorRounds: clamp(
+        victoryCondition.narratorRounds,
+        NARRATOR_ROUNDS_MIN,
+        NARRATOR_ROUNDS_MAX,
+      ),
     },
     phaseTimeouts: {
       narrator: clamp(phaseTimeouts.narrator, TIMEOUT_MIN, TIMEOUT_MAX),
-      othersChoosing: clamp(phaseTimeouts.othersChoosing, TIMEOUT_MIN, TIMEOUT_MAX),
+      othersChoosing: clamp(
+        phaseTimeouts.othersChoosing,
+        TIMEOUT_MIN,
+        TIMEOUT_MAX,
+      ),
       voting: clamp(phaseTimeouts.voting, TIMEOUT_MIN, TIMEOUT_MAX),
       results: clamp(phaseTimeouts.results, TIMEOUT_MIN, TIMEOUT_MAX),
     },

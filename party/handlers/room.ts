@@ -1,15 +1,21 @@
-import type * as Party from "partykit/server";
-import { GamePhase, Player, DeckOption, PhaseTimeouts, ServerMessageType } from "../../src/types";
-import { generatePlayerId, getPublicState } from "../game-logic";
-import { sanitizeSettings } from "../settings-sanitizer";
-import { PLAYER_COLORS } from "../../src/config";
+import type * as Party from 'partykit/server';
 import GAME_CONFIG from '../../game.config.json';
-import type GameServer from "../server";
+import { PLAYER_COLORS } from '../../src/config';
+import {
+  type DeckOption,
+  GamePhase,
+  type PhaseTimeouts,
+  type Player,
+  ServerMessageType,
+} from '../../src/types';
+import { generatePlayerId, getPublicState } from '../game-logic';
+import type GameServer from '../server';
+import { sanitizeSettings } from '../settings-sanitizer';
 
 function generateSecret(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 export async function handleJoinRoom(
@@ -17,7 +23,7 @@ export async function handleJoinRoom(
   playerName: string,
   conn: Party.Connection,
   reconnectId?: string,
-  reconnectSecret?: string
+  reconnectSecret?: string,
 ) {
   // Verifica se já está conectado
   if (server.connections.has(conn.id)) {
@@ -27,11 +33,17 @@ export async function handleJoinRoom(
 
   // Reconnection: try to reclaim a player by ID (validated by secret)
   if (reconnectId) {
-    const player = server.state.players.find(p => p.id === reconnectId && !p.isBot);
+    const player = server.state.players.find(
+      (p) => p.id === reconnectId && !p.isBot,
+    );
     const storedSecret = server.playerSecrets.get(reconnectId);
 
     // Validate reconnect: player must exist, and if secret was stored, provided secret must match
-    const isSecretValid = Boolean(player && (!storedSecret || (reconnectSecret && storedSecret === reconnectSecret)));
+    const isSecretValid = Boolean(
+      player &&
+        (!storedSecret ||
+          (reconnectSecret && storedSecret === reconnectSecret)),
+    );
 
     if (player && isSecretValid) {
       let secretToUse = storedSecret;
@@ -43,7 +55,10 @@ export async function handleJoinRoom(
       // Verifica se já existe uma conexão ativa para este jogador
       let existingConn: Party.Connection | undefined;
       let existingConnIdSaved: string | undefined;
-      for (const [existingConnId, existingPlayerId] of server.connections.entries()) {
+      for (const [
+        existingConnId,
+        existingPlayerId,
+      ] of server.connections.entries()) {
         if (existingPlayerId === player.id) {
           existingConn = server.room.getConnection(existingConnId);
           existingConnIdSaved = existingConnId;
@@ -54,17 +69,19 @@ export async function handleJoinRoom(
       if (existingConn) {
         // Assume que a nova conexão (mesmo jogador) é a correta e derruba a antiga imediatamente.
         if (existingConnIdSaved) server.connections.delete(existingConnIdSaved);
-        existingConn.close(1000, "Reconnected elsewhere");
+        existingConn.close(1000, 'Reconnected elsewhere');
         server.telemetry.recordGhostSocketKick(player.id, player.name);
       }
 
       // Reclaim: map new connection to existing player
       player.isConnected = true;
-      
+
       server.connections.set(conn.id, player.id);
 
       // Remove from readied list so they can re-confirm if disconnected during RESULTS
-      server.state.playersWhoReadied = server.state.playersWhoReadied.filter(id => id !== player.id);
+      server.state.playersWhoReadied = server.state.playersWhoReadied.filter(
+        (id) => id !== player.id,
+      );
 
       server.broadcast({
         type: ServerMessageType.PLAYER_JOINED,
@@ -72,7 +89,7 @@ export async function handleJoinRoom(
       });
 
       server.broadcastState();
-      
+
       // Send confirmation with player ID and secret so client can restore local state
       server.sendToConnection(conn, {
         type: ServerMessageType.SYNC_STATE,
@@ -80,7 +97,7 @@ export async function handleJoinRoom(
         yourPlayerId: player.id,
         yourReconnectSecret: secretToUse,
       });
-      
+
       server.telemetry.recordReconnectSuccess(player.name, reconnectId);
       return;
     }
@@ -161,13 +178,19 @@ export async function handleJoinRoom(
   server.broadcastState();
 }
 
-export function handleLeaveRoom(server: GameServer, playerId: string, conn: Party.Connection) {
-  const player = server.state.players.find(p => p.id === playerId);
+export function handleLeaveRoom(
+  server: GameServer,
+  playerId: string,
+  conn: Party.Connection,
+) {
+  const player = server.state.players.find((p) => p.id === playerId);
   if (!player) return;
 
   // Remove do jogo se no lobby
   if (server.state.phase === GamePhase.LOBBY) {
-    server.state.players = server.state.players.filter(p => p.id !== playerId);
+    server.state.players = server.state.players.filter(
+      (p) => p.id !== playerId,
+    );
 
     if (player.isHost && server.state.players.length > 0) {
       server.state.players[0].isHost = true;
@@ -190,14 +213,19 @@ export function handleLeaveRoom(server: GameServer, playerId: string, conn: Part
 export function handleUpdateSettings(
   server: GameServer,
   playerId: string,
-  victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
+  victoryCondition: {
+    scoreEnabled: boolean;
+    targetScore: number;
+    narratorRoundsEnabled: boolean;
+    narratorRounds: number;
+  },
   deckOption: DeckOption,
   phaseTimeouts: PhaseTimeouts,
-  timerEnabled: boolean
+  timerEnabled: boolean,
 ) {
   if (server.state.phase !== GamePhase.LOBBY) return;
-  
-  const player = server.state.players.find(p => p.id === playerId);
+
+  const player = server.state.players.find((p) => p.id === playerId);
   if (!player?.isHost) return;
 
   server.state.timerEnabled = timerEnabled;

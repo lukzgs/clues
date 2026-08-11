@@ -174,7 +174,16 @@ describe('Template function correctness', () => {
 
 describe('No cross-language contamination', () => {
   // Known PT-only words that should NEVER appear in EN translations
-  const ptOnlyWords = ['você', 'jogador', 'pista', 'sala', 'iniciar', 'aguardando', 'votação', 'narrador'];
+  const ptOnlyWords = [
+    'você',
+    'jogador',
+    'pista',
+    'sala',
+    'iniciar',
+    'aguardando',
+    'votação',
+    'narrador',
+  ];
   // Known EN-only words that should NEVER appear in PT translations
   const enOnlyWords = ['player', 'waiting', 'choose', 'spectator', 'narrator'];
 
@@ -198,9 +207,9 @@ describe('No cross-language contamination', () => {
   describe('PT should not contain English words', () => {
     // Be more targeted — skip keys that legitimately share words
     const skipPaths = new Set([
-      'lobby.addBot',     // "ADD BOT" is a gaming term kept in EN
-      'common.pts',       // "Pts" is universal
-      'join.title',       // "Story Weaver" is the app name
+      'lobby.addBot', // "ADD BOT" is a gaming term kept in EN
+      'common.pts', // "Pts" is universal
+      'join.title', // "Story Weaver" is the app name
     ]);
 
     for (const path of ptPaths) {
@@ -241,7 +250,17 @@ describe('Language keys', () => {
 // ============================================
 
 describe('Section completeness', () => {
-  const expectedSections = ['common', 'join', 'connecting', 'lobby', 'game', 'results', 'gameOver', 'modals', 'afk'];
+  const expectedSections = [
+    'common',
+    'join',
+    'connecting',
+    'lobby',
+    'game',
+    'results',
+    'gameOver',
+    'modals',
+    'afk',
+  ];
 
   for (const section of expectedSections) {
     it(`EN should have section: ${section}`, () => {

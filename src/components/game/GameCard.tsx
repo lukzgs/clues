@@ -1,4 +1,4 @@
-import { Card } from '../../types';
+import type { Card } from '../../types';
 
 interface GameCardProps {
   card: Card;
@@ -45,28 +45,32 @@ export const GameCard: React.FC<GameCardProps> = ({
       className={`
         relative rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300
         ${sizeClasses[size]}
-        ${isClickable
-          ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]'
-          : ''
+        ${
+          isClickable
+            ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]'
+            : ''
         }
-        ${isSelected
-          ? 'ring-4 ring-amber-400 scale-105 -translate-y-2 shadow-xl shadow-amber-500/30'
-          : ''
+        ${
+          isSelected
+            ? 'ring-4 ring-amber-400 scale-105 -translate-y-2 shadow-xl shadow-amber-500/30'
+            : ''
         }
-        ${isHighlighted
-          ? 'ring-4 scale-105 shadow-xl'
-          : ''
-        }
-        ${disabled && dimWhenDisabled
-          ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
-          : disabled && !dimWhenDisabled
-          ? 'cursor-not-allowed'
-          : ''
+        ${isHighlighted ? 'ring-4 scale-105 shadow-xl' : ''}
+        ${
+          disabled && dimWhenDisabled
+            ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
+            : disabled && !dimWhenDisabled
+              ? 'cursor-not-allowed'
+              : ''
         }
         ${className}
         shadow-lg
       `}
-      style={isHighlighted && highlightColor ? { '--tw-ring-color': highlightColor } as React.CSSProperties : undefined}
+      style={
+        isHighlighted && highlightColor
+          ? ({ '--tw-ring-color': highlightColor } as React.CSSProperties)
+          : undefined
+      }
     >
       {isHidden || card.id === -1 ? (
         // Carta virada (verso)
@@ -84,7 +88,9 @@ export const GameCard: React.FC<GameCardProps> = ({
             alt={`Card ${card.id}`}
             className="w-full h-full object-cover"
             loading={loading}
-            onError={(e) => { (e.target as HTMLImageElement).src = '/cards/new/back_001.avif'; }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/cards/new/back_001.avif';
+            }}
           />
           {/* Overlay sutil no topo e base */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />

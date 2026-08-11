@@ -1,23 +1,33 @@
-import React, { useState } from 'react';
-import { useTheme } from '../../providers/ThemeProvider';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
 
 interface FeedbackSectionProps {
-  onTriggerToast?: (type: 'success' | 'warning' | 'error' | 'info', message: string) => void;
+  onTriggerToast?: (
+    type: 'success' | 'warning' | 'error' | 'info',
+    message: string,
+  ) => void;
 }
 
 export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
   const { theme } = useTheme();
   const { lang } = useTranslation();
   const { addToast } = useToast();
-  const [dismissedAlerts, setDismissedAlerts] = useState<Record<string, boolean>>({});
+  const [dismissedAlerts, setDismissedAlerts] = useState<
+    Record<string, boolean>
+  >({});
 
   const toggleDismiss = (id: string) => {
-    setDismissedAlerts(prev => ({ ...prev, [id]: !prev[id] }));
+    setDismissedAlerts((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleTrigger = (type: 'success' | 'warning' | 'error' | 'info', message: string, title?: string) => {
+  const handleTrigger = (
+    type: 'success' | 'warning' | 'error' | 'info',
+    message: string,
+    title?: string,
+  ) => {
     addToast(type, message, title);
   };
 
@@ -25,22 +35,29 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
     <section id="feedback-alertas" className="scroll-mt-28 space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <span className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}>
+          <span
+            className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}
+          >
             Seção 06
           </span>
           <h2 className="text-3xl font-cinzel text-white font-bold tracking-wide mt-1">
             Notificações, Alertas & Feedback Visual (Toast System)
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Sinais visuais de estado da aplicação, componentes de toast estáticos e disparadores flutuantes centralizados na base da tela.
+            Sinais visuais de estado da aplicação, componentes de toast
+            estáticos e disparadores flutuantes centralizados na base da tela.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* INLINE ALERT BANNERS */}
-        <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
-          <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
+        <div
+          className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}
+        >
+          <h3
+            className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}
+          >
             1. Banners de Alerta Estáticos (Inline Alerts)
           </h3>
 
@@ -48,7 +65,17 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {!dismissedAlerts['success'] && (
             <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 shrink-0 mt-0.5">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-emerald-400 shrink-0 mt-0.5"
+                >
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
@@ -57,11 +84,15 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                     Sucesso — Conexão Estabelecida
                   </h4>
                   <p className="text-xs font-sans text-emerald-200/80 mt-0.5">
-                    Sua conexão com o servidor WebSocket da sala foi estabelecida com latência de 14ms.
+                    Sua conexão com o servidor WebSocket da sala foi
+                    estabelecida com latência de 14ms.
                   </p>
                 </div>
               </div>
-              <button onClick={() => toggleDismiss('success')} className="text-emerald-400/60 hover:text-emerald-200 text-sm">
+              <button
+                onClick={() => toggleDismiss('success')}
+                className="text-emerald-400/60 hover:text-emerald-200 text-sm"
+              >
                 ✕
               </button>
             </div>
@@ -71,7 +102,17 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {!dismissedAlerts['warning'] && (
             <div className="bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0 mt-0.5">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-amber-400 shrink-0 mt-0.5"
+                >
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                   <line x1="12" y1="9" x2="12" y2="13" />
                   <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -81,11 +122,15 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                     Aviso — Inatividade da Sala
                   </h4>
                   <p className="text-xs font-sans text-amber-200/80 mt-0.5">
-                    A sala fechará por inatividade se nenhuma ação for realizada nos próximos minutos.
+                    A sala fechará por inatividade se nenhuma ação for realizada
+                    nos próximos minutos.
                   </p>
                 </div>
               </div>
-              <button onClick={() => toggleDismiss('warning')} className="text-amber-400/60 hover:text-amber-200 text-sm">
+              <button
+                onClick={() => toggleDismiss('warning')}
+                className="text-amber-400/60 hover:text-amber-200 text-sm"
+              >
                 ✕
               </button>
             </div>
@@ -95,7 +140,17 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {!dismissedAlerts['error'] && (
             <div className="bg-red-950/40 border border-red-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 shrink-0 mt-0.5">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-red-400 shrink-0 mt-0.5"
+                >
                   <circle cx="12" cy="12" r="10" />
                   <line x1="15" y1="9" x2="9" y2="15" />
                   <line x1="9" y1="9" x2="15" y2="15" />
@@ -105,11 +160,15 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                     Erro — Falha de Validação
                   </h4>
                   <p className="text-xs font-sans text-red-200/80 mt-0.5">
-                    Você não pode votar na sua própria carta jogada durante a fase de votação.
+                    Você não pode votar na sua própria carta jogada durante a
+                    fase de votação.
                   </p>
                 </div>
               </div>
-              <button onClick={() => toggleDismiss('error')} className="text-red-400/60 hover:text-red-200 text-sm">
+              <button
+                onClick={() => toggleDismiss('error')}
+                className="text-red-400/60 hover:text-red-200 text-sm"
+              >
                 ✕
               </button>
             </div>
@@ -119,7 +178,17 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {!dismissedAlerts['info'] && (
             <div className="bg-sky-950/40 border border-sky-500/40 rounded-xl p-4 flex items-start justify-between gap-3 text-sky-200 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
               <div className="flex items-start gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0 mt-0.5">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-sky-400 shrink-0 mt-0.5"
+                >
                   <circle cx="12" cy="12" r="10" />
                   <line x1="12" y1="16" x2="12" y2="12" />
                   <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -129,11 +198,15 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                     Informação — Modo Espectador
                   </h4>
                   <p className="text-xs font-sans text-sky-200/80 mt-0.5">
-                    Você está assistindo à partida em tempo real sem interferir na pontuação.
+                    Você está assistindo à partida em tempo real sem interferir
+                    na pontuação.
                   </p>
                 </div>
               </div>
-              <button onClick={() => toggleDismiss('info')} className="text-sky-400/60 hover:text-sky-200 text-sm">
+              <button
+                onClick={() => toggleDismiss('info')}
+                className="text-sky-400/60 hover:text-sky-200 text-sm"
+              >
                 ✕
               </button>
             </div>
@@ -150,40 +223,69 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
         </div>
 
         {/* DYNAMIC TOAST TRIGGERS */}
-        <div className={`border rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
+        <div
+          className={`border rounded-2xl p-6 flex flex-col justify-between space-y-4 transition-all duration-500 ${theme.innerCardBg}`}
+        >
           <div>
-            <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
+            <h3
+              className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}
+            >
               2. Disparador de Notificações Flutuantes (Toasts)
             </h3>
             <p className="text-xs font-sans text-white/60 mt-2">
-              Clique nos botões abaixo para disparar notificações dinâmicas que empilham no centro inferior da tela com temporizador automático.
+              Clique nos botões abaixo para disparar notificações dinâmicas que
+              empilham no centro inferior da tela com temporizador automático.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
             <button
-              onClick={() => handleTrigger('success', 'Conexão estabelecida com sucesso!', 'Conexão')}
+              onClick={() =>
+                handleTrigger(
+                  'success',
+                  'Conexão estabelecida com sucesso!',
+                  'Conexão',
+                )
+              }
               className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-emerald-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
               ✓ Toast Sucesso (Conexão)
             </button>
 
             <button
-              onClick={() => handleTrigger('warning', 'A sala fechará por inatividade em 2:00 minutos.', 'Inatividade da Sala')}
+              onClick={() =>
+                handleTrigger(
+                  'warning',
+                  'A sala fechará por inatividade em 2:00 minutos.',
+                  'Inatividade da Sala',
+                )
+              }
               className="bg-amber-950/40 border border-amber-500/40 text-amber-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-amber-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
               ! Toast Alerta (Inatividade)
             </button>
 
             <button
-              onClick={() => handleTrigger('error', 'Código de sala inválido ou inexistente.', 'Erro do Servidor')}
+              onClick={() =>
+                handleTrigger(
+                  'error',
+                  'Código de sala inválido ou inexistente.',
+                  'Erro do Servidor',
+                )
+              }
               className="bg-red-950/40 border border-red-500/40 text-red-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-red-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
               ✕ Toast Erro (Servidor)
             </button>
 
             <button
-              onClick={() => handleTrigger('info', 'Você é o narrador desta rodada!', 'Informação')}
+              onClick={() =>
+                handleTrigger(
+                  'info',
+                  'Você é o narrador desta rodada!',
+                  'Informação',
+                )
+              }
               className="bg-sky-950/40 border border-sky-500/40 text-sky-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-sky-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
             >
               ℹ Toast Informação
@@ -191,14 +293,19 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           </div>
 
           <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-[11px] font-mono text-white/40">
-            Toast System · Auto-dismiss em 4.5s · Posicionamento Central Inferior (z-[9999])
+            Toast System · Auto-dismiss em 4.5s · Posicionamento Central
+            Inferior (z-[9999])
           </div>
         </div>
       </div>
 
       {/* 3. STATIC TOAST CARDS SHOWCASE */}
-      <div className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}>
-        <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}>
+      <div
+        className={`border rounded-2xl p-6 space-y-4 transition-all duration-500 ${theme.innerCardBg}`}
+      >
+        <h3
+          className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold border-b border-white/5 pb-2 ${theme.accentText}`}
+        >
           3. Matriz de Componentes Toast (Exibição Estática no SysD)
         </h3>
 
@@ -206,13 +313,27 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {/* Success Toast */}
           <div className="bg-emerald-950/90 border border-emerald-500/40 text-emerald-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 shrink-0 mt-0.5">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-emerald-400 shrink-0 mt-0.5"
+              >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
               <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-emerald-300">Conexão</h4>
-                <p className="text-xs font-sans font-medium mt-0.5">Conectado ao servidor!</p>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-emerald-300">
+                  Conexão
+                </h4>
+                <p className="text-xs font-sans font-medium mt-0.5">
+                  Conectado ao servidor!
+                </p>
               </div>
             </div>
             <span className="opacity-40 text-xs">✕</span>
@@ -221,14 +342,28 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {/* Warning Toast */}
           <div className="bg-amber-950/90 border border-amber-500/40 text-amber-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0 mt-0.5">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-amber-400 shrink-0 mt-0.5"
+              >
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
               <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-amber-300">Inatividade</h4>
-                <p className="text-xs font-sans font-medium mt-0.5">A sala fechará em breve.</p>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-amber-300">
+                  Inatividade
+                </h4>
+                <p className="text-xs font-sans font-medium mt-0.5">
+                  A sala fechará em breve.
+                </p>
               </div>
             </div>
             <span className="opacity-40 text-xs">✕</span>
@@ -237,14 +372,28 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {/* Error Toast */}
           <div className="bg-red-950/90 border border-red-500/40 text-red-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 shrink-0 mt-0.5">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-red-400 shrink-0 mt-0.5"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="15" y1="9" x2="9" y2="15" />
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
               <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-red-300">Servidor</h4>
-                <p className="text-xs font-sans font-medium mt-0.5">Erro na ação da sala.</p>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-red-300">
+                  Servidor
+                </h4>
+                <p className="text-xs font-sans font-medium mt-0.5">
+                  Erro na ação da sala.
+                </p>
               </div>
             </div>
             <span className="opacity-40 text-xs">✕</span>
@@ -253,14 +402,28 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
           {/* Info Toast */}
           <div className="bg-sky-950/90 border border-sky-500/40 text-sky-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0 mt-0.5">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-sky-400 shrink-0 mt-0.5"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-sky-300">Informação</h4>
-                <p className="text-xs font-sans font-medium mt-0.5">Sua vez como narrador!</p>
+                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-sky-300">
+                  Informação
+                </h4>
+                <p className="text-xs font-sans font-medium mt-0.5">
+                  Sua vez como narrador!
+                </p>
               </div>
             </div>
             <span className="opacity-40 text-xs">✕</span>

@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import { useTheme } from '../../providers/ThemeProvider';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
 
 interface TypographySectionProps {
   onCopy: (value: string, label: string) => void;
 }
 
-export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) => {
+export const TypographySection: React.FC<TypographySectionProps> = ({
+  onCopy,
+}) => {
   const { theme } = useTheme();
   const { lang } = useTranslation();
-  const [sampleText, setSampleText] = useState('O Narrador sussurra um mistério entre as cartas da rodada.');
+  const [sampleText, setSampleText] = useState(
+    'O Narrador sussurra um mistério entre as cartas da rodada.',
+  );
 
   const typographySpecs = [
     {
@@ -21,7 +26,8 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
     {
       level: 'H2 — Título de Seção',
       tag: 'h2',
-      className: 'font-cinzel text-2xl md:text-3xl tracking-wide text-white font-semibold',
+      className:
+        'font-cinzel text-2xl md:text-3xl tracking-wide text-white font-semibold',
       specs: 'Cinzel · 30px/1.875rem · Semibold (600) · Tracking Wide',
     },
     {
@@ -33,19 +39,22 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
     {
       level: 'H4 — Cabeçalho de Card',
       tag: 'h4',
-      className: 'font-cinzel text-lg text-white font-bold uppercase tracking-wider',
+      className:
+        'font-cinzel text-lg text-white font-bold uppercase tracking-wider',
       specs: 'Cinzel · 18px/1.125rem · Bold (700) · Uppercase',
     },
     {
       level: 'Corpo — Texto Principal (Body)',
       tag: 'p',
-      className: 'font-sans text-base text-white/80 leading-relaxed font-normal',
+      className:
+        'font-sans text-base text-white/80 leading-relaxed font-normal',
       specs: 'Inter · 16px/1rem · Normal (400) · Leading Relaxed',
     },
     {
       level: 'Rótulo / Label Técnico',
       tag: 'span',
-      className: 'font-sans text-[10px] md:text-xs text-white/40 uppercase tracking-[0.2em] font-medium block',
+      className:
+        'font-sans text-[10px] md:text-xs text-white/40 uppercase tracking-[0.2em] font-medium block',
       specs: 'Inter · 10px · Medium (500) · Uppercase · Tracking 0.2em',
     },
     {
@@ -66,14 +75,21 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
     <section id="tipografia" className="scroll-mt-28 space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <span className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}>
+          <span
+            className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}
+          >
             Seção 02
           </span>
           <h2 className="text-3xl font-cinzel text-white font-bold tracking-wide mt-1">
             Tipografia & Hierarquia de Texto
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            As famílias tipográficas <strong className={theme.accentText}>Cinzel</strong>, <strong className={theme.accentText}>Playfair Display</strong> e <strong className={theme.accentText}>Inter</strong> renderizadas com o tema <strong className={theme.accentText}>{theme.name[lang]}</strong>.
+            As famílias tipográficas{' '}
+            <strong className={theme.accentText}>Cinzel</strong>,{' '}
+            <strong className={theme.accentText}>Playfair Display</strong> e{' '}
+            <strong className={theme.accentText}>Inter</strong> renderizadas com
+            o tema{' '}
+            <strong className={theme.accentText}>{theme.name[lang]}</strong>.
           </p>
         </div>
 
@@ -101,7 +117,9 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
             className={`bg-black/30 border border-white/10 rounded-2xl p-5 md:p-6 hover:${theme.accentBorder} transition-all duration-300 group flex flex-col gap-3`}
           >
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-3">
-              <span className={`text-xs font-sans font-semibold tracking-wide uppercase ${theme.accentText}`}>
+              <span
+                className={`text-xs font-sans font-semibold tracking-wide uppercase ${theme.accentText}`}
+              >
                 {item.level}
               </span>
               <div className="flex items-center gap-3">
@@ -120,7 +138,8 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
             {/* Rendered Preview */}
             <div className="pt-2 overflow-x-auto">
               <div className={item.className}>
-                {sampleText || 'Exemplo de texto para demonstração da tipografia'}
+                {sampleText ||
+                  'Exemplo de texto para demonstração da tipografia'}
               </div>
             </div>
           </div>
@@ -129,4 +148,3 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ onCopy }) 
     </section>
   );
 };
-

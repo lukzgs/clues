@@ -1,23 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { GamePhase } from './types';
-import { useGameRoom } from './hooks';
-import { JoinScreen, LobbyScreen, GameScreen } from './components/screens';
 import { DesignSystemScreen } from './components/design-system/DesignSystemScreen';
+import { GameScreen, JoinScreen, LobbyScreen } from './components/screens';
+import { useGameRoom } from './hooks';
 import { useTranslation } from './i18n/index.tsx';
-import { GameSessionProvider, useGameSession } from './providers/GameSessionProvider';
+import {
+  GameSessionProvider,
+  useGameSession,
+} from './providers/GameSessionProvider';
 import { ThemeProvider, useTheme } from './providers/ThemeProvider';
 import { ToastProvider, useToast } from './providers/ToastProvider';
+import { GamePhase } from './types';
 
 // Gera código de sala aleatório (criptograficamente seguro)
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const array = new Uint8Array(6);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => chars[byte % chars.length]).join('');
+  return Array.from(array, (byte) => chars[byte % chars.length]).join('');
 }
 
 const GameRouter: React.FC = () => {
-  const { session, setSession, clearSession, urlRoomCode, clearUrlRoomCode } = useGameSession();
+  const { session, setSession, clearSession, urlRoomCode, clearUrlRoomCode } =
+    useGameSession();
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { addToast } = useToast();
@@ -69,7 +73,10 @@ const GameRouter: React.FC = () => {
     kickPlayer,
     toggleSpectator,
     requestPlay,
-  } = useGameRoom({ roomCode: session?.roomCode || null, playerName: session?.playerName || null });
+  } = useGameRoom({
+    roomCode: session?.roomCode || null,
+    playerName: session?.playerName || null,
+  });
 
   // Connection & Reconnection Toasts (apenas se houve queda prévia)
   const wasDisconnectedRef = React.useRef(false);
@@ -92,7 +99,12 @@ const GameRouter: React.FC = () => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [isConnected, addToast, t.connecting.lostConnection, t.connecting.reconnected]);
+  }, [
+    isConnected,
+    addToast,
+    t.connecting.lostConnection,
+    t.connecting.reconnected,
+  ]);
 
   // Toast for server errors
   useEffect(() => {
@@ -105,23 +117,37 @@ const GameRouter: React.FC = () => {
   // Toast for room inactivity timeout
   useEffect(() => {
     if (roomCloseTime) {
-      const remainingSeconds = Math.max(0, Math.floor((roomCloseTime - Date.now()) / 1000));
+      const remainingSeconds = Math.max(
+        0,
+        Math.floor((roomCloseTime - Date.now()) / 1000),
+      );
       if (remainingSeconds > 0) {
         const minutes = Math.floor(remainingSeconds / 60);
         const secs = remainingSeconds % 60;
-        addToast('warning', `A sala fechará por inatividade em ${minutes}:${secs.toString().padStart(2, '0')}`, 'Inatividade da Sala', 8000);
+        addToast(
+          'warning',
+          `A sala fechará por inatividade em ${minutes}:${secs.toString().padStart(2, '0')}`,
+          'Inatividade da Sala',
+          8000,
+        );
       }
     }
   }, [roomCloseTime, addToast]);
 
-  const handleCreateRoom = useCallback((playerName: string) => {
-    const roomCode = generateRoomCode();
-    setSession({ roomCode, playerName });
-  }, [setSession]);
+  const handleCreateRoom = useCallback(
+    (playerName: string) => {
+      const roomCode = generateRoomCode();
+      setSession({ roomCode, playerName });
+    },
+    [setSession],
+  );
 
-  const handleJoinRoom = useCallback((roomCode: string, playerName: string) => {
-    setSession({ roomCode, playerName });
-  }, [setSession]);
+  const handleJoinRoom = useCallback(
+    (roomCode: string, playerName: string) => {
+      setSession({ roomCode, playerName });
+    },
+    [setSession],
+  );
 
   const handleLeaveRoom = useCallback(() => {
     leaveRoom();
@@ -153,7 +179,10 @@ const GameRouter: React.FC = () => {
       >
         <div
           className="fixed inset-0 pointer-events-none z-0"
-          style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)' }}
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)',
+          }}
         />
         <div
           className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`}
@@ -162,11 +191,27 @@ const GameRouter: React.FC = () => {
         <div className="w-full max-w-[420px] z-10">
           <div
             className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-8 md:p-10 flex flex-col items-center transition-all duration-500 ${theme.cardBg} ${theme.accentBorder}`}
-            style={{ animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+            style={{
+              animation: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both',
+            }}
           >
-            <div className={`mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full border bg-black/50 ring-1 ring-white/10 ${theme.accentBgLight} ${theme.accentBorder} ${theme.glowShadow}`}>
-              <div className={`absolute inset-0 rounded-full border-2 border-transparent border-t-current animate-spin ${theme.accentText}`} />
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={`md:w-5 md:h-5 transition-colors duration-300 ${theme.accentText}`}>
+            <div
+              className={`mb-5 md:mb-6 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full border bg-black/50 ring-1 ring-white/10 ${theme.accentBgLight} ${theme.accentBorder} ${theme.glowShadow}`}
+            >
+              <div
+                className={`absolute inset-0 rounded-full border-2 border-transparent border-t-current animate-spin ${theme.accentText}`}
+              />
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`md:w-5 md:h-5 transition-colors duration-300 ${theme.accentText}`}
+              >
                 <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
                 <line x1="2" y1="19" x2="22" y2="19" />
               </svg>
@@ -175,8 +220,12 @@ const GameRouter: React.FC = () => {
             <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 font-sans font-medium">
               {t.connecting.label}
             </p>
-            <div className={`rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border mb-2 transition-all duration-300 ${theme.accentBorder} ${theme.accentBgLight}`}>
-              <span className={`text-lg md:text-xl font-cinzel font-bold tracking-wider ${theme.accentText}`}>
+            <div
+              className={`rounded-xl px-4 md:px-5 py-2 md:py-2.5 inline-block border mb-2 transition-all duration-300 ${theme.accentBorder} ${theme.accentBgLight}`}
+            >
+              <span
+                className={`text-lg md:text-xl font-cinzel font-bold tracking-wider ${theme.accentText}`}
+              >
                 {session.roomCode}
               </span>
             </div>
@@ -184,7 +233,9 @@ const GameRouter: React.FC = () => {
               {t.connecting.joiningRoom}
             </p>
 
-            <div className={`mt-5 md:mt-6 w-full text-center transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+            <div
+              className={`mt-5 md:mt-6 w-full text-center transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+            >
               <button
                 onClick={() => clearSession()}
                 className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
@@ -202,7 +253,7 @@ const GameRouter: React.FC = () => {
     return (
       <LobbyScreen
         gameState={gameState}
-        currentPlayer={gameState.players.find(p => p.id === playerId)}
+        currentPlayer={gameState.players.find((p) => p.id === playerId)}
         onStartGame={startGame}
         onUpdateSettings={updateSettings}
         onLeaveRoom={handleLeaveRoom}

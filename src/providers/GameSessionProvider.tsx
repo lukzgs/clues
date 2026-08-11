@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 export type GameSession = {
   roomCode: string;
@@ -15,11 +22,15 @@ interface GameSessionContextType {
   clearUrlRoomCode: () => void;
 }
 
-const GameSessionContext = createContext<GameSessionContextType | undefined>(undefined);
+const GameSessionContext = createContext<GameSessionContextType | undefined>(
+  undefined,
+);
 
 export const SESSION_STORAGE_KEY = 'story-weaver:active_session';
 
-export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [session, setSessionState] = useState<GameSession | null>(null);
   const [urlRoomCode, setUrlRoomCode] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -55,7 +66,7 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     } catch (e) {
       console.warn('Failed to parse session storage');
     }
-    
+
     setIsLoaded(true);
   }, []);
 
@@ -68,9 +79,15 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       const playerIdEqual = prev.playerId === newSession.playerId;
       const playerNameEqual = prev.playerName === newSession.playerName;
       const roomCodeEqual = prev.roomCode === newSession.roomCode;
-      const reconnectSecretEqual = prev.reconnectSecret === newSession.reconnectSecret;
+      const reconnectSecretEqual =
+        prev.reconnectSecret === newSession.reconnectSecret;
 
-      if (playerIdEqual && playerNameEqual && roomCodeEqual && reconnectSecretEqual) {
+      if (
+        playerIdEqual &&
+        playerNameEqual &&
+        roomCodeEqual &&
+        reconnectSecretEqual
+      ) {
         return prev;
       }
 
@@ -96,13 +113,16 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     window.history.replaceState({}, document.title, url.toString());
   }, []);
 
-  const contextValue = React.useMemo(() => ({
-    session,
-    setSession,
-    clearSession,
-    urlRoomCode,
-    clearUrlRoomCode
-  }), [session, setSession, clearSession, urlRoomCode, clearUrlRoomCode]);
+  const contextValue = React.useMemo(
+    () => ({
+      session,
+      setSession,
+      clearSession,
+      urlRoomCode,
+      clearUrlRoomCode,
+    }),
+    [session, setSession, clearSession, urlRoomCode, clearUrlRoomCode],
+  );
 
   if (!isLoaded) return null; // Or a loading spinner
 

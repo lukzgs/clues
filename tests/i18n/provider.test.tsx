@@ -7,11 +7,11 @@
  * @vitest-environment jsdom
  */
 
-import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { LanguageProvider, useTranslation } from '../../src/i18n/index.tsx';
+import React from 'react';
 import { LanguageToggle } from '../../src/components/ui/LanguageToggle';
+import { LanguageProvider, useTranslation } from '../../src/i18n/index.tsx';
 import { translations } from '../../src/i18n/translations';
 
 // ============================================
@@ -29,8 +29,12 @@ function TestConsumer() {
       <span data-testid="title">{t.join.title}</span>
       <span data-testid="subtitle">{t.join.subtitle}</span>
       <span data-testid="newRoom">{t.join.newRoom}</span>
-      <button data-testid="set-pt" onClick={() => setLang('pt')}>set-pt-btn</button>
-      <button data-testid="set-en" onClick={() => setLang('en')}>set-en-btn</button>
+      <button data-testid="set-pt" onClick={() => setLang('pt')}>
+        set-pt-btn
+      </button>
+      <button data-testid="set-en" onClick={() => setLang('en')}>
+        set-en-btn
+      </button>
     </div>
   );
 }
@@ -39,7 +43,7 @@ function renderWithProvider() {
   return render(
     <LanguageProvider>
       <TestConsumer />
-    </LanguageProvider>
+    </LanguageProvider>,
   );
 }
 
@@ -62,24 +66,37 @@ describe('LanguageProvider — basics', () => {
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('en');
     expect(screen.getByTestId('title').textContent).toBe('Story Weaver');
-    expect(screen.getByTestId('subtitle').textContent).toBe('The art of storytelling');
+    expect(screen.getByTestId('subtitle').textContent).toBe(
+      'The art of storytelling',
+    );
   });
 
   it('provides PT translations by default for pt-BR browser', () => {
-    Object.defineProperty(navigator, 'language', { value: 'pt-BR', configurable: true });
+    Object.defineProperty(navigator, 'language', {
+      value: 'pt-BR',
+      configurable: true,
+    });
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('pt');
-    expect(screen.getByTestId('subtitle').textContent).toBe('A arte de contar histórias');
+    expect(screen.getByTestId('subtitle').textContent).toBe(
+      'A arte de contar histórias',
+    );
   });
 
   it('provides PT translations for pt (without region)', () => {
-    Object.defineProperty(navigator, 'language', { value: 'pt', configurable: true });
+    Object.defineProperty(navigator, 'language', {
+      value: 'pt',
+      configurable: true,
+    });
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('pt');
   });
 
   it('defaults to EN for non-Portuguese languages', () => {
-    Object.defineProperty(navigator, 'language', { value: 'fr-FR', configurable: true });
+    Object.defineProperty(navigator, 'language', {
+      value: 'fr-FR',
+      configurable: true,
+    });
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('en');
   });
@@ -92,14 +109,20 @@ describe('LanguageProvider — basics', () => {
 describe('LanguageProvider — localStorage persistence', () => {
   it('respects stored "pt" preference over browser language', () => {
     localStorage.setItem(STORAGE_KEY, 'pt');
-    Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true });
+    Object.defineProperty(navigator, 'language', {
+      value: 'en-US',
+      configurable: true,
+    });
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('pt');
   });
 
   it('respects stored "en" preference over browser language', () => {
     localStorage.setItem(STORAGE_KEY, 'en');
-    Object.defineProperty(navigator, 'language', { value: 'pt-BR', configurable: true });
+    Object.defineProperty(navigator, 'language', {
+      value: 'pt-BR',
+      configurable: true,
+    });
     renderWithProvider();
     expect(screen.getByTestId('lang').textContent).toBe('en');
   });
@@ -158,13 +181,19 @@ describe('LanguageProvider — language switching', () => {
     renderWithProvider();
 
     await user.click(screen.getByTestId('set-pt'));
-    expect(screen.getByTestId('subtitle').textContent).toBe('A arte de contar histórias');
+    expect(screen.getByTestId('subtitle').textContent).toBe(
+      'A arte de contar histórias',
+    );
 
     await user.click(screen.getByTestId('set-en'));
-    expect(screen.getByTestId('subtitle').textContent).toBe('The art of storytelling');
+    expect(screen.getByTestId('subtitle').textContent).toBe(
+      'The art of storytelling',
+    );
 
     await user.click(screen.getByTestId('set-pt'));
-    expect(screen.getByTestId('subtitle').textContent).toBe('A arte de contar histórias');
+    expect(screen.getByTestId('subtitle').textContent).toBe(
+      'A arte de contar histórias',
+    );
   });
 });
 
@@ -195,7 +224,7 @@ describe('LanguageToggle component', () => {
       <LanguageProvider>
         <LanguageToggle />
         <TestConsumer />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
   }
 
@@ -208,7 +237,9 @@ describe('LanguageToggle component', () => {
   it('has correct aria-label for EN mode', () => {
     renderToggle();
     // When lang is EN, aria-label should suggest switching to PT
-    const button = screen.getByRole('button', { name: /mudar para português/i });
+    const button = screen.getByRole('button', {
+      name: /mudar para português/i,
+    });
     expect(button).toBeInTheDocument();
   });
 
@@ -243,7 +274,9 @@ describe('JoinScreen — requires LanguageProvider to render', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Dynamic import to avoid top-level issues
-    const { JoinScreen } = await import('../../src/components/screens/JoinScreen');
+    const { JoinScreen } = await import(
+      '../../src/components/screens/JoinScreen'
+    );
 
     expect(() => {
       render(
@@ -251,7 +284,7 @@ describe('JoinScreen — requires LanguageProvider to render', () => {
           onCreateRoom={vi.fn()}
           onJoinRoom={vi.fn()}
           prefillRoomCode=""
-        />
+        />,
       );
     }).toThrow();
 
@@ -259,7 +292,9 @@ describe('JoinScreen — requires LanguageProvider to render', () => {
   });
 
   it('should render correctly WITH LanguageProvider', async () => {
-    const { JoinScreen } = await import('../../src/components/screens/JoinScreen');
+    const { JoinScreen } = await import(
+      '../../src/components/screens/JoinScreen'
+    );
 
     render(
       <LanguageProvider>
@@ -268,7 +303,7 @@ describe('JoinScreen — requires LanguageProvider to render', () => {
           onJoinRoom={vi.fn()}
           prefillRoomCode=""
         />
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
     expect(screen.getByText('Story Weaver')).toBeInTheDocument();

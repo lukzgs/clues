@@ -11,10 +11,10 @@
 
 import GameServer from '../../party/server';
 import {
-  createMockRoom,
   createMockConnection,
-  simulateJoinRoom,
+  createMockRoom,
   getLastSyncState,
+  simulateJoinRoom,
 } from '../helpers/test-helpers';
 
 // ============================================
@@ -23,18 +23,26 @@ import {
 
 /** Start a game with the given connections and return the last sync state */
 async function startGame(server: any, hostConn: any) {
-  await server.onMessage(JSON.stringify({
-    type: 'START_GAME',
-    victoryCondition: {
-      scoreEnabled: true,
-      targetScore: 30,
-      narratorRoundsEnabled: false,
-      narratorRounds: 2,
-    },
-    deckOption: 'mixed',
-    phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
-    timerEnabled: true,
-  }), hostConn);
+  await server.onMessage(
+    JSON.stringify({
+      type: 'START_GAME',
+      victoryCondition: {
+        scoreEnabled: true,
+        targetScore: 30,
+        narratorRoundsEnabled: false,
+        narratorRounds: 2,
+      },
+      deckOption: 'mixed',
+      phaseTimeouts: {
+        narrator: 60,
+        othersChoosing: 45,
+        voting: 30,
+        results: 15,
+      },
+      timerEnabled: true,
+    }),
+    hostConn,
+  );
 }
 
 /** Play a full round: narrator submits clue, others play cards, everyone votes, all ready up */
@@ -49,22 +57,32 @@ async function playFullRound(
 
   // Narrator submits clue
   let state = getLastSyncState(narratorConn);
-  const narratorHand = state.gameState.players.find((p: any) => p.id === narratorId)?.hand;
-  await server.onMessage(JSON.stringify({
-    type: 'SUBMIT_CLUE',
-    cardId: narratorHand[0].id,
-    clue: `Clue from round`,
-  }), narratorConn);
+  const narratorHand = state.gameState.players.find(
+    (p: any) => p.id === narratorId,
+  )?.hand;
+  await server.onMessage(
+    JSON.stringify({
+      type: 'SUBMIT_CLUE',
+      cardId: narratorHand[0].id,
+      clue: `Clue from round`,
+    }),
+    narratorConn,
+  );
 
   // Others play cards
   for (let i = 0; i < connections.length; i++) {
     if (i === narratorIndex) continue;
     state = getLastSyncState(connections[i]);
-    const hand = state.gameState.players.find((p: any) => p.id === playerIds[i])?.hand;
-    await server.onMessage(JSON.stringify({
-      type: 'PLAY_CARD',
-      cardId: hand[0].id,
-    }), connections[i]);
+    const hand = state.gameState.players.find(
+      (p: any) => p.id === playerIds[i],
+    )?.hand;
+    await server.onMessage(
+      JSON.stringify({
+        type: 'PLAY_CARD',
+        cardId: hand[0].id,
+      }),
+      connections[i],
+    );
   }
 
   // Everyone votes (non-narrator)
@@ -72,10 +90,13 @@ async function playFullRound(
     if (i === narratorIndex) continue;
     state = getLastSyncState(connections[i]);
     const votable = state.gameState.tableCards.find((tc: any) => !tc.isMine);
-    await server.onMessage(JSON.stringify({
-      type: 'VOTE',
-      orderId: votable.orderId,
-    }), connections[i]);
+    await server.onMessage(
+      JSON.stringify({
+        type: 'VOTE',
+        orderId: votable.orderId,
+      }),
+      connections[i],
+    );
   }
 }
 
@@ -108,7 +129,7 @@ describe('BUG #6 — Kicking player before narrator corrupts narratorIndex', () 
     const conn4 = await simulateJoinRoom(server, room, 'Player4');
 
     const connections = [conn1, conn2, conn3, conn4];
-    const playerIds = connections.map(c => getLastSyncState(c).yourPlayerId);
+    const playerIds = connections.map((c) => getLastSyncState(c).yourPlayerId);
 
     // Start game — narrator = index 0 (Host)
     await startGame(server, conn1);
@@ -124,19 +145,24 @@ describe('BUG #6 — Kicking player before narrator corrupts narratorIndex', () 
     // Now narrator = P3 (index 2)
     let state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('NARRATOR_CHOOSING');
-    const narratorBeforeKick = state.gameState.players[state.gameState.narratorIndex];
+    const narratorBeforeKick =
+      state.gameState.players[state.gameState.narratorIndex];
     expect(narratorBeforeKick.id).toBe(playerIds[2]); // P3 is narrator
 
     // Host kicks P2 (index 1) — BEFORE the narrator (index 2)
     // After removal: [Host(0), P3(1), P4(2)]
     // narratorIndex stays 2 → now points to P4, not P3!
-    server.onMessage(JSON.stringify({
-      type: 'KICK_PLAYER',
-      targetPlayerId: playerIds[1],
-    }), conn1);
+    server.onMessage(
+      JSON.stringify({
+        type: 'KICK_PLAYER',
+        targetPlayerId: playerIds[1],
+      }),
+      conn1,
+    );
 
     state = getLastSyncState(conn1);
-    const narratorAfterKick = state.gameState.players[state.gameState.narratorIndex];
+    const narratorAfterKick =
+      state.gameState.players[state.gameState.narratorIndex];
 
     // P3 should still be narrator — they did nothing wrong
     expect(narratorAfterKick.id).toBe(playerIds[2]);
@@ -162,7 +188,7 @@ describe('BUG #7 — Non-host AFK players unkickable during RESULTS (DISABLED)',
     const conn4 = await simulateJoinRoom(server, room, 'Player4');
 
     const connections = [conn1, conn2, conn3, conn4];
-    const playerIds = connections.map(c => getLastSyncState(c).yourPlayerId);
+    const playerIds = connections.map((c) => getLastSyncState(c).yourPlayerId);
 
     // Start game and play 1 full round
     await startGame(server, conn1);
@@ -188,7 +214,9 @@ describe('BUG #7 — Non-host AFK players unkickable during RESULTS (DISABLED)',
 
     // P4 should NOT be made spectator because AFK kicking is disabled
     state = getLastSyncState(conn1);
-    const p4State = state.gameState.players.find((p: any) => p.id === playerIds[3]);
+    const p4State = state.gameState.players.find(
+      (p: any) => p.id === playerIds[3],
+    );
 
     expect(p4State?.isSpectator).toBe(false);
   });
@@ -209,15 +237,23 @@ describe('BUG #9 — Kicking players below MIN_PLAYERS ends the game', () => {
     const conn2 = await simulateJoinRoom(server, room, 'P2');
     const conn3 = await simulateJoinRoom(server, room, 'P3');
 
-    const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
+    const playerIds = [conn1, conn2, conn3].map(
+      (c) => getLastSyncState(c).yourPlayerId,
+    );
 
     await startGame(server, conn1);
 
     // Host kicks P2
-    await server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[1] }), conn1);
+    await server.onMessage(
+      JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[1] }),
+      conn1,
+    );
 
     // Host kicks P3 — only 1 active player remains
-    await server.onMessage(JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[2] }), conn1);
+    await server.onMessage(
+      JSON.stringify({ type: 'KICK_PLAYER', targetPlayerId: playerIds[2] }),
+      conn1,
+    );
 
     const state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('GAME_OVER');
@@ -238,7 +274,9 @@ describe('BUG #10 — Restart game resets state properly', () => {
     const conn2 = await simulateJoinRoom(server, room, 'P2');
     const conn3 = await simulateJoinRoom(server, room, 'P3');
 
-    const playerIds = [conn1, conn2, conn3].map(c => getLastSyncState(c).yourPlayerId);
+    const playerIds = [conn1, conn2, conn3].map(
+      (c) => getLastSyncState(c).yourPlayerId,
+    );
 
     await startGame(server, conn1);
     await playFullRound(server, [conn1, conn2, conn3], playerIds, 0);
@@ -283,12 +321,20 @@ describe('Connectivity — Lobby reconnection preserves session', () => {
     const conn2Msgs = room.connections.values().next();
 
     // Reconnect with new connection but same reconnectId and valid secret
-    const conn1b = await simulateJoinRoom(server, room, 'Host', undefined, hostId);
+    const conn1b = await simulateJoinRoom(
+      server,
+      room,
+      'Host',
+      undefined,
+      hostId,
+    );
     state = getLastSyncState(conn1b);
 
     // Should have same player ID and still be host
     expect(state.yourPlayerId).toBe(hostId);
-    const hostPlayer = state.gameState.players.find((p: any) => p.id === hostId);
+    const hostPlayer = state.gameState.players.find(
+      (p: any) => p.id === hostId,
+    );
     expect(hostPlayer).toBeDefined();
     expect(hostPlayer.isHost).toBe(true);
     expect(hostPlayer.isConnected).toBe(true);
@@ -311,12 +357,15 @@ describe('Connectivity — Lobby reconnection preserves session', () => {
     room.connections.set(attackerConn.id, attackerConn);
     await server.onConnect(attackerConn);
 
-    await server.onMessage(JSON.stringify({
-      type: 'JOIN_ROOM',
-      playerName: 'Attacker',
-      reconnectId: aliceId,
-      reconnectSecret: 'wrong-secret-token',
-    }), attackerConn);
+    await server.onMessage(
+      JSON.stringify({
+        type: 'JOIN_ROOM',
+        playerName: 'Attacker',
+        reconnectId: aliceId,
+        reconnectSecret: 'wrong-secret-token',
+      }),
+      attackerConn,
+    );
 
     // Reconnect attempt should be rejected (recorded as failed reconnect in telemetry)
     const snapshot = server.telemetry.getSnapshot(room.id, {
@@ -395,13 +444,26 @@ describe('Connectivity — Disconnected players cleaned on game start', () => {
     server.onClose(conn4);
 
     // Start game
-    await server.onMessage(JSON.stringify({
-      type: 'START_GAME',
-      victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
-      deckOption: 'mixed',
-      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
-      timerEnabled: true,
-    }), conn1);
+    await server.onMessage(
+      JSON.stringify({
+        type: 'START_GAME',
+        victoryCondition: {
+          scoreEnabled: true,
+          targetScore: 30,
+          narratorRoundsEnabled: false,
+          narratorRounds: 2,
+        },
+        deckOption: 'mixed',
+        phaseTimeouts: {
+          narrator: 60,
+          othersChoosing: 45,
+          voting: 30,
+          results: 15,
+        },
+        timerEnabled: true,
+      }),
+      conn1,
+    );
 
     const state = getLastSyncState(conn1);
     expect(state.gameState.phase).toBe('NARRATOR_CHOOSING');
@@ -431,13 +493,26 @@ describe('Connectivity — Mid-game host reassignment', () => {
     const p2Id = getLastSyncState(conn2).yourPlayerId;
 
     // Start game
-    await server.onMessage(JSON.stringify({
-      type: 'START_GAME',
-      victoryCondition: { scoreEnabled: true, targetScore: 30, narratorRoundsEnabled: false, narratorRounds: 2 },
-      deckOption: 'mixed',
-      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
-      timerEnabled: true,
-    }), conn1);
+    await server.onMessage(
+      JSON.stringify({
+        type: 'START_GAME',
+        victoryCondition: {
+          scoreEnabled: true,
+          targetScore: 30,
+          narratorRoundsEnabled: false,
+          narratorRounds: 2,
+        },
+        deckOption: 'mixed',
+        phaseTimeouts: {
+          narrator: 60,
+          othersChoosing: 45,
+          voting: 30,
+          results: 15,
+        },
+        timerEnabled: true,
+      }),
+      conn1,
+    );
 
     // Disconnect host mid-game
     room.connections.delete(conn1.id);

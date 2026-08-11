@@ -64,8 +64,12 @@ describe('JoinScreen — rendering', () => {
 
   it('does not show error message initially', () => {
     renderJoinScreen();
-    expect(screen.queryByText('Choose your name first')).not.toBeInTheDocument();
-    expect(screen.queryByText('Room code must be 6 characters')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Choose your name first'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Room code must be 6 characters'),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -78,7 +82,10 @@ describe('JoinScreen — create room', () => {
     const user = userEvent.setup();
     const { onCreateRoom } = renderJoinScreen();
 
-    await user.type(screen.getByPlaceholderText('Enter your name'), '  Alice  ');
+    await user.type(
+      screen.getByPlaceholderText('Enter your name'),
+      '  Alice  ',
+    );
     await user.click(screen.getByText('New Room'));
 
     expect(onCreateRoom).toHaveBeenCalledWith('Alice');
@@ -165,7 +172,9 @@ describe('JoinScreen — join room', () => {
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
     await user.click(screen.getByText('Join'));
 
-    expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
+    expect(
+      screen.getByText('Room code must be 6 characters'),
+    ).toBeInTheDocument();
     expect(onJoinRoom).not.toHaveBeenCalled();
   });
 
@@ -177,7 +186,9 @@ describe('JoinScreen — join room', () => {
     await user.type(screen.getByPlaceholderText('ROOM ID'), 'ABC');
     await user.click(screen.getByText('Join'));
 
-    expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
+    expect(
+      screen.getByText('Room code must be 6 characters'),
+    ).toBeInTheDocument();
     expect(onJoinRoom).not.toHaveBeenCalled();
   });
 
@@ -203,7 +214,9 @@ describe('JoinScreen — error clearing', () => {
 
     // Type in name — error should disappear
     await user.type(screen.getByPlaceholderText('Enter your name'), 'A');
-    expect(screen.queryByText('Choose your name first')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Choose your name first'),
+    ).not.toBeInTheDocument();
   });
 
   it('clears error when user types in room code input', async () => {
@@ -213,11 +226,15 @@ describe('JoinScreen — error clearing', () => {
     // Trigger error: name present but code missing
     await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob');
     await user.click(screen.getByText('Join'));
-    expect(screen.getByText('Room code must be 6 characters')).toBeInTheDocument();
+    expect(
+      screen.getByText('Room code must be 6 characters'),
+    ).toBeInTheDocument();
 
     // Type in room code — error should disappear
     await user.type(screen.getByPlaceholderText('ROOM ID'), 'A');
-    expect(screen.queryByText('Room code must be 6 characters')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Room code must be 6 characters'),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -303,7 +320,10 @@ describe('JoinScreen — invite mode join flow', () => {
     const user = userEvent.setup();
     const { onJoinRoom } = renderInviteMode();
 
-    await user.type(screen.getByPlaceholderText('Enter your name'), '  Alice  ');
+    await user.type(
+      screen.getByPlaceholderText('Enter your name'),
+      '  Alice  ',
+    );
     await user.click(screen.getByText('JOIN ROOM'));
 
     expect(onJoinRoom).toHaveBeenCalledWith('ABC123', 'Alice');
@@ -314,7 +334,10 @@ describe('JoinScreen — invite mode join flow', () => {
     const user = userEvent.setup();
     const { onJoinRoom } = renderInviteMode();
 
-    await user.type(screen.getByPlaceholderText('Enter your name'), 'Bob{Enter}');
+    await user.type(
+      screen.getByPlaceholderText('Enter your name'),
+      'Bob{Enter}',
+    );
 
     expect(onJoinRoom).toHaveBeenCalledWith('ABC123', 'Bob');
     expect(onJoinRoom).toHaveBeenCalledTimes(1);
@@ -338,6 +361,8 @@ describe('JoinScreen — invite mode join flow', () => {
     expect(screen.getByText('Choose your name first')).toBeInTheDocument();
 
     await user.type(screen.getByPlaceholderText('Enter your name'), 'A');
-    expect(screen.queryByText('Choose your name first')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Choose your name first'),
+    ).not.toBeInTheDocument();
   });
 });

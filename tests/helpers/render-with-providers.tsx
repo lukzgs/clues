@@ -8,8 +8,12 @@
  * determinísticos independentemente do ambiente.
  */
 
-import React from 'react';
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
+import {
+  type RenderOptions,
+  type RenderResult,
+  render,
+} from '@testing-library/react';
+import type React from 'react';
 import { LanguageProvider } from '../../src/i18n';
 
 function AllProviders({ children }: { children: React.ReactNode }) {

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Player } from '../../../types';
+import type React from 'react';
+import { useState } from 'react';
 import { GAME_CONFIG } from '../../../constants';
 import { useTranslation } from '../../../i18n/index.tsx';
 import { useTheme } from '../../../providers/ThemeProvider';
+import type { Player } from '../../../types';
 import { Button } from '../../ui/Button';
 
 interface LobbyActionsProps {
@@ -57,7 +58,16 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
   };
 
   const eyeIcon = (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
@@ -74,9 +84,11 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
             disabled={!canStart}
             className="w-full"
           >
-            {activePlayersCount > maxPlayersForDeck 
-              ? t.lobby.lobbyFull 
-              : canStart ? t.lobby.startGame : t.lobby.minPlayers(GAME_CONFIG.MIN_PLAYERS)}
+            {activePlayersCount > maxPlayersForDeck
+              ? t.lobby.lobbyFull
+              : canStart
+                ? t.lobby.startGame
+                : t.lobby.minPlayers(GAME_CONFIG.MIN_PLAYERS)}
           </Button>
 
           <Button
@@ -94,10 +106,18 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
               size="md"
               icon={eyeIcon}
               onClick={() => handleToggleSpectator(currentPlayer.id)}
-              disabled={isToggling || (currentPlayer.isSpectator && activePlayersCount >= maxPlayersForDeck)}
+              disabled={
+                isToggling ||
+                (currentPlayer.isSpectator &&
+                  activePlayersCount >= maxPlayersForDeck)
+              }
               className="w-full text-blue-300/80 hover:text-blue-300"
             >
-              {currentPlayer.isSpectator ? (activePlayersCount < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull) : t.lobby.becomeSpectator}
+              {currentPlayer.isSpectator
+                ? activePlayersCount < maxPlayersForDeck
+                  ? t.lobby.enterAsPlayer
+                  : t.lobby.lobbyFull
+                : t.lobby.becomeSpectator}
             </Button>
           )}
 
@@ -106,7 +126,11 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
               variant="glass"
               size="md"
               onClick={onAddBot}
-              icon={<span className="text-lg leading-none font-sans font-light">+</span>}
+              icon={
+                <span className="text-lg leading-none font-sans font-light">
+                  +
+                </span>
+              }
               className="w-full"
             >
               {t.lobby.addBot}
@@ -123,7 +147,9 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
               disabled={isToggling || activePlayersCount >= maxPlayersForDeck}
               className="w-full"
             >
-              {activePlayersCount < maxPlayersForDeck ? t.lobby.enterAsPlayer : t.lobby.lobbyFull}
+              {activePlayersCount < maxPlayersForDeck
+                ? t.lobby.enterAsPlayer
+                : t.lobby.lobbyFull}
             </Button>
           )}
           <div className="w-full bg-white/5 border border-white/10 text-blue-300/80 py-3 rounded-xl font-cinzel font-bold uppercase tracking-[0.15em] text-xs md:text-sm flex items-center justify-center gap-2">
@@ -133,8 +159,12 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
         </div>
       ) : (
         <div className="space-y-3">
-          <div className={`text-center py-3 text-white/60 rounded-xl font-cinzel font-bold uppercase tracking-widest text-xs md:text-sm border ${theme.innerCardBg}`}>
-            <span className={`w-2 h-2 rounded-full inline-block animate-pulse mr-3 ${theme.accentText} bg-current`} />
+          <div
+            className={`text-center py-3 text-white/60 rounded-xl font-cinzel font-bold uppercase tracking-widest text-xs md:text-sm border ${theme.innerCardBg}`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full inline-block animate-pulse mr-3 ${theme.accentText} bg-current`}
+            />
             {t.lobby.waitingHost}
           </div>
           {onToggleSpectator && currentPlayer && (
@@ -151,7 +181,7 @@ export const LobbyActions: React.FC<LobbyActionsProps> = ({
           )}
         </div>
       )}
-      
+
       <Button
         variant="ghost"
         size="md"

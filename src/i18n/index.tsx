@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { translations, Language, Translations } from './translations';
+import type React from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
+import { type Language, type Translations, translations } from './translations';
 
 interface LanguageContextValue {
   lang: Language;
@@ -22,8 +23,13 @@ function getInitialLang(): Language {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLang?: Language }> = ({ children, initialLang }) => {
-  const [lang, setLangState] = useState<Language>(initialLang ?? getInitialLang);
+export const LanguageProvider: React.FC<{
+  children: React.ReactNode;
+  initialLang?: Language;
+}> = ({ children, initialLang }) => {
+  const [lang, setLangState] = useState<Language>(
+    initialLang ?? getInitialLang,
+  );
 
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);
@@ -43,7 +49,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode; initialLang
 
 export function useTranslation(): LanguageContextValue {
   const ctx = useContext(LanguageContext);
-  if (!ctx) throw new Error('useTranslation must be used inside <LanguageProvider>');
+  if (!ctx)
+    throw new Error('useTranslation must be used inside <LanguageProvider>');
   return ctx;
 }
 

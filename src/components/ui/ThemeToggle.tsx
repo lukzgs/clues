@@ -1,6 +1,11 @@
-import React, { useContext } from 'react';
-import { ThemeContext, THEMES, ThemeId } from '../../providers/ThemeProvider';
+import type React from 'react';
+import { useContext } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import {
+  THEMES,
+  ThemeContext,
+  type ThemeId,
+} from '../../providers/ThemeProvider';
 
 interface ThemeToggleProps {
   className?: string;

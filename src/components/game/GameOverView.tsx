@@ -1,6 +1,6 @@
-import { GameState } from '../../types';
 import { useTranslation } from '../../i18n/index.tsx';
 import { useTheme } from '../../providers/ThemeProvider';
+import type { GameState } from '../../types';
 import { Button } from '../ui/Button';
 
 interface GameOverViewProps {
@@ -18,15 +18,17 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const currentPlayer = gameState.players.find(p => p.id === playerId);
+  const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isHost = currentPlayer?.isHost ?? false;
-  const winner = gameState.players.find(p => p.id === gameState.winner);
+  const winner = gameState.players.find((p) => p.id === gameState.winner);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 py-8 animate-fade-in">
       {/* Título */}
       <div className="text-center relative z-10">
-        <h1 className={`text-5xl md:text-6xl font-cinzel font-bold tracking-[0.15em] mb-4 ${theme.accentText}`}>
+        <h1
+          className={`text-5xl md:text-6xl font-cinzel font-bold tracking-[0.15em] mb-4 ${theme.accentText}`}
+        >
           {t.gameOver.title}
         </h1>
         <p className="text-xl md:text-2xl text-white/80 font-cinzel tracking-wide font-light">
@@ -35,41 +37,56 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
       </div>
 
       {/* Placar final */}
-      <div className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 w-full max-w-md z-10 transition-all duration-300 ${theme.cardBg} ${theme.accentBorder}`}>
+      <div
+        className={`backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 w-full max-w-md z-10 transition-all duration-300 ${theme.cardBg} ${theme.accentBorder}`}
+      >
         <h3 className="text-white/40 text-[11px] md:text-xs uppercase tracking-[0.25em] mb-6 text-center font-sans font-semibold">
           {t.gameOver.finalScore}
         </h3>
         <div className="space-y-3 md:space-y-4">
           {[...gameState.players]
-            .filter(p => !p.isSpectator)
+            .filter((p) => !p.isSpectator)
             .sort((a, b) => b.score - a.score)
             .map((player, index) => (
               <div
                 key={player.id}
                 className={`flex items-center gap-4 p-3 md:p-4 rounded-xl transition-all duration-300 border ${
-                  index === 0 
-                    ? `${theme.innerCardBg} ${theme.accentBorder} scale-105` 
+                  index === 0
+                    ? `${theme.innerCardBg} ${theme.accentBorder} scale-105`
                     : `${theme.innerCardBg} border-white/10`
                 }`}
               >
-                <span className={`text-2xl w-8 text-center font-cinzel font-bold ${
-                  index === 0 ? theme.accentText :
-                  index === 1 ? 'text-slate-300' :
-                  index === 2 ? 'text-orange-400/80' : 'text-white/40'
-                }`}>
+                <span
+                  className={`text-2xl w-8 text-center font-cinzel font-bold ${
+                    index === 0
+                      ? theme.accentText
+                      : index === 1
+                        ? 'text-slate-300'
+                        : index === 2
+                          ? 'text-orange-400/80'
+                          : 'text-white/40'
+                  }`}
+                >
                   {`${index + 1}.`}
                 </span>
                 <div
                   className="w-9 h-9 md:w-10 md:h-10 rounded-full shadow-lg shrink-0 border border-white/20"
-                  style={{ backgroundColor: player.color, boxShadow: `0 0 10px ${player.color}60` }}
+                  style={{
+                    backgroundColor: player.color,
+                    boxShadow: `0 0 10px ${player.color}60`,
+                  }}
                 />
                 <span className="flex-1 text-white/90 font-cinzel tracking-wide">
                   {player.name}
                   {player.id === playerId && (
-                    <span className="text-white/40 text-[10px] ml-2 tracking-widest uppercase">({t.common.you})</span>
+                    <span className="text-white/40 text-[10px] ml-2 tracking-widest uppercase">
+                      ({t.common.you})
+                    </span>
                   )}
                 </span>
-                <span className={`font-cinzel font-bold text-lg md:text-xl tracking-wider ${theme.accentText}`}>
+                <span
+                  className={`font-cinzel font-bold text-lg md:text-xl tracking-wider ${theme.accentText}`}
+                >
                   {player.score}
                 </span>
               </div>
@@ -101,7 +118,9 @@ export const GameOverView: React.FC<GameOverViewProps> = ({
 
       {!isHost && (
         <p className="text-white/40 font-cinzel font-bold uppercase tracking-widest text-xs md:text-sm flex items-center gap-3 mt-2 z-10">
-          <span className={`w-1.5 h-1.5 rounded-full animate-pulse bg-current ${theme.accentText}`}></span>
+          <span
+            className={`w-1.5 h-1.5 rounded-full animate-pulse bg-current ${theme.accentText}`}
+          ></span>
           {t.gameOver.waitingHost}
         </p>
       )}

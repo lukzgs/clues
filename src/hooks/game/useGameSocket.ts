@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
 import PartySocket from 'partysocket';
-import { GameState, ServerMessageType } from '../../types';
-import { JoinRoomSchema } from '../../schemas/messages';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PARTYKIT_HOST } from '../../constants';
+import { JoinRoomSchema } from '../../schemas/messages';
+import { type GameState, ServerMessageType } from '../../types';
 
 interface UseGameSocketProps {
   roomCode: string | null;
@@ -22,7 +22,9 @@ export function useGameSocket({
   onKicked,
 }: UseGameSocketProps) {
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [playerId, setPlayerId] = useState<string | null>(savedPlayerId || null);
+  const [playerId, setPlayerId] = useState<string | null>(
+    savedPlayerId || null,
+  );
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [roomCloseTime, setRoomCloseTime] = useState<number | null>(null);
@@ -67,10 +69,11 @@ export function useGameSocket({
   useEffect(() => {
     if (!roomCode || !playerName) return;
 
-
     let connectionTimeout: NodeJS.Timeout | null = setTimeout(() => {
       if (!hasJoinedRef.current || !gameStateRef.current) {
-        console.warn('Connection timeout: room is likely gone or server is down.');
+        console.warn(
+          'Connection timeout: room is likely gone or server is down.',
+        );
         setError('Não foi possível conectar à sala (tempo limite esgotado)');
         setIsConnected(false);
         hasJoinedRef.current = false;
@@ -100,7 +103,7 @@ export function useGameSocket({
           reconnectId: savedPlayerIdRef.current,
           reconnectSecret: savedReconnectSecretRef.current,
         });
-        
+
         if (result.success) {
           socket.send(JSON.stringify(result.data));
           hasJoinedRef.current = true;
@@ -138,14 +141,16 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.SYNC_STATE:
-
             if (msg.gameState) {
               setGameState(msg.gameState);
             }
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
-              onJoinSuccessRef.current(msg.yourPlayerId, msg.yourReconnectSecret);
-              
+              onJoinSuccessRef.current(
+                msg.yourPlayerId,
+                msg.yourReconnectSecret,
+              );
+
               if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
                 connectionTimeout = null;
@@ -155,8 +160,12 @@ export function useGameSocket({
               // um ID salvo (savedPlayerId) que não está na lista de jogadores conectados no gameState recebido,
               // forçamos o re-join para garantir que a conexão atual seja associada a este jogador.
               const mySavedId = savedPlayerIdRef.current;
-              const isMySavedIdConnected = mySavedId && msg.gameState?.players?.some(p => p.id === mySavedId && p.isConnected);
-              
+              const isMySavedIdConnected =
+                mySavedId &&
+                msg.gameState?.players?.some(
+                  (p) => p.id === mySavedId && p.isConnected,
+                );
+
               if (mySavedId && !isMySavedIdConnected) {
                 const result = JoinRoomSchema.safeParse({
                   type: 'JOIN_ROOM',
@@ -180,7 +189,10 @@ export function useGameSocket({
             break;
 
           case ServerMessageType.PLAYER_KICKED:
-            if (msg.playerId === playerIdRef.current || msg.playerId === savedPlayerIdRef.current) {
+            if (
+              msg.playerId === playerIdRef.current ||
+              msg.playerId === savedPlayerIdRef.current
+            ) {
               onKickedRef.current();
               setError('Você foi removido da sala');
               socket.close();
@@ -233,4 +245,3 @@ export function useGameSocket({
     socketRef,
   };
 }
-

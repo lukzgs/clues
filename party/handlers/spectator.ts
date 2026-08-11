@@ -1,29 +1,38 @@
-import type * as Party from "partykit/server";
-import { GamePhase, DeckOption, ServerMessageType } from "../../src/types";
+import type * as Party from 'partykit/server';
 import GAME_CONFIG from '../../game.config.json';
-import type GameServer from "../server";
-import { handleNextRound } from "./game";
-import { checkPhaseProgression } from "./afk";
+import { DeckOption, GamePhase, ServerMessageType } from '../../src/types';
+import type GameServer from '../server';
+import { checkPhaseProgression } from './afk';
+import { handleNextRound } from './game';
 
-export function handleKickPlayer(server: GameServer, hostId: string, targetId: string) {
-  const host = server.state.players.find(p => p.id === hostId);
+export function handleKickPlayer(
+  server: GameServer,
+  hostId: string,
+  targetId: string,
+) {
+  const host = server.state.players.find((p) => p.id === hostId);
   if (!host?.isHost) return;
 
-  const target = server.state.players.find(p => p.id === targetId);
+  const target = server.state.players.find((p) => p.id === targetId);
   if (!target) return;
 
   // Cannot kick yourself
   if (hostId === targetId) return;
 
   // Save narrator ID for safety checks
-  const currentNarratorId = server.state.players[server.state.narratorIndex]?.id;
+  const currentNarratorId =
+    server.state.players[server.state.narratorIndex]?.id;
 
   if (server.state.phase === GamePhase.LOBBY) {
     // Lobby phase: completely remove player from state
-    server.state.players = server.state.players.filter(p => p.id !== targetId);
+    server.state.players = server.state.players.filter(
+      (p) => p.id !== targetId,
+    );
     // Clean up their table cards and votes just in case
     delete server.state.votes[targetId];
-    server.state.tableCards = server.state.tableCards.filter(tc => tc.playerId !== targetId);
+    server.state.tableCards = server.state.tableCards.filter(
+      (tc) => tc.playerId !== targetId,
+    );
   } else {
     // Mid-game phase: soft-delete to preserve array indexes
     target.isConnected = false;
@@ -33,13 +42,19 @@ export function handleKickPlayer(server: GameServer, hostId: string, targetId: s
     // Note: We DO NOT remove their tableCard if they already played it, so the round doesn't break
   }
 
-  server.state.playersWhoReadied = server.state.playersWhoReadied.filter(id => id !== targetId);
-  server.state.afkKickVotes = server.state.afkKickVotes.filter(id => id !== targetId);
+  server.state.playersWhoReadied = server.state.playersWhoReadied.filter(
+    (id) => id !== targetId,
+  );
+  server.state.afkKickVotes = server.state.afkKickVotes.filter(
+    (id) => id !== targetId,
+  );
 
   // If kicked player was host (shouldn't happen but safety), reassign
   if (target.isHost && server.state.players.length > 0) {
     target.isHost = false;
-    const newHost = server.state.players.find(p => !p.isSpectator && p.id !== targetId) || server.state.players[0];
+    const newHost =
+      server.state.players.find((p) => !p.isSpectator && p.id !== targetId) ||
+      server.state.players[0];
     if (newHost) newHost.isHost = true;
   }
 
@@ -68,21 +83,27 @@ export function handleKickPlayer(server: GameServer, hostId: string, targetId: s
 
   // If during game, handle edge cases and phase progression
   if (server.state.phase !== GamePhase.LOBBY) {
-    const remainingActive = server.state.players.filter(p => !p.isSpectator);
-    
+    const remainingActive = server.state.players.filter((p) => !p.isSpectator);
+
     // If active players dropped below minimum, end the game
     if (remainingActive.length < GAME_CONFIG.MIN_PLAYERS) {
       server.changePhase(GamePhase.GAME_OVER);
-      const winner = remainingActive.reduce((prev, curr) => prev.score > curr.score ? prev : curr, remainingActive[0]);
+      const winner = remainingActive.reduce(
+        (prev, curr) => (prev.score > curr.score ? prev : curr),
+        remainingActive[0],
+      );
       server.state.winner = winner?.id ?? null;
       server.broadcastState();
       return;
     }
 
     // If the narrator was kicked during NARRATOR_CHOOSING, abort the round
-    if (server.state.phase === GamePhase.NARRATOR_CHOOSING && targetId === currentNarratorId) {
+    if (
+      server.state.phase === GamePhase.NARRATOR_CHOOSING &&
+      targetId === currentNarratorId
+    ) {
       server.changePhase(GamePhase.RESULTS);
-      const hostPlayer = server.state.players.find(p => p.isHost);
+      const hostPlayer = server.state.players.find((p) => p.isHost);
       if (hostPlayer) handleNextRound(server, hostPlayer.id);
       return;
     }
@@ -94,14 +115,18 @@ export function handleKickPlayer(server: GameServer, hostId: string, targetId: s
   server.broadcastState();
 }
 
-export function handleToggleSpectator(server: GameServer, requesterId: string, targetId: string) {
+export function handleToggleSpectator(
+  server: GameServer,
+  requesterId: string,
+  targetId: string,
+) {
   // Only in lobby
   if (server.state.phase !== GamePhase.LOBBY) return;
 
-  const requester = server.state.players.find(p => p.id === requesterId);
+  const requester = server.state.players.find((p) => p.id === requesterId);
   if (!requester) return;
 
-  const target = server.state.players.find(p => p.id === targetId);
+  const target = server.state.players.find((p) => p.id === targetId);
   if (!target) return;
 
   // Permission check:
@@ -114,8 +139,11 @@ export function handleToggleSpectator(server: GameServer, requesterId: string, t
 
   if (target.isSpectator) {
     // Spectator → Player: check max active players
-    const activePlayers = server.state.players.filter(p => !p.isSpectator);
-    const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption, server.state.victoryCondition);
+    const activePlayers = server.state.players.filter((p) => !p.isSpectator);
+    const maxPlayers = server.getMaxPlayersForDeck(
+      server.state.deckOption,
+      server.state.victoryCondition,
+    );
     if (activePlayers.length >= maxPlayers) return;
     target.isSpectator = false;
   } else {
@@ -130,13 +158,16 @@ export function handleRequestPlay(server: GameServer, playerId: string) {
   // Only in lobby
   if (server.state.phase !== GamePhase.LOBBY) return;
 
-  const player = server.state.players.find(p => p.id === playerId);
+  const player = server.state.players.find((p) => p.id === playerId);
   if (!player) return;
   if (!player.isSpectator) return; // Already a player
 
   // Check max active players
-  const activePlayers = server.state.players.filter(p => !p.isSpectator);
-  const maxPlayers = server.getMaxPlayersForDeck(server.state.deckOption, server.state.victoryCondition);
+  const activePlayers = server.state.players.filter((p) => !p.isSpectator);
+  const maxPlayers = server.getMaxPlayersForDeck(
+    server.state.deckOption,
+    server.state.victoryCondition,
+  );
   if (activePlayers.length >= maxPlayers) return;
 
   player.isSpectator = false;

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 interface ColorSwatchProps {
   name: string;
@@ -34,7 +35,9 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
         className={`w-full h-24 rounded-xl border border-white/10 shadow-inner flex items-center justify-center p-3 relative overflow-hidden transition-transform duration-300 group-hover:scale-[1.02] ${twClass}`}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/10 pointer-events-none" />
-        <span className={`font-cinzel text-xs font-bold tracking-widest uppercase drop-shadow-md z-10 ${textColor}`}>
+        <span
+          className={`font-cinzel text-xs font-bold tracking-widest uppercase drop-shadow-md z-10 ${textColor}`}
+        >
           {name}
         </span>
       </div>

@@ -4,7 +4,6 @@
 
 export type DeckOption = 'original' | 'new' | 'mixed';
 
-
 export interface Card {
   id: number;
   imageUrl: string;
@@ -23,7 +22,7 @@ export interface Player {
 }
 
 export interface TableCard {
-  orderId: number;  // Ordem para embaralhar na votação
+  orderId: number; // Ordem para embaralhar na votação
   playerId: string;
   card: Card;
   isMine?: boolean; // Set by server in getPublicState — true only for the player's own card
@@ -35,7 +34,7 @@ export enum GamePhase {
   OTHERS_CHOOSING = 'OTHERS_CHOOSING',
   VOTING = 'VOTING',
   RESULTS = 'RESULTS',
-  GAME_OVER = 'GAME_OVER'
+  GAME_OVER = 'GAME_OVER',
 }
 
 // ============================================
@@ -43,17 +42,17 @@ export enum GamePhase {
 // ============================================
 
 export interface VictoryCondition {
-  scoreEnabled: boolean;       // Enable score-based victory
-  targetScore: number;         // First to reach X points wins
+  scoreEnabled: boolean; // Enable score-based victory
+  targetScore: number; // First to reach X points wins
   narratorRoundsEnabled: boolean; // Enable narrator-rounds-based victory
-  narratorRounds: number;      // Each player narrates X times
+  narratorRounds: number; // Each player narrates X times
 }
 
 export interface PhaseTimeouts {
-  narrator: number;       // in seconds
+  narrator: number; // in seconds
   othersChoosing: number; // in seconds
-  voting: number;         // in seconds
-  results: number;        // in seconds
+  voting: number; // in seconds
+  results: number; // in seconds
 }
 
 export interface GameState {
@@ -79,7 +78,11 @@ export interface GameState {
 }
 
 // Estado completo do servidor (não exposto ao cliente)
-export interface ServerGameState extends Omit<GameState, 'deckCount' | 'playersWhoPlayed' | 'playersWhoVoted'> {
+export interface ServerGameState
+  extends Omit<
+    GameState,
+    'deckCount' | 'playersWhoPlayed' | 'playersWhoVoted'
+  > {
   deck: Card[];
 }
 

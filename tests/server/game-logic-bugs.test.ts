@@ -11,7 +11,13 @@ import {
   checkVictoryCondition,
   getPublicState,
 } from '../../party/game-logic';
-import { GamePhase, Player, TableCard, ServerGameState, VictoryCondition } from '../../src/types';
+import {
+  GamePhase,
+  type Player,
+  type ServerGameState,
+  type TableCard,
+  type VictoryCondition,
+} from '../../src/types';
 
 // ============================================
 // HELPERS
@@ -33,15 +39,24 @@ function createPlayer(overrides: Partial<Player> = {}): Player {
   };
 }
 
-function createTableCard(playerId: string, orderId: number, cardId: number): TableCard {
+function createTableCard(
+  playerId: string,
+  orderId: number,
+  cardId: number,
+): TableCard {
   return {
     orderId,
     playerId,
-    card: { id: cardId, imageUrl: `/cards/new/card_${String(cardId).padStart(4, '0')}.avif` },
+    card: {
+      id: cardId,
+      imageUrl: `/cards/new/card_${String(cardId).padStart(4, '0')}.avif`,
+    },
   };
 }
 
-function createServerState(overrides: Partial<ServerGameState> = {}): ServerGameState {
+function createServerState(
+  overrides: Partial<ServerGameState> = {},
+): ServerGameState {
   return {
     roomCode: 'TEST01',
     phase: GamePhase.VOTING,
@@ -63,7 +78,12 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
     afkKickVotes: [],
     deckOption: 'mixed',
     playersWhoReadied: [],
-    phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    phaseTimeouts: {
+      narrator: 60,
+      othersChoosing: 45,
+      voting: 30,
+      results: 15,
+    },
     timerEnabled: true,
     ...overrides,
   };
@@ -149,8 +169,18 @@ describe('BUG #2 — Spectator votes corrupt scoring', () => {
     const votesWithSpectator = { p2: 0, p3: 1, spectator: 0 };
     const votesWithoutSpectator = { p2: 0, p3: 1 };
 
-    const resultWith = calculateScores(players, 0, tableCards, votesWithSpectator);
-    const resultWithout = calculateScores(players, 0, tableCards, votesWithoutSpectator);
+    const resultWith = calculateScores(
+      players,
+      0,
+      tableCards,
+      votesWithSpectator,
+    );
+    const resultWithout = calculateScores(
+      players,
+      0,
+      tableCards,
+      votesWithoutSpectator,
+    );
 
     // Spectator vote should not change the outcome
     expect(resultWith['narrator']).toBe(resultWithout['narrator']);
@@ -190,12 +220,14 @@ describe('BUG #2 — Spectator votes corrupt scoring', () => {
 describe('BUG #5 — getPublicState omits phaseTimeouts (client crash)', () => {
   it('should include phaseTimeouts in the returned GameState', () => {
     const state = createServerState({
-      players: [
-        createPlayer({ id: 'p1' }),
-        createPlayer({ id: 'p2' }),
-      ],
+      players: [createPlayer({ id: 'p1' }), createPlayer({ id: 'p2' })],
       phase: GamePhase.NARRATOR_CHOOSING,
-      phaseTimeouts: { narrator: 90, othersChoosing: 60, voting: 45, results: 20 },
+      phaseTimeouts: {
+        narrator: 90,
+        othersChoosing: 60,
+        voting: 45,
+        results: 20,
+      },
     });
 
     const publicState = getPublicState(state, 'p1');

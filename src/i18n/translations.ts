@@ -93,7 +93,7 @@ export const translations = {
       // Voting phase
       votingPhase: 'Voting Phase',
       playersVoting: 'Players are voting...',
-      // Results phase  
+      // Results phase
       leaveRoomButton: 'LEAVE',
     },
     results: {
@@ -128,13 +128,15 @@ export const translations = {
       },
       leave: {
         title: 'Leave Match',
-        message: 'Are you sure you want to leave? All your progress in this match will be lost.',
+        message:
+          'Are you sure you want to leave? All your progress in this match will be lost.',
         cancel: 'Cancel',
         leave: 'Leave',
       },
       kick: {
         title: 'Remove Player',
-        message: (name: string) => `Are you sure you want to remove ${name} from the game?`,
+        message: (name: string) =>
+          `Are you sure you want to remove ${name} from the game?`,
         cancel: 'Cancel',
         remove: 'Remove',
       },
@@ -308,13 +310,15 @@ export const translations = {
       },
       leave: {
         title: 'Sair da Partida',
-        message: 'Tem certeza que deseja sair? Todo o seu progresso nesta partida será perdido.',
+        message:
+          'Tem certeza que deseja sair? Todo o seu progresso nesta partida será perdido.',
         cancel: 'Cancelar',
         leave: 'Sair',
       },
       kick: {
         title: 'Remover Jogador',
-        message: (name: string) => `Tem certeza que deseja remover ${name} do jogo?`,
+        message: (name: string) =>
+          `Tem certeza que deseja remover ${name} do jogo?`,
         cancel: 'Cancelar',
         remove: 'Remover',
       },
@@ -361,4 +365,4 @@ export const translations = {
 } as const;
 
 export type Language = keyof typeof translations;
-export type Translations = typeof translations[Language];
+export type Translations = (typeof translations)[Language];

@@ -1,6 +1,6 @@
 export interface TelemetryEventLog {
   timestamp: string;
-  type: 
+  type:
     | 'RECONNECT_SUCCESS'
     | 'RECONNECT_FAILED'
     | 'GHOST_SOCKET_KICK'
@@ -58,7 +58,7 @@ export class ServerTelemetry {
   private addLog(
     type: TelemetryEventLog['type'],
     message: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     const entry: TelemetryEventLog = {
       timestamp: new Date().toISOString(),
@@ -77,15 +77,30 @@ export class ServerTelemetry {
     this.counters.reconnectsTotal++;
     this.counters.reconnectsSuccessful++;
     // Sanitize ID prefix/suffix for telemetry safety
-    const safeId = reconnectId.length > 8 ? `${reconnectId.slice(0, 4)}...${reconnectId.slice(-4)}` : reconnectId;
-    this.addLog('RECONNECT_SUCCESS', `Player "${playerName}" reconnected successfully`, { safeReconnectId: safeId });
+    const safeId =
+      reconnectId.length > 8
+        ? `${reconnectId.slice(0, 4)}...${reconnectId.slice(-4)}`
+        : reconnectId;
+    this.addLog(
+      'RECONNECT_SUCCESS',
+      `Player "${playerName}" reconnected successfully`,
+      { safeReconnectId: safeId },
+    );
   }
 
-  public recordReconnectFailed(reconnectId: string, reason: string = 'Invalid or expired reconnectId') {
+  public recordReconnectFailed(
+    reconnectId: string,
+    reason: string = 'Invalid or expired reconnectId',
+  ) {
     this.counters.reconnectsTotal++;
     this.counters.reconnectsFailedInvalidId++;
-    const safeId = reconnectId.length > 8 ? `${reconnectId.slice(0, 4)}...${reconnectId.slice(-4)}` : reconnectId;
-    this.addLog('RECONNECT_FAILED', `Reconnect failed: ${reason}`, { safeReconnectId: safeId });
+    const safeId =
+      reconnectId.length > 8
+        ? `${reconnectId.slice(0, 4)}...${reconnectId.slice(-4)}`
+        : reconnectId;
+    this.addLog('RECONNECT_FAILED', `Reconnect failed: ${reason}`, {
+      safeReconnectId: safeId,
+    });
   }
 
   public recordGhostSocketKick(playerId: string, playerName?: string) {
@@ -93,18 +108,26 @@ export class ServerTelemetry {
     this.addLog(
       'GHOST_SOCKET_KICK',
       `Older connection dropped due to reconnection of player "${playerName || playerId}"`,
-      { playerId }
+      { playerId },
     );
   }
 
   public recordRateLimitHit(connId: string) {
     this.counters.rateLimitViolations++;
-    this.addLog('RATE_LIMIT_EXCEEDED', `Connection exceeded message rate limit`, { connId });
+    this.addLog(
+      'RATE_LIMIT_EXCEEDED',
+      `Connection exceeded message rate limit`,
+      { connId },
+    );
   }
 
   public recordValidationError(connId: string, errorSummary: string) {
     this.counters.schemaValidationErrors++;
-    this.addLog('VALIDATION_ERROR', `Client message failed Zod schema validation`, { connId, errorSummary });
+    this.addLog(
+      'VALIDATION_ERROR',
+      `Client message failed Zod schema validation`,
+      { connId, errorSummary },
+    );
   }
 
   public recordUncaughtError(errorMsg: string) {
@@ -112,7 +135,10 @@ export class ServerTelemetry {
     this.addLog('UNCAUGHT_ERROR', `Server caught unhandled error: ${errorMsg}`);
   }
 
-  public getSnapshot(roomCode: string, roomSummary: TelemetrySnapshot['roomSummary']): TelemetrySnapshot {
+  public getSnapshot(
+    roomCode: string,
+    roomSummary: TelemetrySnapshot['roomSummary'],
+  ): TelemetrySnapshot {
     const uptimeSeconds = Math.floor((Date.now() - this.startTime) / 1000);
     return {
       roomCode,

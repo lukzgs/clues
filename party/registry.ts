@@ -1,4 +1,4 @@
-import type * as Party from "partykit/server";
+import type * as Party from 'partykit/server';
 
 export interface ActiveRoomEntry {
   roomCode: string;
@@ -48,7 +48,9 @@ export default class RegistryServer implements Party.Server {
 
   constructor(readonly room: Party.Room) {}
 
-  public registerOrUpdateRoom(entry: Omit<ActiveRoomEntry, "lastSeenTimestamp">) {
+  public registerOrUpdateRoom(
+    entry: Omit<ActiveRoomEntry, 'lastSeenTimestamp'>,
+  ) {
     this.rooms.set(entry.roomCode, {
       ...entry,
       lastSeenTimestamp: Date.now(),
@@ -99,11 +101,15 @@ export default class RegistryServer implements Party.Server {
       phaseDistribution[r.phase] = (phaseDistribution[r.phase] || 0) + 1;
 
       aggregatedCounters.reconnectsTotal += r.counters.reconnectsTotal || 0;
-      aggregatedCounters.reconnectsSuccessful += r.counters.reconnectsSuccessful || 0;
-      aggregatedCounters.reconnectsFailedInvalidId += r.counters.reconnectsFailedInvalidId || 0;
+      aggregatedCounters.reconnectsSuccessful +=
+        r.counters.reconnectsSuccessful || 0;
+      aggregatedCounters.reconnectsFailedInvalidId +=
+        r.counters.reconnectsFailedInvalidId || 0;
       aggregatedCounters.ghostSocketKicks += r.counters.ghostSocketKicks || 0;
-      aggregatedCounters.rateLimitViolations += r.counters.rateLimitViolations || 0;
-      aggregatedCounters.schemaValidationErrors += r.counters.schemaValidationErrors || 0;
+      aggregatedCounters.rateLimitViolations +=
+        r.counters.rateLimitViolations || 0;
+      aggregatedCounters.schemaValidationErrors +=
+        r.counters.schemaValidationErrors || 0;
       aggregatedCounters.uncaughtErrors += r.counters.uncaughtErrors || 0;
     }
 
@@ -125,20 +131,31 @@ export default class RegistryServer implements Party.Server {
     const url = new URL(req.url);
 
     // Internal endpoint for rooms to update status
-    if (req.method === "POST" && (url.pathname === "/update" || url.pathname.endsWith("/update"))) {
+    if (
+      req.method === 'POST' &&
+      (url.pathname === '/update' || url.pathname.endsWith('/update'))
+    ) {
       try {
-        const body = (await req.json()) as Omit<ActiveRoomEntry, "lastSeenTimestamp">;
+        const body = (await req.json()) as Omit<
+          ActiveRoomEntry,
+          'lastSeenTimestamp'
+        >;
         if (body && body.roomCode) {
           this.registerOrUpdateRoom(body);
           return new Response(JSON.stringify({ ok: true }), { status: 200 });
         }
       } catch {
-        return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+          status: 400,
+        });
       }
     }
 
     // Internal endpoint for rooms to unregister when closed
-    if (req.method === "POST" && (url.pathname === "/unregister" || url.pathname.endsWith("/unregister"))) {
+    if (
+      req.method === 'POST' &&
+      (url.pathname === '/unregister' || url.pathname.endsWith('/unregister'))
+    ) {
       try {
         const body = (await req.json()) as { roomCode: string };
         if (body && body.roomCode) {
@@ -146,25 +163,27 @@ export default class RegistryServer implements Party.Server {
           return new Response(JSON.stringify({ ok: true }), { status: 200 });
         }
       } catch {
-        return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+          status: 400,
+        });
       }
     }
 
     // Public metrics GET endpoint protected by Bearer token
-    if (url.pathname === "/metrics" || url.pathname.endsWith("/metrics")) {
-      if (req.method !== "GET") {
-        return new Response("Method Not Allowed", { status: 405 });
+    if (url.pathname === '/metrics' || url.pathname.endsWith('/metrics')) {
+      if (req.method !== 'GET') {
+        return new Response('Method Not Allowed', { status: 405 });
       }
 
-      const authHeader = req.headers.get("Authorization");
+      const authHeader = req.headers.get('Authorization');
       const expectedToken =
-        (this.room.env as Record<string, string> | undefined)?.METRICS_SECRET_TOKEN ||
-        process.env.METRICS_SECRET_TOKEN;
+        (this.room.env as Record<string, string> | undefined)
+          ?.METRICS_SECRET_TOKEN || process.env.METRICS_SECRET_TOKEN;
 
       if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         });
       }
 
@@ -173,14 +192,17 @@ export default class RegistryServer implements Party.Server {
       return new Response(JSON.stringify(snapshot, null, 2), {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       });
     }
 
-    return new Response("Not Found", { status: 404 });
+    return new Response('Not Found', { status: 404 });
   }
 }
 
-export const globalRegistry = new RegistryServer({ id: "global", env: {} } as unknown as Party.Room);
+export const globalRegistry = new RegistryServer({
+  id: 'global',
+  env: {},
+} as unknown as Party.Room);

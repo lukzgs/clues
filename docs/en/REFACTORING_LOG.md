@@ -204,9 +204,9 @@ With the foundation clean, the following phases can proceed without introducing 
 - [x] **2.3** Eliminate `any` in `App.tsx` and `useGameSocket.ts`
 - [x] **2.4** Fix `globalRegistry` singleton typing
 
-### Phase 3 — Tests & DX (in progress)
+### Phase 3 — Tests & DX (completed)
 - [x] **3.1** Fix failing test caused by CSS class coupling
-- [ ] **3.2** Configure ESLint/Biome
+- [x] **3.2** Configure ESLint/Biome (Biome 2.5.8 configured)
 - [x] **3.3** Create `.env.example`
 
 ### Phase 4 — Architecture (Future)

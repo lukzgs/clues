@@ -1,27 +1,45 @@
-import React, { useState } from 'react';
-import { useTheme } from '../../providers/ThemeProvider';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
+import { useTheme } from '../../providers/ThemeProvider';
 
 interface ButtonMatrixSectionProps {
   onCopy: (value: string, label: string) => void;
 }
 
-export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy }) => {
+export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({
+  onCopy,
+}) => {
   const { theme } = useTheme();
   const { lang, t } = useTranslation();
-  const [selectedVariant, setSelectedVariant] = useState<'primary' | 'glass' | 'outline' | 'destructive' | 'ghost'>('primary');
-  const [activeTab, setActiveTab] = useState<'matrix' | 'interactive'>('matrix');
+  const [selectedVariant, setSelectedVariant] = useState<
+    'primary' | 'glass' | 'outline' | 'destructive' | 'ghost'
+  >('primary');
+  const [activeTab, setActiveTab] = useState<'matrix' | 'interactive'>(
+    'matrix',
+  );
 
   // Interactive playground state
   const [size, setSize] = useState<'xs' | 'sm' | 'md' | 'lg'>('md');
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [iconPos, setIconPos] = useState<'none' | 'left' | 'right' | 'only'>('left');
+  const [iconPos, setIconPos] = useState<'none' | 'left' | 'right' | 'only'>(
+    'left',
+  );
   const [buttonText, setButtonText] = useState('Criar Nova Sala');
 
   // Crown SVG Icon
   const CrownIcon = (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
       <line x1="2" y1="19" x2="22" y2="19" />
     </svg>
@@ -29,7 +47,16 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
 
   // Arrow Right SVG Icon
   const ArrowIcon = (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <line x1="5" y1="12" x2="19" y2="12" />
       <polyline points="12 5 19 12 12 19" />
     </svg>
@@ -49,13 +76,20 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
 
   const variantClasses = {
     primary: `${theme.primaryGradient} font-cinzel font-bold uppercase tracking-widest ${theme.glowShadow} hover:scale-[1.02] active:scale-[0.98]`,
-    glass: 'bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]',
+    glass:
+      'bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]',
     outline: `bg-transparent border ${theme.accentBorder} ${theme.accentText} font-cinzel font-bold uppercase tracking-widest hover:${theme.accentBgLight} hover:scale-[1.02] active:scale-[0.98]`,
-    destructive: 'bg-red-950/40 border border-red-500/40 text-red-200 font-cinzel font-bold uppercase tracking-widest hover:bg-red-900/60 hover:border-red-500/70 hover:scale-[1.02] active:scale-[0.98]',
-    ghost: 'bg-transparent border border-white/20 text-white/70 font-cinzel font-semibold uppercase tracking-widest hover:bg-white/10 hover:border-white/40 hover:text-white active:scale-[0.98]',
+    destructive:
+      'bg-red-950/40 border border-red-500/40 text-red-200 font-cinzel font-bold uppercase tracking-widest hover:bg-red-900/60 hover:border-red-500/70 hover:scale-[1.02] active:scale-[0.98]',
+    ghost:
+      'bg-transparent border border-white/20 text-white/70 font-cinzel font-semibold uppercase tracking-widest hover:bg-white/10 hover:border-white/40 hover:text-white active:scale-[0.98]',
   };
 
-  const getCombinedClasses = (v: typeof selectedVariant, s: typeof size, disabled = false) => {
+  const getCombinedClasses = (
+    v: typeof selectedVariant,
+    s: typeof size,
+    disabled = false,
+  ) => {
     return `rounded-xl flex items-center justify-center gap-2 transition-all duration-300 ${sizeClasses[s]} ${variantClasses[v]} ${disabled ? 'opacity-40 pointer-events-none grayscale' : ''}`;
   };
 
@@ -63,14 +97,17 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
     <section id="botoes" className="scroll-mt-28 space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <span className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}>
+          <span
+            className={`text-[10px] font-sans uppercase tracking-[0.2em] font-medium ${theme.accentText}`}
+          >
             Seção 03
           </span>
           <h2 className="text-3xl font-cinzel text-white font-bold tracking-wide mt-1">
             Botões & Ações (Button System)
           </h2>
           <p className="text-sm font-sans text-white/60 mt-1 max-w-2xl">
-            Matriz completa de botões adaptada dinamicamente ao tema ativo <strong className={theme.accentText}>{theme.name[lang]}</strong>.
+            Matriz completa de botões adaptada dinamicamente ao tema ativo{' '}
+            <strong className={theme.accentText}>{theme.name[lang]}</strong>.
           </p>
         </div>
 
@@ -79,7 +116,9 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
           <button
             onClick={() => setActiveTab('matrix')}
             className={`px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all ${
-              activeTab === 'matrix' ? `${theme.primaryGradient} shadow-md` : 'text-white/60 hover:text-white'
+              activeTab === 'matrix'
+                ? `${theme.primaryGradient} shadow-md`
+                : 'text-white/60 hover:text-white'
             }`}
           >
             {t.sysd.generalMatrix}
@@ -87,7 +126,9 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
           <button
             onClick={() => setActiveTab('interactive')}
             className={`px-4 py-2 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all ${
-              activeTab === 'interactive' ? `${theme.primaryGradient} shadow-md` : 'text-white/60 hover:text-white'
+              activeTab === 'interactive'
+                ? `${theme.primaryGradient} shadow-md`
+                : 'text-white/60 hover:text-white'
             }`}
           >
             {t.sysd.interactivePlayground}
@@ -100,7 +141,9 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
         <div className="space-y-6">
           {/* Variant Filter Buttons */}
           <div className="flex flex-wrap gap-2">
-            {(['primary', 'glass', 'outline', 'destructive', 'ghost'] as const).map(v => (
+            {(
+              ['primary', 'glass', 'outline', 'destructive', 'ghost'] as const
+            ).map((v) => (
               <button
                 key={v}
                 onClick={() => setSelectedVariant(v)}
@@ -145,21 +188,30 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
               </h3>
               <div className="flex flex-wrap items-center gap-4 bg-black/40 border border-white/5 rounded-xl p-4">
                 <div className="text-center space-y-1.5">
-                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">Normal</span>
+                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">
+                    Normal
+                  </span>
                   <button className={getCombinedClasses(selectedVariant, 'md')}>
                     Ação Normal
                   </button>
                 </div>
 
                 <div className="text-center space-y-1.5">
-                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">Disabled</span>
-                  <button className={getCombinedClasses(selectedVariant, 'md', true)} disabled>
+                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">
+                    Disabled
+                  </span>
+                  <button
+                    className={getCombinedClasses(selectedVariant, 'md', true)}
+                    disabled
+                  >
                     Ação Desabilitada
                   </button>
                 </div>
 
                 <div className="text-center space-y-1.5">
-                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">Loading</span>
+                  <span className="text-[9px] font-sans uppercase tracking-widest text-white/30 block">
+                    Loading
+                  </span>
                   <button className={getCombinedClasses(selectedVariant, 'md')}>
                     {SpinnerIcon} Processando...
                   </button>
@@ -179,7 +231,10 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
                 <button className={getCombinedClasses(selectedVariant, 'md')}>
                   Ícone Direita {ArrowIcon}
                 </button>
-                <button className={`${getCombinedClasses(selectedVariant, 'md')} p-3! shrink-0`} title="Icon Only">
+                <button
+                  className={`${getCombinedClasses(selectedVariant, 'md')} p-3! shrink-0`}
+                  title="Icon Only"
+                >
                   {CrownIcon}
                 </button>
               </div>
@@ -191,13 +246,17 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
         <div className="bg-black/30 border border-white/10 rounded-2xl p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Controls */}
           <div className="space-y-4 lg:col-span-1 border-r border-white/5 pr-0 lg:pr-6">
-            <h3 className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold ${theme.accentText}`}>
+            <h3
+              className={`text-xs font-sans uppercase tracking-[0.2em] font-semibold ${theme.accentText}`}
+            >
               Configurações do Botão
             </h3>
 
             {/* Text Input */}
             <div>
-              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">Texto do Botão</label>
+              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">
+                Texto do Botão
+              </label>
               <input
                 type="text"
                 value={buttonText}
@@ -208,7 +267,9 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
 
             {/* Variant Selector */}
             <div>
-              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">Variante Visual</label>
+              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">
+                Variante Visual
+              </label>
               <select
                 value={selectedVariant}
                 onChange={(e) => setSelectedVariant(e.target.value as any)}
@@ -224,14 +285,18 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
 
             {/* Size Selector */}
             <div>
-              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">Tamanho</label>
+              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">
+                Tamanho
+              </label>
               <div className="grid grid-cols-4 gap-1.5">
-                {(['xs', 'sm', 'md', 'lg'] as const).map(s => (
+                {(['xs', 'sm', 'md', 'lg'] as const).map((s) => (
                   <button
                     key={s}
                     onClick={() => setSize(s)}
                     className={`py-1 rounded text-xs uppercase font-mono font-bold border transition-all ${
-                      size === s ? `${theme.primaryGradient}` : 'bg-black/40 text-white/60 border-white/10'
+                      size === s
+                        ? `${theme.primaryGradient}`
+                        : 'bg-black/40 text-white/60 border-white/10'
                     }`}
                   >
                     {s}
@@ -242,14 +307,18 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
 
             {/* Icon Position */}
             <div>
-              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">Posição do Ícone</label>
+              <label className="block text-white/40 text-[10px] uppercase tracking-wider mb-1 font-sans">
+                Posição do Ícone
+              </label>
               <div className="grid grid-cols-4 gap-1.5">
-                {(['none', 'left', 'right', 'only'] as const).map(pos => (
+                {(['none', 'left', 'right', 'only'] as const).map((pos) => (
                   <button
                     key={pos}
                     onClick={() => setIconPos(pos)}
                     className={`py-1 rounded text-[10px] uppercase font-sans font-bold border transition-all ${
-                      iconPos === pos ? `${theme.primaryGradient}` : 'bg-black/40 text-white/60 border-white/10'
+                      iconPos === pos
+                        ? `${theme.primaryGradient}`
+                        : 'bg-black/40 text-white/60 border-white/10'
                     }`}
                   >
                     {pos}
@@ -307,7 +376,12 @@ export const ButtonMatrixSection: React.FC<ButtonMatrixSectionProps> = ({ onCopy
                 class="{variantClasses[selectedVariant]} {sizeClasses[size]}"
               </span>
               <button
-                onClick={() => onCopy(`${variantClasses[selectedVariant]} ${sizeClasses[size]}`, 'Classes do Botão')}
+                onClick={() =>
+                  onCopy(
+                    `${variantClasses[selectedVariant]} ${sizeClasses[size]}`,
+                    'Classes do Botão',
+                  )
+                }
                 className={`text-[10px] font-sans uppercase tracking-widest font-bold ${theme.accentBgLight} ${theme.accentText} border ${theme.accentBorder} px-3 py-1.5 rounded-lg hover:opacity-90 transition-all shrink-0`}
               >
                 Copiar CSS

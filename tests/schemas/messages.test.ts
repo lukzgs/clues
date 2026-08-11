@@ -6,18 +6,18 @@
  */
 
 import {
+  AddBotSchema,
+  ClientMessageSchema,
   JoinRoomSchema,
   LeaveRoomSchema,
+  NextRoundSchema,
+  PlayCardSchema,
+  RemoveBotSchema,
+  RestartGameSchema,
   StartGameSchema,
   SubmitClueSchema,
-  PlayCardSchema,
-  VoteSchema,
-  NextRoundSchema,
-  RestartGameSchema,
-  AddBotSchema,
-  RemoveBotSchema,
-  ClientMessageSchema,
   VictoryConditionSchema,
+  VoteSchema,
 } from '../../src/schemas/messages';
 
 // ============================================
@@ -67,7 +67,11 @@ describe('JoinRoomSchema', () => {
   });
 
   it('rejects HTML characters in player name (XSS prevention)', () => {
-    const malicious = ['<script>alert(1)</script>', '<img src=x>', 'Alice<>Bob'];
+    const malicious = [
+      '<script>alert(1)</script>',
+      '<img src=x>',
+      'Alice<>Bob',
+    ];
     for (const name of malicious) {
       const result = JoinRoomSchema.safeParse({
         type: 'JOIN_ROOM',
@@ -263,19 +267,23 @@ describe('VictoryConditionSchema', () => {
   });
 
   it('accepts targetScore at boundary values (10 and 100)', () => {
-    expect(VictoryConditionSchema.safeParse({
-      scoreEnabled: true,
-      targetScore: 10,
-      narratorRoundsEnabled: false,
-      narratorRounds: 1,
-    }).success).toBe(true);
+    expect(
+      VictoryConditionSchema.safeParse({
+        scoreEnabled: true,
+        targetScore: 10,
+        narratorRoundsEnabled: false,
+        narratorRounds: 1,
+      }).success,
+    ).toBe(true);
 
-    expect(VictoryConditionSchema.safeParse({
-      scoreEnabled: true,
-      targetScore: 100,
-      narratorRoundsEnabled: false,
-      narratorRounds: 1,
-    }).success).toBe(true);
+    expect(
+      VictoryConditionSchema.safeParse({
+        scoreEnabled: true,
+        targetScore: 100,
+        narratorRoundsEnabled: false,
+        narratorRounds: 1,
+      }).success,
+    ).toBe(true);
   });
 
   it('rejects narratorRounds below 1', () => {
@@ -335,15 +343,21 @@ describe('RemoveBotSchema', () => {
 
 describe('Simple message schemas', () => {
   it('LeaveRoomSchema accepts valid message', () => {
-    expect(LeaveRoomSchema.safeParse({ type: 'LEAVE_ROOM' }).success).toBe(true);
+    expect(LeaveRoomSchema.safeParse({ type: 'LEAVE_ROOM' }).success).toBe(
+      true,
+    );
   });
 
   it('NextRoundSchema accepts valid message', () => {
-    expect(NextRoundSchema.safeParse({ type: 'NEXT_ROUND' }).success).toBe(true);
+    expect(NextRoundSchema.safeParse({ type: 'NEXT_ROUND' }).success).toBe(
+      true,
+    );
   });
 
   it('RestartGameSchema accepts valid message', () => {
-    expect(RestartGameSchema.safeParse({ type: 'RESTART_GAME' }).success).toBe(true);
+    expect(RestartGameSchema.safeParse({ type: 'RESTART_GAME' }).success).toBe(
+      true,
+    );
   });
 
   it('AddBotSchema accepts valid message', () => {

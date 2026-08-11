@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
 import { useTheme } from '../../providers/ThemeProvider';
 
@@ -6,7 +6,9 @@ interface LanguageToggleProps {
   className?: string;
 }
 
-export const LanguageToggle: React.FC<LanguageToggleProps> = ({ className = "" }) => {
+export const LanguageToggle: React.FC<LanguageToggleProps> = ({
+  className = '',
+}) => {
   const { lang, setLang } = useTranslation();
 
   let accentText = 'text-amber-300';
@@ -76,9 +78,10 @@ const LangPill: React.FC<{
       w-10 h-[80%] rounded-lg
       font-cinzel font-bold text-[10px] tracking-[0.1em]
       transition-all duration-300
-      ${active
-        ? `${accentText} ${accentBg} border ${accentBorder} shadow-sm`
-        : 'text-white/30 bg-transparent border border-transparent'
+      ${
+        active
+          ? `${accentText} ${accentBg} border ${accentBorder} shadow-sm`
+          : 'text-white/30 bg-transparent border border-transparent'
       }
     `}
   >

@@ -5,17 +5,17 @@
  * easy to unit test without instantiating the full server.
  */
 
-import {
-  Card,
-  Player,
-  TableCard,
-  GamePhase,
-  GameState,
-  ServerGameState,
-  VictoryCondition,
-  DeckOption,
-} from '../src/types';
 import GAME_CONFIG from '../game.config.json';
+import {
+  type Card,
+  type DeckOption,
+  GamePhase,
+  type GameState,
+  type Player,
+  type ServerGameState,
+  type TableCard,
+  type VictoryCondition,
+} from '../src/types';
 
 // ============================================
 // DECK & UTILITY FUNCTIONS
@@ -24,13 +24,20 @@ import GAME_CONFIG from '../game.config.json';
 /**
  * Creates a deck of cards with sequential IDs and image URLs.
  */
-export function createDeck(deckOption: DeckOption, originalSize: number, newSize: number): Card[] {
+export function createDeck(
+  deckOption: DeckOption,
+  originalSize: number,
+  newSize: number,
+): Card[] {
   const cards: Card[] = [];
   let idCounter = 1;
 
   if (deckOption === 'original' || deckOption === 'mixed') {
     for (let i = 1; i <= originalSize; i++) {
-      cards.push({ id: idCounter++, imageUrl: `/cards/original/${String(i).padStart(3, '0')}.avif` });
+      cards.push({
+        id: idCounter++,
+        imageUrl: `/cards/original/${String(i).padStart(3, '0')}.avif`,
+      });
     }
   }
 
@@ -93,7 +100,7 @@ export function calculateScores(
   votes: Record<string, number>,
 ): Record<string, number> {
   const narrator = players[narratorIndex];
-  const narratorCard = tableCards.find(tc => tc.playerId === narrator.id)!;
+  const narratorCard = tableCards.find((tc) => tc.playerId === narrator.id)!;
   const pointsEarned: Record<string, number> = {};
 
   // Initialize all players to 0
@@ -104,17 +111,18 @@ export function calculateScores(
   // Filter out spectator votes (defensive — server should already block these)
   const activeVotes: Record<string, number> = {};
   for (const [voterId, orderId] of Object.entries(votes)) {
-    const voter = players.find(p => p.id === voterId);
+    const voter = players.find((p) => p.id === voterId);
     if (voter && !voter.isSpectator) {
       activeVotes[voterId] = orderId;
     }
   }
 
   // Count votes for narrator's card
-  const votesForNarrator = Object.values(activeVotes)
-    .filter(orderId => orderId === narratorCard.orderId).length;
+  const votesForNarrator = Object.values(activeVotes).filter(
+    (orderId) => orderId === narratorCard.orderId,
+  ).length;
 
-  const activePlayers = players.filter(p => !p.isSpectator);
+  const activePlayers = players.filter((p) => !p.isSpectator);
   const totalVoters = activePlayers.length - 1;
 
   if (votesForNarrator === 0 || votesForNarrator === totalVoters) {
@@ -138,10 +146,11 @@ export function calculateScores(
 
   // Bonus: +1 point per vote received (non-narrator cards only)
   for (const tc of tableCards) {
-    const cardOwner = players.find(p => p.id === tc.playerId);
+    const cardOwner = players.find((p) => p.id === tc.playerId);
     if (tc.playerId !== narrator.id && !cardOwner?.isSpectator) {
-      const votesReceived = Object.values(activeVotes)
-        .filter(orderId => orderId === tc.orderId).length;
+      const votesReceived = Object.values(activeVotes).filter(
+        (orderId) => orderId === tc.orderId,
+      ).length;
       pointsEarned[tc.playerId] += votesReceived;
     }
   }
@@ -161,7 +170,9 @@ export function checkVictoryCondition(
 ): string | null {
   // Check score-based victory
   if (victoryCondition.scoreEnabled) {
-    const winners = players.filter(p => !p.isSpectator && p.score >= victoryCondition.targetScore);
+    const winners = players.filter(
+      (p) => !p.isSpectator && p.score >= victoryCondition.targetScore,
+    );
     if (winners.length > 0) {
       // If multiple players cross the target score in the same round, the one with highest score wins
       winners.sort((a, b) => b.score - a.score);
@@ -171,7 +182,7 @@ export function checkVictoryCondition(
 
   // Check narrator-rounds-based victory
   if (victoryCondition.narratorRoundsEnabled) {
-    const activePlayers = players.filter(p => !p.isSpectator);
+    const activePlayers = players.filter((p) => !p.isSpectator);
     const totalRounds = activePlayers.length * victoryCondition.narratorRounds;
     const completedRounds = currentRound + 1;
 
@@ -201,14 +212,17 @@ export function getPublicState(
   state: ServerGameState,
   forPlayerId: string | null,
 ): GameState {
-  const narrator = state.players ? state.players[state.narratorIndex] : undefined;
+  const narrator = state.players
+    ? state.players[state.narratorIndex]
+    : undefined;
   const isNarrator = forPlayerId === narrator?.id;
-  const isRevealed = state.phase === GamePhase.RESULTS || state.phase === GamePhase.GAME_OVER;
+  const isRevealed =
+    state.phase === GamePhase.RESULTS || state.phase === GamePhase.GAME_OVER;
 
   // Filter tableCards: hide playerId unless narrator or in RESULTS/GAME_OVER
-  const tableCards = (state.tableCards || []).map(tc => ({
+  const tableCards = (state.tableCards || []).map((tc) => ({
     orderId: tc.orderId,
-    playerId: (isNarrator || isRevealed) ? tc.playerId : '',
+    playerId: isNarrator || isRevealed ? tc.playerId : '',
     card: tc.card,
     isMine: tc.playerId === forPlayerId,
   }));
@@ -224,28 +238,30 @@ export function getPublicState(
   }
 
   // playersWhoPlayed: safe list of IDs who already placed a card (no card association)
-  const playersWhoPlayed = (state.tableCards || []).map(tc => tc.playerId);
-  
+  const playersWhoPlayed = (state.tableCards || []).map((tc) => tc.playerId);
+
   // playersWhoVoted: safe list of IDs who already voted (no choice association)
   const playersWhoVoted = state.votes ? Object.keys(state.votes) : [];
-
-
 
   return {
     roomCode: state.roomCode || '',
     phase: state.phase || GamePhase.LOBBY,
-    players: (state.players || []).map(p => ({
+    players: (state.players || []).map((p) => ({
       id: p.id || '',
       name: p.name || '',
       score: typeof p.score === 'number' ? p.score : 0,
-      hand: p.id === forPlayerId ? (p.hand || []) : (p.hand || []).map(() => ({ id: -1, imageUrl: '' })),
+      hand:
+        p.id === forPlayerId
+          ? p.hand || []
+          : (p.hand || []).map(() => ({ id: -1, imageUrl: '' })),
       color: p.color || '#000000',
       isConnected: typeof p.isConnected === 'boolean' ? p.isConnected : false,
       isHost: typeof p.isHost === 'boolean' ? p.isHost : false,
       isBot: typeof p.isBot === 'boolean' ? p.isBot : false,
       isSpectator: typeof p.isSpectator === 'boolean' ? p.isSpectator : false,
     })),
-    narratorIndex: typeof state.narratorIndex === 'number' ? state.narratorIndex : 0,
+    narratorIndex:
+      typeof state.narratorIndex === 'number' ? state.narratorIndex : 0,
     currentClue: state.currentClue || '',
     tableCards,
     votes,
@@ -259,8 +275,12 @@ export function getPublicState(
       narratorRoundsEnabled: false,
       narratorRounds: GAME_CONFIG.DEFAULT_NARRATOR_ROUNDS,
     },
-    currentRound: typeof state.currentRound === 'number' ? state.currentRound : 0,
-    phaseStartTime: typeof state.phaseStartTime === 'number' ? state.phaseStartTime : Date.now(),
+    currentRound:
+      typeof state.currentRound === 'number' ? state.currentRound : 0,
+    phaseStartTime:
+      typeof state.phaseStartTime === 'number'
+        ? state.phaseStartTime
+        : Date.now(),
     afkKickVotes: state.afkKickVotes || [],
     deckOption: state.deckOption || 'mixed',
     playersWhoReadied: state.playersWhoReadied || [],
@@ -270,7 +290,7 @@ export function getPublicState(
       voting: 30,
       results: 15,
     },
-    timerEnabled: typeof state.timerEnabled === 'boolean' ? state.timerEnabled : true,
+    timerEnabled:
+      typeof state.timerEnabled === 'boolean' ? state.timerEnabled : true,
   };
 }
-

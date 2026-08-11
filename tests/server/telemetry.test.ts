@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ServerTelemetry } from '../../party/telemetry';
 
 describe('ServerTelemetry', () => {
@@ -93,6 +93,8 @@ describe('ServerTelemetry', () => {
 
     expect(snapshot.counters.uncaughtErrors).toBe(25);
     expect(snapshot.recentLogs.length).toBe(20);
-    expect(snapshot.recentLogs[0].message).toBe('Server caught unhandled error: Error 5');
+    expect(snapshot.recentLogs[0].message).toBe(
+      'Server caught unhandled error: Error 5',
+    );
   });
 });

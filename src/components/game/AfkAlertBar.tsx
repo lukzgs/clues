@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { GameState, GamePhase } from '../../types';
 import GAME_CONFIG from '../../../game.config.json';
+import { GamePhase, type GameState } from '../../types';
 
 interface AfkAlertBarProps {
   gameState: GameState;
@@ -8,7 +8,9 @@ interface AfkAlertBarProps {
 
 export function AfkAlertBar({ gameState }: AfkAlertBarProps) {
   // As fases LOBBY e GAME_OVER não tem timeout
-  const isActivePhase = gameState.phase !== GamePhase.LOBBY && gameState.phase !== GamePhase.GAME_OVER;
+  const isActivePhase =
+    gameState.phase !== GamePhase.LOBBY &&
+    gameState.phase !== GamePhase.GAME_OVER;
 
   // Dynamically determine current phase timeout
   let currentPhaseTimeout = GAME_CONFIG.PHASE_TIMEOUT_MS;
@@ -55,7 +57,7 @@ export function AfkAlertBar({ gameState }: AfkAlertBarProps) {
   // Apenas um indicador sutil visual de tempo
   return (
     <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
-      <div 
+      <div
         className="h-full bg-white/50 transition-all duration-100 ease-linear"
         style={{ width: `${(timeLeft / currentPhaseTimeout) * 100}%` }}
       />

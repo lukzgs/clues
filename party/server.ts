@@ -1,36 +1,43 @@
-import type * as Party from "partykit/server";
-import {
-  GamePhase,
-  Player,
-  Card,
-  TableCard,
-  ServerGameState,
-  GameState,
-  ClientMessageType,
-  ServerMessageType,
-  DeckOption,
-} from "../src/types";
-import { ClientMessageSchema } from "../src/schemas";
-import { getPublicState } from "./game-logic";
-import { calculateMaxPlayers } from "../src/utils/gameMath";
+import type * as Party from 'partykit/server';
 import GAME_CONFIG from '../game.config.json';
-
-// Import local handlers
-import { handleJoinRoom, handleLeaveRoom, handleUpdateSettings } from "./handlers/room";
+import { ClientMessageSchema } from '../src/schemas';
 import {
+  Card,
+  ClientMessageType,
+  type DeckOption,
+  GamePhase,
+  type GameState,
+  Player,
+  type ServerGameState,
+  ServerMessageType,
+  TableCard,
+} from '../src/types';
+import { calculateMaxPlayers } from '../src/utils/gameMath';
+import { BotManager } from './bots';
+import { getPublicState } from './game-logic';
+import { handleVoteKickAfk } from './handlers/afk';
+import { handleAddBot, handleRemoveBot } from './handlers/bot';
+import {
+  handleNextRound,
+  handlePlayCard,
+  handleRestartGame,
   handleStartGame,
   handleSubmitClue,
-  handlePlayCard,
   handleVote,
-  handleNextRound,
-  handleRestartGame,
-} from "./handlers/game";
-import { handleKickPlayer, handleToggleSpectator, handleRequestPlay } from "./handlers/spectator";
-import { handleVoteKickAfk } from "./handlers/afk";
-import { handleAddBot, handleRemoveBot } from "./handlers/bot";
-import { ServerTelemetry } from "./telemetry";
-import RegistryServer, { globalRegistry } from "./registry";
-import { BotManager } from "./bots";
+} from './handlers/game';
+// Import local handlers
+import {
+  handleJoinRoom,
+  handleLeaveRoom,
+  handleUpdateSettings,
+} from './handlers/room';
+import {
+  handleKickPlayer,
+  handleRequestPlay,
+  handleToggleSpectator,
+} from './handlers/spectator';
+import RegistryServer, { globalRegistry } from './registry';
+import { ServerTelemetry } from './telemetry';
 
 export { RegistryServer as registry };
 
@@ -55,7 +62,8 @@ export default class GameServer implements Party.Server {
   public telemetry: ServerTelemetry;
 
   // Rate limiting: connectionId -> { count, windowStart }
-  private rateLimitData: Map<string, { count: number; windowStart: number }> = new Map();
+  private rateLimitData: Map<string, { count: number; windowStart: number }> =
+    new Map();
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
@@ -85,13 +93,21 @@ export default class GameServer implements Party.Server {
       phaseStartTime: Date.now(),
       afkKickVotes: [],
       playersWhoReadied: [],
-      phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+      phaseTimeouts: {
+        narrator: 60,
+        othersChoosing: 45,
+        voting: 30,
+        results: 15,
+      },
       timerEnabled: true,
     };
   }
 
   // [SPECTATOR] Returns max active players based on deck option and victory condition
-  public getMaxPlayersForDeck(deckOption: DeckOption, vc: ServerGameState['victoryCondition']): number {
+  public getMaxPlayersForDeck(
+    deckOption: DeckOption,
+    vc: ServerGameState['victoryCondition'],
+  ): number {
     return calculateMaxPlayers(deckOption, vc);
   }
 
@@ -117,7 +133,10 @@ export default class GameServer implements Party.Server {
 
     // Check if the player already reconnected via a different connection (ghost socket guard)
     let hasOtherConnection = false;
-    for (const [existingConnId, existingPlayerId] of this.connections.entries()) {
+    for (const [
+      existingConnId,
+      existingPlayerId,
+    ] of this.connections.entries()) {
       if (existingPlayerId === playerId && existingConnId !== conn.id) {
         hasOtherConnection = true;
         break;
@@ -131,7 +150,7 @@ export default class GameServer implements Party.Server {
     // If player has another active connection, don't mark as disconnected
     if (hasOtherConnection) return;
 
-    const player = this.state.players.find(p => p.id === playerId);
+    const player = this.state.players.find((p) => p.id === playerId);
     if (player) {
       player.isConnected = false;
 
@@ -139,8 +158,14 @@ export default class GameServer implements Party.Server {
         // Lobby: keep player in state for reconnection, but schedule host migration
         if (player.isHost) {
           setTimeout(() => {
-            if (this.state.phase === GamePhase.LOBBY && player.isHost && !player.isConnected) {
-              const nextHost = this.state.players.find(p => p.isConnected && !p.isSpectator && !p.isBot);
+            if (
+              this.state.phase === GamePhase.LOBBY &&
+              player.isHost &&
+              !player.isConnected
+            ) {
+              const nextHost = this.state.players.find(
+                (p) => p.isConnected && !p.isSpectator && !p.isBot,
+              );
               if (nextHost) {
                 player.isHost = false;
                 nextHost.isHost = true;
@@ -152,7 +177,9 @@ export default class GameServer implements Party.Server {
       } else {
         // Mid-game: reassign host immediately if disconnected host
         if (player.isHost) {
-          const nextHost = this.state.players.find(p => p.isConnected && !p.isSpectator && p.id !== playerId);
+          const nextHost = this.state.players.find(
+            (p) => p.isConnected && !p.isSpectator && p.id !== playerId,
+          );
           if (nextHost) {
             player.isHost = false;
             nextHost.isHost = true;
@@ -216,7 +243,10 @@ export default class GameServer implements Party.Server {
       const parsed = ClientMessageSchema.safeParse(JSON.parse(message));
       if (!parsed.success) {
         console.warn('Mensagem inválida:', parsed.error.issues);
-        this.telemetry.recordValidationError(sender.id, JSON.stringify(parsed.error.issues));
+        this.telemetry.recordValidationError(
+          sender.id,
+          JSON.stringify(parsed.error.issues),
+        );
         return; // Ignora silenciosamente
       }
       const msg = parsed.data;
@@ -226,7 +256,13 @@ export default class GameServer implements Party.Server {
 
       switch (msg.type) {
         case 'JOIN_ROOM':
-          await handleJoinRoom(this, msg.playerName, sender, msg.reconnectId, msg.reconnectSecret);
+          await handleJoinRoom(
+            this,
+            msg.playerName,
+            sender,
+            msg.reconnectId,
+            msg.reconnectSecret,
+          );
           break;
 
         case 'LEAVE_ROOM':
@@ -234,11 +270,27 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'START_GAME':
-          if (playerId) handleStartGame(this, playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
+          if (playerId)
+            handleStartGame(
+              this,
+              playerId,
+              msg.victoryCondition,
+              msg.deckOption,
+              msg.phaseTimeouts,
+              msg.timerEnabled,
+            );
           break;
 
         case 'UPDATE_SETTINGS':
-          if (playerId) handleUpdateSettings(this, playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
+          if (playerId)
+            handleUpdateSettings(
+              this,
+              playerId,
+              msg.victoryCondition,
+              msg.deckOption,
+              msg.phaseTimeouts,
+              msg.timerEnabled,
+            );
           break;
 
         case 'SUBMIT_CLUE':
@@ -267,7 +319,8 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'REMOVE_BOT':
-          if (playerId && this.botManager) handleRemoveBot(this, playerId, msg.botId);
+          if (playerId && this.botManager)
+            handleRemoveBot(this, playerId, msg.botId);
           break;
 
         case 'VOTE_KICK_AFK':
@@ -280,7 +333,8 @@ export default class GameServer implements Party.Server {
           break;
 
         case 'TOGGLE_SPECTATOR':
-          if (playerId) handleToggleSpectator(this, playerId, msg.targetPlayerId);
+          if (playerId)
+            handleToggleSpectator(this, playerId, msg.targetPlayerId);
           break;
 
         case 'REQUEST_PLAY':
@@ -289,7 +343,9 @@ export default class GameServer implements Party.Server {
       }
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
-      this.telemetry.recordUncaughtError(error instanceof Error ? error.message : String(error));
+      this.telemetry.recordUncaughtError(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   }
 
@@ -300,33 +356,37 @@ export default class GameServer implements Party.Server {
   async onRequest(req: Party.Request): Promise<Response> {
     const url = new URL(req.url);
 
-    if (url.pathname === "/metrics" || url.pathname.endsWith("/metrics")) {
-      if (req.method !== "GET") {
-        return new Response("Method Not Allowed", { status: 405 });
+    if (url.pathname === '/metrics' || url.pathname.endsWith('/metrics')) {
+      if (req.method !== 'GET') {
+        return new Response('Method Not Allowed', { status: 405 });
       }
 
       // Guard de Autenticação (Bearer Token)
-      const authHeader = req.headers.get("Authorization");
+      const authHeader = req.headers.get('Authorization');
       const expectedToken =
-        (this.room.env as Record<string, string> | undefined)?.METRICS_SECRET_TOKEN ||
-        process.env.METRICS_SECRET_TOKEN;
+        (this.room.env as Record<string, string> | undefined)
+          ?.METRICS_SECRET_TOKEN || process.env.METRICS_SECRET_TOKEN;
 
       if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         });
       }
 
       // Return global server snapshot if room ID is 'global' or URL targets registry/global
       const cleanPath = url.pathname.toLowerCase();
-      if (this.room.id.toLowerCase() === "global" || cleanPath.includes("/global/") || cleanPath.includes("registry")) {
+      if (
+        this.room.id.toLowerCase() === 'global' ||
+        cleanPath.includes('/global/') ||
+        cleanPath.includes('registry')
+      ) {
         const snapshot = globalRegistry.getGlobalSnapshot();
         return new Response(JSON.stringify(snapshot, null, 2), {
           status: 200,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
           },
         });
       }
@@ -335,23 +395,26 @@ export default class GameServer implements Party.Server {
         phase: this.state.phase,
         activeConnectionsCount: this.connections.size,
         totalPlayersCount: this.state.players.length,
-        humanPlayersCount: this.state.players.filter(p => !p.isBot).length,
-        botPlayersCount: this.state.players.filter(p => p.isBot).length,
-        spectatorsCount: this.state.players.filter(p => p.isSpectator).length,
+        humanPlayersCount: this.state.players.filter((p) => !p.isBot).length,
+        botPlayersCount: this.state.players.filter((p) => p.isBot).length,
+        spectatorsCount: this.state.players.filter((p) => p.isSpectator).length,
       };
 
-      const metricsSnapshot = this.telemetry.getSnapshot(this.room.id, roomSummary);
+      const metricsSnapshot = this.telemetry.getSnapshot(
+        this.room.id,
+        roomSummary,
+      );
 
       return new Response(JSON.stringify(metricsSnapshot, null, 2), {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "null",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'null',
         },
       });
     }
 
-    return new Response("Not Found", { status: 404 });
+    return new Response('Not Found', { status: 404 });
   }
 
   public async resetInactivityTimer() {
@@ -365,24 +428,26 @@ export default class GameServer implements Party.Server {
 
   async onAlarm() {
     const isClosing = await this.room.storage.get<boolean>('isClosing');
-    
+
     if (!isClosing) {
       // Alarme de 9 minutos!
       await this.room.storage.put('isClosing', true);
-      this.room.broadcast(JSON.stringify({ 
-        type: 'SERVER_CLOSING_WARNING', 
-        closeTime: Date.now() + 60 * 1000 
-      }));
+      this.room.broadcast(
+        JSON.stringify({
+          type: 'SERVER_CLOSING_WARNING',
+          closeTime: Date.now() + 60 * 1000,
+        }),
+      );
       await this.room.storage.setAlarm(Date.now() + 60 * 1000);
     } else {
       // Alarme de 10 minutos!
       this.room.broadcast(JSON.stringify({ type: 'SERVER_CLOSED' }));
-      
+
       // Desconecta todos
       for (const conn of this.room.getConnections()) {
-        conn.close(1000, "Room closed due to inactivity");
+        conn.close(1000, 'Room closed due to inactivity');
       }
-      
+
       // Limpa storage
       await this.room.storage.deleteAll();
       await this.notifyRegistry(true);
@@ -408,7 +473,12 @@ export default class GameServer implements Party.Server {
   public getPublicState(forPlayerId: string | null): GameState {
     // Migração de estado interno ativa
     if (!this.state.phaseTimeouts) {
-      this.state.phaseTimeouts = { narrator: 60, othersChoosing: 45, voting: 30, results: 15 };
+      this.state.phaseTimeouts = {
+        narrator: 60,
+        othersChoosing: 45,
+        voting: 30,
+        results: 15,
+      };
     }
     if (!this.state.victoryCondition) {
       this.state.victoryCondition = {
@@ -450,11 +520,14 @@ export default class GameServer implements Party.Server {
       } else {
         const roomSummary = {
           phase: this.state.phase,
-          activeConnectionsCount: this.room.getConnections ? Array.from(this.room.getConnections()).length : this.connections.size,
+          activeConnectionsCount: this.room.getConnections
+            ? Array.from(this.room.getConnections()).length
+            : this.connections.size,
           totalPlayersCount: this.state.players.length,
-          humanPlayersCount: this.state.players.filter(p => !p.isBot).length,
-          botPlayersCount: this.state.players.filter(p => p.isBot).length,
-          spectatorsCount: this.state.players.filter(p => p.isSpectator).length,
+          humanPlayersCount: this.state.players.filter((p) => !p.isBot).length,
+          botPlayersCount: this.state.players.filter((p) => p.isBot).length,
+          spectatorsCount: this.state.players.filter((p) => p.isSpectator)
+            .length,
         };
         const snapshot = this.telemetry.getSnapshot(this.room.id, roomSummary);
         globalRegistry.registerOrUpdateRoom({
@@ -479,7 +552,10 @@ export default class GameServer implements Party.Server {
       const json = JSON.stringify(message);
       this.room.broadcast(json);
     } catch (error) {
-      console.error("[ERROR-SERVER] Erro ao transmitir mensagem (broadcast):", error);
+      console.error(
+        '[ERROR-SERVER] Erro ao transmitir mensagem (broadcast):',
+        error,
+      );
     }
   }
 
@@ -487,7 +563,10 @@ export default class GameServer implements Party.Server {
     try {
       conn.send(JSON.stringify(message));
     } catch (error) {
-      console.error(`[ERROR-SERVER] Erro ao enviar mensagem para conexão ${conn.id}:`, error);
+      console.error(
+        `[ERROR-SERVER] Erro ao enviar mensagem para conexão ${conn.id}:`,
+        error,
+      );
     }
   }
 

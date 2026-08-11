@@ -6,14 +6,20 @@
  */
 
 import {
-  createDeck,
-  shuffle,
-  generatePlayerId,
   calculateScores,
   checkVictoryCondition,
+  createDeck,
+  generatePlayerId,
   getPublicState,
+  shuffle,
 } from '../../party/game-logic';
-import { GamePhase, Player, TableCard, ServerGameState, VictoryCondition } from '../../src/types';
+import {
+  GamePhase,
+  type Player,
+  type ServerGameState,
+  type TableCard,
+  type VictoryCondition,
+} from '../../src/types';
 
 // ============================================
 // HELPERS
@@ -35,15 +41,24 @@ function createPlayer(overrides: Partial<Player> = {}): Player {
   };
 }
 
-function createTableCard(playerId: string, orderId: number, cardId: number): TableCard {
+function createTableCard(
+  playerId: string,
+  orderId: number,
+  cardId: number,
+): TableCard {
   return {
     orderId,
     playerId,
-    card: { id: cardId, imageUrl: `/cards/new/card_${String(cardId).padStart(4, '0')}.avif` },
+    card: {
+      id: cardId,
+      imageUrl: `/cards/new/card_${String(cardId).padStart(4, '0')}.avif`,
+    },
   };
 }
 
-function createServerState(overrides: Partial<ServerGameState> = {}): ServerGameState {
+function createServerState(
+  overrides: Partial<ServerGameState> = {},
+): ServerGameState {
   return {
     roomCode: 'TEST01',
     phase: GamePhase.VOTING,
@@ -65,7 +80,12 @@ function createServerState(overrides: Partial<ServerGameState> = {}): ServerGame
     afkKickVotes: [],
     deckOption: 'mixed',
     playersWhoReadied: [],
-    phaseTimeouts: { narrator: 60, othersChoosing: 45, voting: 30, results: 15 },
+    phaseTimeouts: {
+      narrator: 60,
+      othersChoosing: 45,
+      voting: 30,
+      results: 15,
+    },
     timerEnabled: true,
     ...overrides,
   };
@@ -342,9 +362,7 @@ describe('checkVictoryCondition', () => {
       narratorRounds: 2,
     };
 
-    const players = [
-      createPlayer({ id: 'p1', score: 100 }),
-    ];
+    const players = [createPlayer({ id: 'p1', score: 100 })];
 
     const result = checkVictoryCondition(players, condition, 100);
     expect(result).toBeNull();
@@ -385,9 +403,7 @@ describe('getPublicState', () => {
   const p3 = createPlayer({
     id: 'p3',
     name: 'Player 3',
-    hand: [
-      { id: 30, imageUrl: '/cards/new/30.avif' },
-    ],
+    hand: [{ id: 30, imageUrl: '/cards/new/30.avif' }],
   });
 
   const tableCards: TableCard[] = [
@@ -404,7 +420,7 @@ describe('getPublicState', () => {
       });
 
       const publicState = getPublicState(state, 'p2');
-      const myPlayer = publicState.players.find(p => p.id === 'p2')!;
+      const myPlayer = publicState.players.find((p) => p.id === 'p2')!;
       expect(myPlayer.hand).toEqual(p2.hand);
     });
 
@@ -415,7 +431,7 @@ describe('getPublicState', () => {
       });
 
       const publicState = getPublicState(state, 'p2');
-      const otherPlayer = publicState.players.find(p => p.id === 'p1')!;
+      const otherPlayer = publicState.players.find((p) => p.id === 'p1')!;
 
       // Each card should be masked
       for (const card of otherPlayer.hand) {
@@ -431,8 +447,8 @@ describe('getPublicState', () => {
       });
 
       const publicState = getPublicState(state, 'p2');
-      const p1Public = publicState.players.find(p => p.id === 'p1')!;
-      const p3Public = publicState.players.find(p => p.id === 'p3')!;
+      const p1Public = publicState.players.find((p) => p.id === 'p1')!;
+      const p3Public = publicState.players.find((p) => p.id === 'p3')!;
 
       expect(p1Public.hand).toHaveLength(p1.hand.length);
       expect(p3Public.hand).toHaveLength(p3.hand.length);
@@ -512,8 +528,8 @@ describe('getPublicState', () => {
 
       const publicState = getPublicState(state, 'p2');
 
-      const myCard = publicState.tableCards.find(tc => tc.card.id === 102);
-      const otherCard = publicState.tableCards.find(tc => tc.card.id === 101);
+      const myCard = publicState.tableCards.find((tc) => tc.card.id === 102);
+      const otherCard = publicState.tableCards.find((tc) => tc.card.id === 101);
 
       expect(myCard?.isMine).toBe(true);
       expect(otherCard?.isMine).toBe(false);
@@ -602,7 +618,10 @@ describe('getPublicState', () => {
     it('works with null forPlayerId (spectator view)', () => {
       const state = createServerState({
         players: [p1, p2],
-        tableCards: [createTableCard('p1', 0, 101), createTableCard('p2', 1, 102)],
+        tableCards: [
+          createTableCard('p1', 0, 101),
+          createTableCard('p2', 1, 102),
+        ],
         phase: GamePhase.VOTING,
         narratorIndex: 0,
       });

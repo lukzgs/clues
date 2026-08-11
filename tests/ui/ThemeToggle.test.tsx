@@ -2,11 +2,11 @@
  * @vitest-environment jsdom
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { ThemeToggle } from '../../src/components/ui/ThemeToggle';
-import { ThemeProvider } from '../../src/providers/ThemeProvider';
 import { LanguageProvider } from '../../src/i18n/index.tsx';
+import { ThemeProvider } from '../../src/providers/ThemeProvider';
 
 describe('ThemeToggle Component', () => {
   it('renders correctly and cycles through themes on click', () => {
@@ -15,19 +15,30 @@ describe('ThemeToggle Component', () => {
         <ThemeProvider>
           <ThemeToggle />
         </ThemeProvider>
-      </LanguageProvider>
+      </LanguageProvider>,
     );
 
-    const toggleBtn = screen.getByRole('button', { name: /alternar tema visual/i });
+    const toggleBtn = screen.getByRole('button', {
+      name: /alternar tema visual/i,
+    });
     expect(toggleBtn).toBeInTheDocument();
-    expect(toggleBtn).toHaveAttribute('title', 'Tema: Ouro Místico (Clique para alternar)');
+    expect(toggleBtn).toHaveAttribute(
+      'title',
+      'Tema: Ouro Místico (Clique para alternar)',
+    );
 
     // Click to cycle to Cristal Transparente
     fireEvent.click(toggleBtn);
-    expect(toggleBtn).toHaveAttribute('title', 'Tema: Cristal Transparente (Clique para alternar)');
+    expect(toggleBtn).toHaveAttribute(
+      'title',
+      'Tema: Cristal Transparente (Clique para alternar)',
+    );
 
     // Click to cycle to Eclipse Violeta
     fireEvent.click(toggleBtn);
-    expect(toggleBtn).toHaveAttribute('title', 'Tema: Eclipse Violeta (Clique para alternar)');
+    expect(toggleBtn).toHaveAttribute(
+      'title',
+      'Tema: Eclipse Violeta (Clique para alternar)',
+    );
   });
 });

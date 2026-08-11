@@ -6,7 +6,7 @@
  */
 
 import type * as Party from 'partykit/server';
-import { Player, VictoryCondition } from '../../src/types';
+import { Player, type VictoryCondition } from '../../src/types';
 
 // ============================================
 // MOCK CONNECTION
@@ -31,7 +31,9 @@ export function createMockConnection(id?: string): MockConnection {
   return {
     id: connId,
     uri: `ws://localhost:1999/${connId}`,
-    get readyState() { return readyState; },
+    get readyState() {
+      return readyState;
+    },
     sentMessages,
     send(message: string | ArrayBuffer | ArrayBufferView) {
       if (typeof message === 'string') {
@@ -42,7 +44,9 @@ export function createMockConnection(id?: string): MockConnection {
       readyState = 3; // WebSocket.CLOSED
     },
     serializeAttachment(_attachment: unknown) {},
-    deserializeAttachment(): unknown { return undefined; },
+    deserializeAttachment(): unknown {
+      return undefined;
+    },
     setState<T>(_state: T) {},
     // Socket properties (stubs)
     socket: null as any,
@@ -91,7 +95,10 @@ export function createMockRoom(roomId: string = 'TEST01'): MockRoom {
     getConnections(_tag?: string) {
       return connections.values();
     },
-    broadcast(msg: string | ArrayBuffer | ArrayBufferView, _without?: string[]) {
+    broadcast(
+      msg: string | ArrayBuffer | ArrayBufferView,
+      _without?: string[],
+    ) {
       if (typeof msg === 'string') {
         broadcastMessages.push(msg);
       }
@@ -123,7 +130,8 @@ export async function simulateJoinRoom(
   // Trigger onConnect
   await server.onConnect(conn);
 
-  const secretToPass = reconnectSecret || (reconnectId && server.playerSecrets?.get(reconnectId));
+  const secretToPass =
+    reconnectSecret || (reconnectId && server.playerSecrets?.get(reconnectId));
 
   // Send JOIN_ROOM message
   const joinMsg = JSON.stringify({
@@ -154,7 +162,7 @@ export function getLastSyncState(conn: MockConnection) {
  * Gets all parsed messages sent to a connection.
  */
 export function getParsedMessages(conn: MockConnection) {
-  return conn.sentMessages.map(m => JSON.parse(m));
+  return conn.sentMessages.map((m) => JSON.parse(m));
 }
 
 /**

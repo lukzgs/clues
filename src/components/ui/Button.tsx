@@ -1,10 +1,16 @@
-import React from 'react';
+import type React from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
 
-export type ButtonVariant = 'primary' | 'glass' | 'outline' | 'destructive' | 'ghost';
+export type ButtonVariant =
+  | 'primary'
+  | 'glass'
+  | 'outline'
+  | 'destructive'
+  | 'ghost';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
@@ -34,10 +40,13 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantClasses: Record<ButtonVariant, string> = {
     primary: `${theme.primaryGradient} text-black font-cinzel font-bold uppercase tracking-widest ${theme.glowShadow} hover:scale-[1.02] active:scale-[0.98]`,
-    glass: 'bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]',
+    glass:
+      'bg-white/5 border border-white/10 text-white font-cinzel font-bold uppercase tracking-widest hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]',
     outline: `bg-transparent border ${theme.accentBorder} ${theme.accentText} font-cinzel font-bold uppercase tracking-widest hover:${theme.accentBgLight} hover:scale-[1.02] active:scale-[0.98]`,
-    destructive: 'bg-red-950/40 border border-red-500/40 text-red-200 font-cinzel font-bold uppercase tracking-widest hover:bg-red-900/60 hover:border-red-500/70 hover:scale-[1.02] active:scale-[0.98]',
-    ghost: 'bg-transparent border border-white/20 text-white/70 font-cinzel font-semibold uppercase tracking-widest hover:bg-white/10 hover:border-white/40 hover:text-white active:scale-[0.98]',
+    destructive:
+      'bg-red-950/40 border border-red-500/40 text-red-200 font-cinzel font-bold uppercase tracking-widest hover:bg-red-900/60 hover:border-red-500/70 hover:scale-[1.02] active:scale-[0.98]',
+    ghost:
+      'bg-transparent border border-white/20 text-white/70 font-cinzel font-semibold uppercase tracking-widest hover:bg-white/10 hover:border-white/40 hover:text-white active:scale-[0.98]',
   };
 
   const isDisabled = disabled || isLoading;
@@ -61,11 +70,7 @@ export const Button: React.FC<ButtonProps> = ({
         iconPosition === 'left' && icon
       )}
 
-      {iconPosition === 'only' ? (
-        !isLoading && icon
-      ) : (
-        children
-      )}
+      {iconPosition === 'only' ? !isLoading && icon : children}
 
       {!isLoading && iconPosition === 'right' && icon}
     </button>
