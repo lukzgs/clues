@@ -115,7 +115,7 @@ describe('LobbyScreen', () => {
       renderLobbyScreen(defaultGameState, guestPlayer);
       const bobName = screen.getByText('Bob');
       const card = bobName.closest('.rounded-xl');
-      expect(card).toHaveClass('bg-amber-500/10');
+      expect(card).toHaveClass('border-amber-500/40');
     });
   });
 
