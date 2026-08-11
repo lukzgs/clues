@@ -12,6 +12,7 @@
 import GameServer from '../../party/server';
 import {
   createMockRoom,
+  createMockConnection,
   simulateJoinRoom,
   getLastSyncState,
 } from '../helpers/test-helpers';
@@ -281,7 +282,7 @@ describe('Connectivity — Lobby reconnection preserves session', () => {
     // Verify via a second player's state
     const conn2Msgs = room.connections.values().next();
 
-    // Reconnect with new connection but same reconnectId
+    // Reconnect with new connection but same reconnectId and valid secret
     const conn1b = await simulateJoinRoom(server, room, 'Host', undefined, hostId);
     state = getLastSyncState(conn1b);
 
@@ -291,6 +292,43 @@ describe('Connectivity — Lobby reconnection preserves session', () => {
     expect(hostPlayer).toBeDefined();
     expect(hostPlayer.isHost).toBe(true);
     expect(hostPlayer.isConnected).toBe(true);
+  });
+
+  it('rejects reconnection attempt if reconnectSecret does not match', async () => {
+    const room = createMockRoom('RECONNECT-SEC');
+    const server = new GameServer(room as any);
+
+    const conn1 = await simulateJoinRoom(server, room, 'Alice');
+    const sync1 = getLastSyncState(conn1);
+    const aliceId = sync1.yourPlayerId;
+
+    // Disconnect Alice
+    room.connections.delete(conn1.id);
+    server.onClose(conn1);
+
+    // Attacker tries to reconnect with Alice's ID but wrong secret
+    const attackerConn = createMockConnection();
+    room.connections.set(attackerConn.id, attackerConn);
+    await server.onConnect(attackerConn);
+
+    await server.onMessage(JSON.stringify({
+      type: 'JOIN_ROOM',
+      playerName: 'Attacker',
+      reconnectId: aliceId,
+      reconnectSecret: 'wrong-secret-token',
+    }), attackerConn);
+
+    // Reconnect attempt should be rejected (recorded as failed reconnect in telemetry)
+    const snapshot = server.telemetry.getSnapshot(room.id, {
+      phase: server.state.phase,
+      activeConnectionsCount: server.connections.size,
+      totalPlayersCount: server.state.players.length,
+      humanPlayersCount: 1,
+      botPlayersCount: 0,
+      spectatorsCount: 0,
+    });
+
+    expect(snapshot.counters.reconnectsFailedInvalidId).toBe(1);
   });
 });
 

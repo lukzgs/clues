@@ -4,6 +4,7 @@ export type GameSession = {
   roomCode: string;
   playerName: string;
   playerId?: string;
+  reconnectSecret?: string;
 };
 
 interface GameSessionContextType {
@@ -43,6 +44,7 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
               roomCode: parsedSession.roomCode,
               playerName: parsedSession.playerName,
               playerId: parsedSession.playerId,
+              reconnectSecret: parsedSession.reconnectSecret,
             });
           } else {
             // Clear old session so it doesn't conflict later
@@ -66,8 +68,9 @@ export const GameSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       const playerIdEqual = prev.playerId === newSession.playerId;
       const playerNameEqual = prev.playerName === newSession.playerName;
       const roomCodeEqual = prev.roomCode === newSession.roomCode;
+      const reconnectSecretEqual = prev.reconnectSecret === newSession.reconnectSecret;
 
-      if (playerIdEqual && playerNameEqual && roomCodeEqual) {
+      if (playerIdEqual && playerNameEqual && roomCodeEqual && reconnectSecretEqual) {
         return prev;
       }
 

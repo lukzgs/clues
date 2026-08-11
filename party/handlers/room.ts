@@ -6,11 +6,18 @@ import { PLAYER_COLORS } from "../../src/config";
 import GAME_CONFIG from '../../game.config.json';
 import type GameServer from "../server";
 
+function generateSecret(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function handleJoinRoom(
   server: GameServer,
   playerName: string,
   conn: Party.Connection,
-  reconnectId?: string
+  reconnectId?: string,
+  reconnectSecret?: string
 ) {
   // Verifica se já está conectado
   if (server.connections.has(conn.id)) {
@@ -18,10 +25,21 @@ export async function handleJoinRoom(
     return;
   }
 
-  // Reconnection: try to reclaim a player by ID (even if they still appear connected due to ghost socket)
+  // Reconnection: try to reclaim a player by ID (validated by secret)
   if (reconnectId) {
     const player = server.state.players.find(p => p.id === reconnectId && !p.isBot);
-    if (player) {
+    const storedSecret = server.playerSecrets.get(reconnectId);
+
+    // Validate reconnect: player must exist, and if secret was stored, provided secret must match
+    const isSecretValid = Boolean(player && (!storedSecret || (reconnectSecret && storedSecret === reconnectSecret)));
+
+    if (player && isSecretValid) {
+      let secretToUse = storedSecret;
+      if (!secretToUse) {
+        secretToUse = generateSecret();
+        server.playerSecrets.set(player.id, secretToUse);
+      }
+
       // Verifica se já existe uma conexão ativa para este jogador
       let existingConn: Party.Connection | undefined;
       let existingConnIdSaved: string | undefined;
@@ -55,17 +73,18 @@ export async function handleJoinRoom(
 
       server.broadcastState();
       
-      // Send confirmation with player ID so client can restore local state
+      // Send confirmation with player ID and secret so client can restore local state
       server.sendToConnection(conn, {
         type: ServerMessageType.SYNC_STATE,
         gameState: getPublicState(server.state, player.id),
-        yourPlayerId: player.id
+        yourPlayerId: player.id,
+        yourReconnectSecret: secretToUse,
       });
       
       server.telemetry.recordReconnectSuccess(player.name, reconnectId);
       return;
     }
-    // reconnectId invalid — fall through to normal join
+    // reconnectId invalid or secret mismatch — recorded as failed reconnect
     server.telemetry.recordReconnectFailed(reconnectId);
   }
 
@@ -79,6 +98,9 @@ export async function handleJoinRoom(
 
     // Create spectator player
     const playerId = generatePlayerId();
+    const playerSecret = generateSecret();
+    server.playerSecrets.set(playerId, playerSecret);
+
     const playerIndex = server.state.players.length;
 
     const newPlayer: Player = {
@@ -112,6 +134,9 @@ export async function handleJoinRoom(
 
   // Cria jogador
   const playerId = generatePlayerId();
+  const playerSecret = generateSecret();
+  server.playerSecrets.set(playerId, playerSecret);
+
   const playerIndex = server.state.players.length;
 
   const newPlayer: Player = {

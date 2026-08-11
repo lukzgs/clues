@@ -6,7 +6,7 @@ async function main() {
 
   let targetRoom: string | null = null;
   let host = process.env.PARTYKIT_HOST || 'http://127.0.0.1:1999';
-  let token = process.env.METRICS_SECRET_TOKEN || 'dev-secret-token';
+  let token = process.env.METRICS_SECRET_TOKEN || '';
   let rawJson = false;
 
   for (let i = 0; i < args.length; i++) {

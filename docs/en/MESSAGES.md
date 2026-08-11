@@ -33,7 +33,7 @@ enum ClientMessageType {
 
 | Message | Payload | Valid Phase |
 |---------|---------|-------------|
-| `JOIN_ROOM` | `playerName: string` | Any |
+| `JOIN_ROOM` | `playerName: string, reconnectId?: string, reconnectSecret?: string` | Any |
 | `LEAVE_ROOM` | (none) | Any |
 | `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean` | LOBBY (host only) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (narrator only) |
@@ -51,8 +51,8 @@ enum ClientMessageType {
 ### Example Messages
 
 ```typescript
-// Join a room
-{ type: 'JOIN_ROOM', playerName: 'Alice' }
+// Join a room (or reconnect with reconnectSecret)
+{ type: 'JOIN_ROOM', playerName: 'Alice', reconnectId: 'p-12345', reconnectSecret: 'a1b2c3d4...' }
 
 // Submit a clue as narrator
 { type: 'SUBMIT_CLUE', cardId: 42, clue: 'A dream within a dream' }
@@ -90,7 +90,7 @@ enum ServerMessageType {
 
 | Message | Payload | Description |
 |---------|---------|-------------|
-| `SYNC_STATE` | `gameState: GameState, yourPlayerId: string` | Full state sync |
+| `SYNC_STATE` | `gameState: GameState, yourPlayerId: string, yourReconnectSecret?: string` | Full state sync |
 | `PLAYER_JOINED` | `player: Player` (without hand) | Player joined notification |
 | `PLAYER_LEFT` | `playerId: string, playerName: string` | Player left notification |
 | `PLAYER_KICKED` | `playerId: string` | Player kicked notification |

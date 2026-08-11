@@ -27,6 +27,7 @@ export const JoinRoomSchema = z.object({
     type: z.literal('JOIN_ROOM'),
     playerName: SafeString.min(1, 'Nome obrigatório').max(20, 'Nome muito longo'),
     reconnectId: z.string().optional(),
+    reconnectSecret: z.string().optional(),
 });
 
 export const LeaveRoomSchema = z.object({

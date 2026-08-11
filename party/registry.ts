@@ -159,8 +159,7 @@ export default class RegistryServer implements Party.Server {
       const authHeader = req.headers.get("Authorization");
       const expectedToken =
         (this.room.env as Record<string, string> | undefined)?.METRICS_SECRET_TOKEN ||
-        process.env.METRICS_SECRET_TOKEN ||
-        "dev-secret-token";
+        process.env.METRICS_SECRET_TOKEN;
 
       if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -175,7 +174,7 @@ export default class RegistryServer implements Party.Server {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "null",
+          "Access-Control-Allow-Origin": "*",
         },
       });
     }

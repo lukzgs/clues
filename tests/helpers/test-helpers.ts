@@ -115,6 +115,7 @@ export async function simulateJoinRoom(
   playerName: string,
   connId?: string,
   reconnectId?: string,
+  reconnectSecret?: string,
 ): Promise<MockConnection> {
   const conn = createMockConnection(connId);
   room.connections.set(conn.id, conn);
@@ -122,11 +123,14 @@ export async function simulateJoinRoom(
   // Trigger onConnect
   await server.onConnect(conn);
 
+  const secretToPass = reconnectSecret || (reconnectId && server.playerSecrets?.get(reconnectId));
+
   // Send JOIN_ROOM message
   const joinMsg = JSON.stringify({
     type: 'JOIN_ROOM',
     playerName,
     ...(reconnectId ? { reconnectId } : {}),
+    ...(secretToPass ? { reconnectSecret: secretToPass } : {}),
   });
   await server.onMessage(joinMsg, conn);
 

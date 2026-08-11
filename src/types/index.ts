@@ -111,6 +111,7 @@ export interface JoinRoomMessage {
   type: ClientMessageType.JOIN_ROOM;
   playerName: string;
   reconnectId?: string; // playerId from previous session for reconnection
+  reconnectSecret?: string; // secret token verifying ownership for reconnection
 }
 
 export interface LeaveRoomMessage {
@@ -219,6 +220,7 @@ export interface SyncStateMessage {
   type: ServerMessageType.SYNC_STATE;
   gameState: GameState;
   yourPlayerId: string;
+  yourReconnectSecret?: string;
 }
 
 export interface PlayerJoinedMessage {

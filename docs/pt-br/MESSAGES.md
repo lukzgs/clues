@@ -33,7 +33,7 @@ enum ClientMessageType {
 
 | Mensagem | Payload | Fase Válida |
 |----------|---------|-------------|
-| `JOIN_ROOM` | `playerName: string` | Qualquer |
+| `JOIN_ROOM` | `playerName: string, reconnectId?: string, reconnectSecret?: string` | Qualquer |
 | `LEAVE_ROOM` | (nenhum) | Qualquer |
 | `START_GAME` | `victoryCondition: VictoryCondition, deckOption: DeckOption, phaseTimeouts: PhaseTimeouts, timerEnabled: boolean` | LOBBY (apenas host) |
 | `SUBMIT_CLUE` | `cardId: number, clue: string` | NARRATOR_CHOOSING (apenas narrador) |
@@ -51,8 +51,8 @@ enum ClientMessageType {
 ### Exemplos de Mensagens
 
 ```typescript
-// Entrar em uma sala
-{ type: 'JOIN_ROOM', playerName: 'Alice' }
+// Entrar em uma sala (ou reconectar com reconnectSecret)
+{ type: 'JOIN_ROOM', playerName: 'Alice', reconnectId: 'p-12345', reconnectSecret: 'a1b2c3d4...' }
 
 // Enviar uma dica como narrador
 { type: 'SUBMIT_CLUE', cardId: 42, clue: 'Um sonho dentro de um sonho' }
@@ -90,7 +90,7 @@ enum ServerMessageType {
 
 | Mensagem | Payload | Descrição |
 |----------|---------|-----------|
-| `SYNC_STATE` | `gameState: GameState, yourPlayerId: string` | Sincronização completa de estado |
+| `SYNC_STATE` | `gameState: GameState, yourPlayerId: string, yourReconnectSecret?: string` | Sincronização completa de estado |
 | `PLAYER_JOINED` | `player: Player` (sem mão) | Notificação de jogador entrou |
 | `PLAYER_LEFT` | `playerId: string, playerName: string` | Notificação de jogador saiu |
 | `PLAYER_KICKED` | `playerId: string` | Notificação de jogador expulso |

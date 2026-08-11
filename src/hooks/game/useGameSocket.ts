@@ -8,7 +8,8 @@ interface UseGameSocketProps {
   roomCode: string | null;
   playerName: string | null;
   savedPlayerId?: string;
-  onJoinSuccess: (playerId: string) => void;
+  savedReconnectSecret?: string;
+  onJoinSuccess: (playerId: string, reconnectSecret?: string) => void;
   onKicked: () => void;
 }
 
@@ -16,6 +17,7 @@ export function useGameSocket({
   roomCode,
   playerName,
   savedPlayerId,
+  savedReconnectSecret,
   onJoinSuccess,
   onKicked,
 }: UseGameSocketProps) {
@@ -31,6 +33,7 @@ export function useGameSocket({
   // Use refs to avoid stale closures inside event listeners
   // and to avoid triggering socket reconnections when these values change.
   const savedPlayerIdRef = useRef(savedPlayerId);
+  const savedReconnectSecretRef = useRef(savedReconnectSecret);
   const playerIdRef = useRef(playerId);
   const onJoinSuccessRef = useRef(onJoinSuccess);
   const onKickedRef = useRef(onKicked);
@@ -40,6 +43,10 @@ export function useGameSocket({
   useEffect(() => {
     savedPlayerIdRef.current = savedPlayerId;
   }, [savedPlayerId]);
+
+  useEffect(() => {
+    savedReconnectSecretRef.current = savedReconnectSecret;
+  }, [savedReconnectSecret]);
 
   useEffect(() => {
     playerIdRef.current = playerId;
@@ -91,6 +98,7 @@ export function useGameSocket({
           type: 'JOIN_ROOM',
           playerName,
           reconnectId: savedPlayerIdRef.current,
+          reconnectSecret: savedReconnectSecretRef.current,
         });
         
         if (result.success) {
@@ -125,7 +133,7 @@ export function useGameSocket({
             setGameState(msg.gameState);
             if (msg.yourPlayerId) {
               setPlayerId(msg.yourPlayerId);
-              onJoinSuccessRef.current(msg.yourPlayerId);
+              onJoinSuccessRef.current(msg.yourPlayerId, msg.yourReconnectSecret);
               
               if (connectionTimeout) {
                 clearTimeout(connectionTimeout);
@@ -143,6 +151,7 @@ export function useGameSocket({
                   type: 'JOIN_ROOM',
                   playerName,
                   reconnectId: mySavedId,
+                  reconnectSecret: savedReconnectSecretRef.current,
                 });
                 if (result.success) {
                   socket.send(JSON.stringify(result.data));

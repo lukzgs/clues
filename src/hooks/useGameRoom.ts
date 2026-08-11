@@ -11,9 +11,9 @@ interface UseGameRoomOptions {
 export function useGameRoom({ roomCode, playerName }: UseGameRoomOptions) {
   const { session, clearSession, setSession } = useGameSession();
 
-  const handleJoinSuccess = useCallback((playerId: string) => {
+  const handleJoinSuccess = useCallback((playerId: string, reconnectSecret?: string) => {
     if (roomCode && playerName) {
-      setSession({ roomCode, playerName, playerId });
+      setSession({ roomCode, playerName, playerId, reconnectSecret });
     }
   }, [roomCode, playerName, setSession]);
 
@@ -34,6 +34,7 @@ export function useGameRoom({ roomCode, playerName }: UseGameRoomOptions) {
     roomCode,
     playerName,
     savedPlayerId: session?.playerId,
+    savedReconnectSecret: session?.reconnectSecret,
     onJoinSuccess: handleJoinSuccess,
     onKicked: handleKicked,
   });
