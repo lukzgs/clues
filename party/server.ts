@@ -9,7 +9,6 @@ import {
   ClientMessageType,
   ServerMessageType,
   DeckOption,
-  PhaseTimeouts,
 } from "../src/types";
 import { ClientMessageSchema } from "../src/schemas";
 import { getPublicState } from "./game-logic";
@@ -23,13 +22,12 @@ import {
   handleSubmitClue,
   handlePlayCard,
   handleVote,
-  calculateScores,
   handleNextRound,
   handleRestartGame,
 } from "./handlers/game";
 import { handleKickPlayer, handleToggleSpectator, handleRequestPlay } from "./handlers/spectator";
-import { getAfkPlayers, handleVoteKickAfk, checkPhaseProgression } from "./handlers/afk";
-import { handleAddBot, handleRemoveBot, triggerBotActions } from "./handlers/bot";
+import { handleVoteKickAfk } from "./handlers/afk";
+import { handleAddBot, handleRemoveBot } from "./handlers/bot";
 import { ServerTelemetry } from "./telemetry";
 import RegistryServer, { globalRegistry } from "./registry";
 
@@ -55,6 +53,9 @@ export default class GameServer implements Party.Server {
 
   // Mapeamento: connectionId -> playerId
   public connections: Map<string, string> = new Map();
+
+  // Mapeamento: playerId -> reconnectSecret
+  public playerSecrets: Map<string, string> = new Map();
 
   // [BOT] Gerenciador de bots (opcional)
   public botManager: any = null;
@@ -237,65 +238,65 @@ export default class GameServer implements Party.Server {
 
       switch (msg.type) {
         case 'JOIN_ROOM':
-          await this.handleJoinRoom(msg.playerName, sender, msg.reconnectId);
+          await handleJoinRoom(this, msg.playerName, sender, msg.reconnectId, msg.reconnectSecret);
           break;
 
         case 'LEAVE_ROOM':
-          if (playerId) this.handleLeaveRoom(playerId, sender);
+          if (playerId) handleLeaveRoom(this, playerId, sender);
           break;
 
         case 'START_GAME':
-          if (playerId) this.handleStartGame(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
+          if (playerId) handleStartGame(this, playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
           break;
 
         case 'UPDATE_SETTINGS':
-          if (playerId) this.handleUpdateSettings(playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
+          if (playerId) handleUpdateSettings(this, playerId, msg.victoryCondition, msg.deckOption, msg.phaseTimeouts, msg.timerEnabled);
           break;
 
         case 'SUBMIT_CLUE':
-          if (playerId) this.handleSubmitClue(playerId, msg.cardId, msg.clue);
+          if (playerId) handleSubmitClue(this, playerId, msg.cardId, msg.clue);
           break;
 
         case 'PLAY_CARD':
-          if (playerId) this.handlePlayCard(playerId, msg.cardId);
+          if (playerId) handlePlayCard(this, playerId, msg.cardId);
           break;
 
         case 'VOTE':
-          if (playerId) this.handleVote(playerId, msg.orderId);
+          if (playerId) handleVote(this, playerId, msg.orderId);
           break;
 
         case 'NEXT_ROUND':
-          if (playerId) this.handleNextRound(playerId);
+          if (playerId) handleNextRound(this, playerId);
           break;
 
         case 'RESTART_GAME':
-          if (playerId) this.handleRestartGame(playerId);
+          if (playerId) handleRestartGame(this, playerId);
           break;
 
         // [BOT] Handlers de bot
         case 'ADD_BOT':
-          if (playerId && this.botManager) this.handleAddBot(playerId);
+          if (playerId && this.botManager) handleAddBot(this, playerId);
           break;
 
         case 'REMOVE_BOT':
-          if (playerId && this.botManager) this.handleRemoveBot(playerId, msg.botId);
+          if (playerId && this.botManager) handleRemoveBot(this, playerId, msg.botId);
           break;
 
         case 'VOTE_KICK_AFK':
-          if (playerId) this.handleVoteKickAfk(playerId);
+          if (playerId) handleVoteKickAfk(this, playerId);
           break;
 
         // [SPECTATOR] Handlers de spectator/kick
         case 'KICK_PLAYER':
-          if (playerId) this.handleKickPlayer(playerId, msg.targetPlayerId);
+          if (playerId) handleKickPlayer(this, playerId, msg.targetPlayerId);
           break;
 
         case 'TOGGLE_SPECTATOR':
-          if (playerId) this.handleToggleSpectator(playerId, msg.targetPlayerId);
+          if (playerId) handleToggleSpectator(this, playerId, msg.targetPlayerId);
           break;
 
         case 'REQUEST_PLAY':
-          if (playerId) this.handleRequestPlay(playerId);
+          if (playerId) handleRequestPlay(this, playerId);
           break;
       }
     } catch (error) {
@@ -320,8 +321,7 @@ export default class GameServer implements Party.Server {
       const authHeader = req.headers.get("Authorization");
       const expectedToken =
         (this.room.env as Record<string, string> | undefined)?.METRICS_SECRET_TOKEN ||
-        process.env.METRICS_SECRET_TOKEN ||
-        "dev-secret-token";
+        process.env.METRICS_SECRET_TOKEN;
 
       if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -338,7 +338,7 @@ export default class GameServer implements Party.Server {
           status: 200,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "null",
+            "Access-Control-Allow-Origin": "*",
           },
         });
       }
@@ -402,72 +402,8 @@ export default class GameServer implements Party.Server {
   }
 
   // ============================================
-  // HANDLERS DELEGATION BRIDGES
+  // MÉTODOS DE ESTADO
   // ============================================
-
-  public async handleJoinRoom(playerName: string, conn: Party.Connection, reconnectId?: string) {
-    return handleJoinRoom(this, playerName, conn, reconnectId);
-  }
-
-  public handleLeaveRoom(playerId: string, conn: Party.Connection) {
-    return handleLeaveRoom(this, playerId, conn);
-  }
-
-  public handleUpdateSettings(
-    playerId: string,
-    victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
-    deckOption: DeckOption,
-    phaseTimeouts: PhaseTimeouts,
-    timerEnabled: boolean
-  ) {
-    return handleUpdateSettings(this, playerId, victoryCondition, deckOption, phaseTimeouts, timerEnabled);
-  }
-
-  public handleStartGame(
-    playerId: string,
-    victoryCondition: { scoreEnabled: boolean; targetScore: number; narratorRoundsEnabled: boolean; narratorRounds: number },
-    deckOption: DeckOption,
-    phaseTimeouts: PhaseTimeouts,
-    timerEnabled: boolean
-  ) {
-    return handleStartGame(this, playerId, victoryCondition, deckOption, phaseTimeouts, timerEnabled);
-  }
-
-  public handleSubmitClue(playerId: string, cardId: number, clue: string) {
-    return handleSubmitClue(this, playerId, cardId, clue);
-  }
-
-  public handlePlayCard(playerId: string, cardId: number) {
-    return handlePlayCard(this, playerId, cardId);
-  }
-
-  public handleVote(playerId: string, orderId: number) {
-    return handleVote(this, playerId, orderId);
-  }
-
-  public calculateScores() {
-    return calculateScores(this);
-  }
-
-  public handleNextRound(playerId: string) {
-    return handleNextRound(this, playerId);
-  }
-
-  public handleRestartGame(playerId: string) {
-    return handleRestartGame(this, playerId);
-  }
-
-  public handleKickPlayer(hostId: string, targetId: string) {
-    return handleKickPlayer(this, hostId, targetId);
-  }
-
-  public handleToggleSpectator(requesterId: string, targetId: string) {
-    return handleToggleSpectator(this, requesterId, targetId);
-  }
-
-  public handleRequestPlay(playerId: string) {
-    return handleRequestPlay(this, playerId);
-  }
 
   public changePhase(newPhase: GamePhase) {
     this.state.phase = newPhase;
@@ -475,30 +411,6 @@ export default class GameServer implements Party.Server {
     this.state.afkKickVotes = [];
     this.state.playersWhoReadied = [];
     this.notifyRegistry();
-  }
-
-  public getAfkPlayers(): Player[] {
-    return getAfkPlayers(this);
-  }
-
-  public handleVoteKickAfk(playerId: string) {
-    return handleVoteKickAfk(this, playerId);
-  }
-
-  public checkPhaseProgression() {
-    return checkPhaseProgression(this);
-  }
-
-  public handleAddBot(playerId: string) {
-    return handleAddBot(this, playerId);
-  }
-
-  public handleRemoveBot(playerId: string, botId: string) {
-    return handleRemoveBot(this, playerId, botId);
-  }
-
-  public triggerBotActions() {
-    return triggerBotActions(this);
   }
 
   // ============================================
@@ -531,10 +443,12 @@ export default class GameServer implements Party.Server {
     for (const [connId, playerId] of this.connections) {
       const conn = this.room.getConnection(connId);
       if (conn) {
+        const secret = this.playerSecrets.get(playerId);
         this.sendToConnection(conn, {
           type: ServerMessageType.SYNC_STATE,
           gameState: this.getPublicState(playerId),
           yourPlayerId: playerId,
+          ...(secret ? { yourReconnectSecret: secret } : {}),
         });
       }
     }

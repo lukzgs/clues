@@ -1,6 +1,7 @@
 import { GamePhase, ServerMessageType } from "../../src/types";
 import GAME_CONFIG from '../../game.config.json';
 import type GameServer from "../server";
+import { handleSubmitClue, handlePlayCard, handleVote } from "./game";
 
 export function handleAddBot(server: GameServer, playerId: string) {
   if (!GAME_CONFIG.ENABLE_BOTS || !server.botManager) return;
@@ -52,14 +53,8 @@ export function triggerBotActions(server: GameServer) {
   if (!GAME_CONFIG.ENABLE_BOTS || !server.botManager) return;
 
   server.botManager.executeBotActions(server.state, {
-    submitClue: (botId: string, cardId: number, clue: string) => {
-      server.handleSubmitClue(botId, cardId, clue);
-    },
-    playCard: (botId: string, cardId: number) => {
-      server.handlePlayCard(botId, cardId);
-    },
-    vote: (botId: string, orderId: number) => {
-      server.handleVote(botId, orderId);
-    },
+    submitClue: (botId: string, cardId: number, clue: string) => handleSubmitClue(server, botId, cardId, clue),
+    playCard: (botId: string, cardId: number) => handlePlayCard(server, botId, cardId),
+    vote: (botId: string, orderId: number) => handleVote(server, botId, orderId),
   });
 }

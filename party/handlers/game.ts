@@ -8,6 +8,7 @@ import {
 import { sanitizeSettings } from "../settings-sanitizer";
 import GAME_CONFIG from '../../game.config.json';
 import type GameServer from "../server";
+import { triggerBotActions } from "./bot";
 
 export function handleStartGame(
   server: GameServer,
@@ -83,7 +84,7 @@ export function handleStartGame(
   server.broadcastState();
 
   // [BOT] Faz bots agirem se necessário
-  server.triggerBotActions();
+  triggerBotActions(server);
 }
 
 export function handleSubmitClue(server: GameServer, playerId: string, cardId: number, clue: string) {
@@ -112,7 +113,7 @@ export function handleSubmitClue(server: GameServer, playerId: string, cardId: n
   server.broadcastState();
 
   // [BOT] Faz bots jogarem cartas
-  server.triggerBotActions();
+  triggerBotActions(server);
 }
 
 export function handlePlayCard(server: GameServer, playerId: string, cardId: number) {
@@ -152,7 +153,7 @@ export function handlePlayCard(server: GameServer, playerId: string, cardId: num
     }));
 
     server.changePhase(GamePhase.VOTING);
-    server.triggerBotActions();
+    triggerBotActions(server);
   }
 
   server.broadcastState();
@@ -188,7 +189,7 @@ export function handleVote(server: GameServer, playerId: string, orderId: number
   const activeVotes = Object.keys(server.state.votes).filter(vId => !server.state.players.find(p => p.id === vId)?.isSpectator);
   
   if (activeVotes.length >= votersCount) {
-    server.calculateScores();
+    calculateScores(server);
   }
 
   server.broadcastState();
@@ -296,7 +297,7 @@ export function handleNextRound(server: GameServer, playerId: string) {
   server.broadcastState();
 
   // [BOT] Faz bots agirem se próximo narrador for bot
-  server.triggerBotActions();
+  triggerBotActions(server);
 }
 
 export function handleRestartGame(server: GameServer, playerId: string) {

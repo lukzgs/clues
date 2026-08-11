@@ -1,6 +1,8 @@
 import { GamePhase, Player } from "../../src/types";
 import { shuffle } from "../game-logic";
 import type GameServer from "../server";
+import { calculateScores } from "./game";
+import { triggerBotActions } from "./bot";
 
 export function getAfkPlayers(server: GameServer): Player[] {
   const activePlayers = server.state.players.filter(p => !p.isSpectator);
@@ -41,13 +43,13 @@ export function checkPhaseProgression(server: GameServer) {
         orderId: i,
       }));
       server.changePhase(GamePhase.VOTING);
-      server.triggerBotActions();
+      triggerBotActions(server);
     }
   } else if (server.state.phase === GamePhase.VOTING) {
     const votersCount = activePlayers.length - 1; // -1 for narrator
     const activeVotes = Object.keys(server.state.votes).filter(vId => !server.state.players.find(p => p.id === vId)?.isSpectator);
     if (activeVotes.length >= votersCount) {
-      server.calculateScores();
+      calculateScores(server);
     }
   }
 }

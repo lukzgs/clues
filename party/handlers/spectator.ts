@@ -2,6 +2,8 @@ import type * as Party from "partykit/server";
 import { GamePhase, DeckOption, ServerMessageType } from "../../src/types";
 import GAME_CONFIG from '../../game.config.json';
 import type GameServer from "../server";
+import { handleNextRound } from "./game";
+import { checkPhaseProgression } from "./afk";
 
 export function handleKickPlayer(server: GameServer, hostId: string, targetId: string) {
   const host = server.state.players.find(p => p.id === hostId);
@@ -81,12 +83,12 @@ export function handleKickPlayer(server: GameServer, hostId: string, targetId: s
     if (server.state.phase === GamePhase.NARRATOR_CHOOSING && targetId === currentNarratorId) {
       server.changePhase(GamePhase.RESULTS);
       const hostPlayer = server.state.players.find(p => p.isHost);
-      if (hostPlayer) server.handleNextRound(hostPlayer.id);
+      if (hostPlayer) handleNextRound(server, hostPlayer.id);
       return;
     }
 
     // Check if phase can now progress (fewer players needed)
-    server.checkPhaseProgression();
+    checkPhaseProgression(server);
   }
 
   server.broadcastState();
