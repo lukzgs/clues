@@ -204,10 +204,19 @@ Localizados em `src/components/game/`:
 | `RoomTimeoutBar` | Componente interno da GameScreen que mostra uma contagem regressiva quando a sala está prestes a fechar por inatividade. |
 | `GameCard.tsx` | Exibição de carta individual com estado de seleção; usa `back_001.avif` para cartas ocultas/verso. Inclui a prop `dimWhenDisabled` (padrão true) que pode ser configurada como false para reter a visibilidade/opacidade total quando a carta está desabilitada. |
 | `ClueModal.tsx` | Modal universal aprimorado com design de vidro profundo (glassmorphism), gradientes radiais e cartas em tamanho expandido para facilitar a visualização e interação. |
-| `ResultsView.tsx` | Pontuações da rodada; exibe apenas os votos recebidos por cada carta; requer que todos os jogadores ativos cliquem em "Próxima Rodada" (que muda o texto para "Finalizar Jogo" na última rodada). O layout foi otimizado com botões de ação posicionados diretamente abaixo das cartas, seguidos pelo placar. |
+| `ResultsView.tsx` | Resultados da rodada com as cartas reveladas na mesa; exibe apenas os votos recebidos por cada carta; ações centralizadas abaixo das cartas. O ranking e as pontuações dos jogadores permanecem fixos na `PlayerSidebar` (desktop) e no `MobileScoreModal` (mobile), mantendo a consistência visual em todas as fases. |
 | `KickConfirmModal.tsx` | Modal de confirmação para o host expulsar jogadores |
 | `LeaveConfirmModal.tsx` | Modal de confirmação para que os jogadores saiam da sessão de jogo com segurança |
 | `GameOverView.tsx` | Pontuações finais e vencedor |
+
+---
+
+## Acessibilidade & Navegação por Teclado
+
+O frontend segue as diretrizes de acessibilidade WCAG 2.1 AA:
+- **Navegação Direcional por Setas (`src/hooks/useKeyboardNav.ts`)**: Suporte nativo a `ArrowLeft`, `ArrowRight`, `ArrowUp`, `ArrowDown`, `Home` e `End` para percorrer mãos de cartas, cartas da mesa e carrosséis.
+- **Localização Dinâmica**: Todos os atributos `aria-label`, indicadores de status e anúncios de acessibilidade consomem chaves traduzidas dinamicamente do `src/i18n/translations.ts`.
+- **Atalhos de Teclado**: `Enter`/`Espaço` para selecionar/confirmar cartas e ações; `Escape` para fechar modais abertos.
 
 ---
 

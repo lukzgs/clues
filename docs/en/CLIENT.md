@@ -194,10 +194,19 @@ Located in `src/components/game/`:
 | `LobbyScreen.tsx` | Game settings, player list, and deck selection. Features a standardized "Mythic" design system with polished typography and full Portuguese localization for the interface. |
 | `GameCard.tsx` | Individual card display with selection state; uses `back_001.avif` for hidden/back-face cards. Includes a `dimWhenDisabled` prop (defaults to true) which can be set to false to retain full card visibility/opacity when the card is in a disabled state. |
 | `ClueModal.tsx` | Universal modal for narrator to enter clue, players to select cards, and voters to cast votes. Features an enhanced glassmorphism UI with radial depth and expanded card sizing. |
-| `ResultsView.tsx` | Round results with scores; only displays received votes for each card; requires all active players to click "Next Round" (labeled "Finish Game" on the final round). The layout is optimized with action buttons placed directly below the cards, followed by the scoreboard. |
+| `ResultsView.tsx` | Round results with revealed table cards; only displays received votes for each card; action buttons placed cleanly below the cards. Player rankings are permanently situated in the `PlayerSidebar` (desktop) and `MobileScoreModal` (mobile) for layout consistency across all game phases. |
 | `KickConfirmModal.tsx` | Confirmation modal for host to kick players |
 | `LeaveConfirmModal.tsx` | Confirmation modal for players to safely leave the game session |
 | `GameOverView.tsx` | Final scores and winner |
+
+---
+
+## Accessibility & Keyboard Navigation
+
+The frontend adheres to WCAG 2.1 AA accessibility guidelines:
+- **Directional Arrow Navigation (`src/hooks/useKeyboardNav.ts`)**: Supports `ArrowLeft`, `ArrowRight`, `ArrowUp`, `ArrowDown`, `Home`, and `End` for navigating card hands, table cards, and modal carousels.
+- **Dynamic Localization**: All `aria-label`s, status indicators, and screen reader announcements dynamically consume translated keys from `src/i18n/translations.ts`.
+- **Keyboard Shortcuts**: `Enter`/`Space` to select/confirm cards and actions; `Escape` to dismiss open modals.
 
 ---
 
