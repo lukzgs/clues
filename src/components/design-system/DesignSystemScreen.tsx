@@ -203,10 +203,12 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
               {toast.message}
             </span>
             <button
+              type="button"
               onClick={() =>
                 setToasts((prev) => prev.filter((t) => t.id !== toast.id))
               }
-              className="opacity-60 hover:opacity-100 transition-opacity text-xs"
+              aria-label="Close notification"
+              className="opacity-60 hover:opacity-100 transition-opacity text-xs focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             >
               ✕
             </button>
@@ -231,6 +233,7 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
                 className={theme.accentText}
               >
                 <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -265,10 +268,11 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
               const isActive = activeThemeId === id;
               return (
                 <button
+                  type="button"
                   key={id}
                   onClick={() => setTheme(id)}
                   title={themeItem.description[lang]}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] font-cinzel font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl text-[10px] font-cinzel font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                     isActive
                       ? `${themeItem.primaryGradient} shadow-md scale-[1.02]`
                       : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -301,9 +305,10 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-2 flex items-center gap-2 whitespace-nowrap">
             {sectionsList.map((sec) => (
               <button
+                type="button"
                 key={sec.id}
                 onClick={() => scrollToSection(sec.id)}
-                className={`text-xs font-cinzel font-bold text-white/60 hover:bg-white/5 border border-transparent hover:border-white/10 px-3 py-1.5 rounded-lg transition-all hover:${theme.accentText}`}
+                className={`text-xs font-cinzel font-bold text-white/60 hover:bg-white/5 border border-transparent hover:border-white/10 px-3 py-1.5 rounded-lg transition-all hover:${theme.accentText} focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
               >
                 {sec.title}
               </button>
@@ -338,13 +343,14 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
 
           <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto">
             <button
+              type="button"
               onClick={() =>
                 handleCopy(
                   JSON.stringify(colorSwatches, null, 2),
                   'Tokens do Tema JSON',
                 )
               }
-              className="bg-black/60 hover:bg-black/80 border border-white/10 text-white font-cinzel font-bold text-xs uppercase tracking-wider px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              className="bg-black/60 hover:bg-black/80 border border-white/10 text-white font-cinzel font-bold text-xs uppercase tracking-wider px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             >
               <svg
                 width="14"
@@ -355,6 +361,7 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
@@ -418,8 +425,9 @@ const DesignSystemContent: React.FC<DesignSystemScreenProps> = ({
       <footer className="max-w-7xl mx-auto px-4 md:px-8 mt-20 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-white/40">
         <p>STORY WEAVER © 2026 — Design System & Style Showcase</p>
         <button
+          type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className={`hover:${theme.accentText} transition-colors uppercase tracking-widest font-bold font-cinzel`}
+          className={`hover:${theme.accentText} transition-colors uppercase tracking-widest font-bold font-cinzel focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
         >
           ▲ {t.sysd.backToTop}
         </button>

@@ -12,16 +12,31 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "a11y": {
+        "noSvgWithoutTitle": "error",
+        "noStaticElementInteractions": "error",
+        "useKeyWithClickEvents": "error",
+        "noLabelWithoutControl": "error",
+        "useButtonType": "error",
+        "noAutofocus": "warn"
+      },
       "correctness": {
         "noUnusedVariables": "warn",
-        "noUnusedImports": "warn"
+        "noUnusedImports": "warn",
+        "useExhaustiveDependencies": "warn"
       },
       "style": {
         "useConst": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "off"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {

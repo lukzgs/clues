@@ -53,9 +53,11 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      type={props.type || 'button'}
       disabled={isDisabled}
       className={`
         rounded-xl flex items-center justify-center gap-2 transition-all duration-300 select-none
+        focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none focus-visible:ring-offset-1 focus-visible:ring-offset-black
         ${sizeClasses[size]}
         ${variantClasses[variant]}
         ${isDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none grayscale' : 'cursor-pointer'}

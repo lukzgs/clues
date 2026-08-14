@@ -78,6 +78,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                   className="text-white/80"
                 >
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -113,8 +114,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                     height="14"
                     viewBox="0 0 24 24"
                     fill="currentColor"
+                    aria-hidden="true"
                   >
-                    <title>Host</title>
                     <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
                   </svg>
                 </div>
@@ -126,12 +127,18 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                   {/* Toggle spectator */}
                   {onToggleSpectator && (
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleToggleSpectator(player.id);
                       }}
                       disabled={isToggling}
-                      className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 ${
+                      aria-label={
+                        player.isSpectator
+                          ? t.lobby.makePlayer(player.name)
+                          : t.lobby.makeSpectator(player.name)
+                      }
+                      className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none ${
                         isToggling
                           ? 'opacity-50 cursor-not-allowed text-white/30 bg-white/5'
                           : player.isSpectator
@@ -139,7 +146,9 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                             : 'text-white/50 bg-white/5 hover:text-blue-400 hover:bg-blue-500/20'
                       }`}
                       title={
-                        player.isSpectator ? 'Make player' : 'Make spectator'
+                        player.isSpectator
+                          ? t.lobby.makePlayer(player.name)
+                          : t.lobby.makeSpectator(player.name)
                       }
                     >
                       <svg
@@ -151,18 +160,35 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        aria-hidden="true"
                       >
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                     </button>
                   )}
-                  {/* Kick */}
-                  {onKickPlayer && (
+                  {/* Kick / Remove Bot */}
+                  {(player.isBot
+                    ? onRemoveBot || onKickPlayer
+                    : onKickPlayer) && (
                     <button
-                      onClick={() => onKickPlayer(player.id)}
-                      className="text-white/20 hover:text-red-400 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300"
-                      title="Remove player"
+                      type="button"
+                      onClick={() =>
+                        player.isBot && onRemoveBot
+                          ? onRemoveBot(player.id)
+                          : onKickPlayer?.(player.id)
+                      }
+                      aria-label={
+                        player.isBot
+                          ? t.lobby.removeBot(player.name)
+                          : t.lobby.removePlayer(player.name)
+                      }
+                      className="text-white/20 hover:text-red-400 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+                      title={
+                        player.isBot
+                          ? t.lobby.removeBot(player.name)
+                          : t.lobby.removePlayer(player.name)
+                      }
                     >
                       <svg
                         width="14"
@@ -173,6 +199,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        aria-hidden="true"
                       >
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
@@ -187,12 +214,18 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                 !player.isBot &&
                 onToggleSpectator && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleToggleSpectator(player.id);
                     }}
                     disabled={isToggling}
-                    className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 shrink-0 ${
+                    aria-label={
+                      player.isSpectator
+                        ? t.lobby.enterAsPlayer
+                        : t.lobby.becomeSpectator
+                    }
+                    className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-300 shrink-0 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none ${
                       isToggling
                         ? 'opacity-50 cursor-not-allowed text-white/30 bg-white/5'
                         : player.isSpectator
@@ -214,36 +247,10 @@ export const PlayerList: React.FC<PlayerListProps> = ({
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
-                )}
-
-              {/* Bot remove (legacy) */}
-              {GAME_CONFIG.ENABLE_BOTS &&
-                player.isBot &&
-                isHost &&
-                onRemoveBot &&
-                !onKickPlayer && (
-                  <button
-                    onClick={() => onRemoveBot(player.id)}
-                    className="text-white/20 hover:text-red-400 text-base w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-all duration-300 mr-1"
-                    title="Remove bot"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>
                 )}

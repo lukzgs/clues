@@ -50,14 +50,15 @@ export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({
         </div>
         <div className="absolute left-full ml-2 sm:ml-3 md:ml-4 flex items-center">
           <button
+            type="button"
             onClick={handleCopyLink}
-            className={`p-2 sm:p-2.5 md:p-3 rounded-xl transition-all duration-300 border shadow-sm ${
+            className={`p-2 sm:p-2.5 md:p-3 rounded-xl transition-all duration-300 border shadow-sm focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
               copied
                 ? 'text-green-400 border-green-500/30 bg-green-500/10 scale-105'
                 : `text-white/60 ${theme.innerCardBg} hover:${theme.accentText} hover:border-white/20 hover:scale-105`
             }`}
-            title="Copy room link"
-            aria-label="Copy room link"
+            title={t.lobby.copyLink}
+            aria-label={t.lobby.copyLink}
           >
             {copied ? (
               <svg
@@ -68,6 +69,7 @@ export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
@@ -80,6 +82,7 @@ export const RoomCodeDisplay: React.FC<RoomCodeDisplayProps> = ({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />

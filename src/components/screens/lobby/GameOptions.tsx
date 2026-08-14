@@ -62,8 +62,9 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 {t.lobby.byScore}
               </span>
               <button
+                type="button"
                 onClick={() => updateVC({ scoreEnabled: !vc.scoreEnabled })}
-                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
+                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                   vc.scoreEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
                 aria-label="Toggle score condition"
@@ -79,11 +80,15 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
             {vc.scoreEnabled && (
               <div className="px-3 pb-3 pt-0.5">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">
+                  <label
+                    htmlFor="target-score-input"
+                    className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold"
+                  >
                     {t.lobby.firstToReach}
-                  </span>
+                  </label>
                   <div className="flex items-center gap-1.5">
                     <input
+                      id="target-score-input"
                       type="number"
                       min={10}
                       max={100}
@@ -101,7 +106,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                           ),
                         })
                       }
-                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all
+                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all focus-visible:ring-2 focus-visible:ring-amber-400
                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                     />
                     <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">
@@ -111,6 +116,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 </div>
                 <input
                   type="range"
+                  aria-label={t.lobby.adjustTargetScore}
                   min={10}
                   max={100}
                   step={5}
@@ -169,10 +175,11 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 {t.lobby.byRounds}
               </span>
               <button
+                type="button"
                 onClick={() =>
                   updateVC({ narratorRoundsEnabled: !vc.narratorRoundsEnabled })
                 }
-                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
+                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                   vc.narratorRoundsEnabled
                     ? theme.primaryGradient
                     : 'bg-white/10'
@@ -190,11 +197,15 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
             {vc.narratorRoundsEnabled && (
               <div className="px-3 pb-3 pt-0.5">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold">
+                  <label
+                    htmlFor="narrator-rounds-input"
+                    className="text-white/40 text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-sans font-bold"
+                  >
                     {t.lobby.eachPlayerNarrates}
-                  </span>
+                  </label>
                   <div className="flex items-center gap-1.5">
                     <input
+                      id="narrator-rounds-input"
                       type="number"
                       min={1}
                       max={maxRounds}
@@ -212,7 +223,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                           ),
                         })
                       }
-                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all
+                      className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all focus-visible:ring-2 focus-visible:ring-amber-400
                         [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                     />
                     <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">
@@ -222,6 +233,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 </div>
                 <input
                   type="range"
+                  aria-label={t.lobby.adjustNarratorRounds}
                   min={1}
                   max={maxRounds}
                   step={1}
@@ -286,6 +298,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               strokeLinecap="round"
               strokeLinejoin="round"
               className={`${theme.accentText} shrink-0 mt-0.5`}
+              aria-hidden="true"
             >
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
               <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -322,10 +335,11 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           />
           {(['original', 'new', 'mixed'] as DeckOption[]).map((option) => (
             <button
+              type="button"
               key={option}
               onClick={() => isHost && setDeckOption(option)}
               disabled={!isHost}
-              className={`flex-1 py-2 md:py-2.5 text-[10px] md:text-sm font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg
+              className={`flex-1 py-2 md:py-2.5 text-[10px] md:text-sm font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none
                 ${deckOption === option ? theme.accentText : 'text-white/40 hover:text-white/80'}
                 ${!isHost && 'cursor-default'}
               `}
@@ -349,11 +363,12 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
             </p>
             {isHost && (
               <button
+                type="button"
                 onClick={() => setTimerEnabled(!timerEnabled)}
-                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 ${
+                className={`relative w-10 h-5 md:w-12 md:h-6 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                   timerEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
-                aria-label="Toggle phase timeouts"
+                aria-label="Toggle timer"
               >
                 <span
                   className={`absolute top-0.5 left-0.5 md:top-0.5 md:left-1 w-4 h-4 md:w-5 md:h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${
@@ -363,84 +378,84 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               </button>
             )}
           </div>
-
-          {timerEnabled && (
-            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-              {[
-                {
-                  key: 'narrator' as keyof PhaseTimeouts,
-                  label: t.lobby.phaseNarrator,
-                },
-                {
-                  key: 'othersChoosing' as keyof PhaseTimeouts,
-                  label: t.lobby.phaseChoosing,
-                },
-                {
-                  key: 'voting' as keyof PhaseTimeouts,
-                  label: t.lobby.phaseVoting,
-                },
-                {
-                  key: 'results' as keyof PhaseTimeouts,
-                  label: t.lobby.phaseResults,
-                },
-              ].map(({ key, label }) => (
+          <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            {[
+              {
+                key: 'narrator' as keyof PhaseTimeouts,
+                label: t.lobby.phaseNarrator,
+              },
+              {
+                key: 'othersChoosing' as keyof PhaseTimeouts,
+                label: t.lobby.phaseChoosing,
+              },
+              {
+                key: 'voting' as keyof PhaseTimeouts,
+                label: t.lobby.phaseVoting,
+              },
+              {
+                key: 'results' as keyof PhaseTimeouts,
+                label: t.lobby.phaseResults,
+              },
+            ].map(({ key, label }) => (
+              <div
+                key={key}
+                className={`border rounded-xl p-3 transition-all duration-300 ${theme.innerCardBg}`}
+              >
                 <div
-                  key={key}
-                  className={`border rounded-xl p-3 transition-all duration-300 ${theme.innerCardBg}`}
+                  className={`flex items-center justify-between ${isHost ? 'mb-2' : ''}`}
                 >
-                  <div
-                    className={`flex items-center justify-between ${isHost ? 'mb-2' : ''}`}
+                  <label
+                    htmlFor={`timeout-input-${key}`}
+                    className="text-xs md:text-sm font-cinzel font-bold text-white/80"
                   >
-                    <span className="text-xs md:text-sm font-cinzel font-bold text-white/80">
-                      {label}
-                    </span>
-                    {isHost ? (
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          max={120}
-                          step={1}
-                          value={phaseTimeouts[key]}
-                          onChange={(e) => {
-                            const v = Number(e.target.value);
-                            if (!isNaN(v)) {
-                              updateTimeout(key, v);
-                            }
-                          }}
-                          onBlur={() => updateTimeout(key, phaseTimeouts[key])}
-                          className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
-                        />
-                        <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">
-                          {t.lobby.sec}
-                        </span>
-                      </div>
-                    ) : (
-                      <span
-                        className={`w-12 h-7 md:w-14 md:h-8 flex items-center justify-center ${theme.innerCardBg} border border-white/10 rounded-lg ${theme.accentText} font-cinzel font-bold text-sm md:text-base tabular-nums`}
-                      >
-                        {phaseTimeouts[key]}
+                    {label}
+                  </label>
+                  {isHost ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        id={`timeout-input-${key}`}
+                        type="number"
+                        min={0}
+                        max={120}
+                        step={1}
+                        value={phaseTimeouts[key]}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          if (!Number.isNaN(v)) {
+                            updateTimeout(key, v);
+                          }
+                        }}
+                        onBlur={() => updateTimeout(key, phaseTimeouts[key])}
+                        className={`w-14 md:w-16 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-base md:text-lg text-center tabular-nums outline-none transition-all focus-visible:ring-2 focus-visible:ring-amber-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                      />
+                      <span className="text-white/30 text-[9px] md:text-[10px] tracking-widest font-sans font-bold uppercase">
+                        {t.lobby.sec}
                       </span>
-                    )}
-                  </div>
-                  {isHost && (
-                    <input
-                      type="range"
-                      min={0}
-                      max={120}
-                      step={1}
-                      value={phaseTimeouts[key]}
-                      onChange={(e) =>
-                        updateTimeout(key, Number(e.target.value))
-                      }
-                      className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
-                      style={{ accentColor: 'currentColor' }}
-                    />
+                    </div>
+                  ) : (
+                    <span
+                      className={`w-12 h-7 md:w-14 md:h-8 flex items-center justify-center ${theme.innerCardBg} border border-white/10 rounded-lg ${theme.accentText} font-cinzel font-bold text-sm md:text-base tabular-nums`}
+                    >
+                      {phaseTimeouts[key]}
+                    </span>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
+                {isHost && (
+                  <input
+                    type="range"
+                    aria-label={t.lobby.adjustTimeout(label)}
+                    min={0}
+                    max={120}
+                    step={1}
+                    value={phaseTimeouts[key]}
+                    onChange={(e) => updateTimeout(key, Number(e.target.value))}
+                    className={`w-full h-2 rounded-full cursor-pointer bg-white/10 ${theme.accentText}`}
+                    style={{ accentColor: 'currentColor' }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

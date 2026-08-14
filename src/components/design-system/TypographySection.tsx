@@ -95,16 +95,20 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
         {/* Live Interactive Input */}
         <div className="w-full md:w-80">
-          <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-1.5 font-sans font-medium">
+          <label
+            htmlFor="live-interactive-sample-text"
+            className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-1.5 font-sans font-medium"
+          >
             Testar Frase em Tempo Real
           </label>
 
           <input
+            id="live-interactive-sample-text"
             type="text"
             value={sampleText}
             onChange={(e) => setSampleText(e.target.value)}
             placeholder="Digite algo para testar..."
-            className={`w-full bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:${theme.accentBorder} focus:ring-1 transition-all font-sans`}
+            className={`w-full bg-[#1A1A1A]/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:${theme.accentBorder} focus:ring-1 transition-all font-sans focus-visible:ring-2 focus-visible:ring-amber-400`}
           />
         </div>
       </div>
@@ -127,8 +131,9 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
                   {item.specs}
                 </span>
                 <button
+                  type="button"
                   onClick={() => onCopy(item.className, `Classe ${item.level}`)}
-                  className={`text-[10px] font-sans uppercase tracking-widest font-bold bg-white/5 hover:${theme.accentBgLight} hover:${theme.accentText} text-white/60 border border-white/10 hover:${theme.accentBorder} px-3 py-1 rounded-lg transition-all`}
+                  className={`text-[10px] font-sans uppercase tracking-widest font-bold bg-white/5 hover:${theme.accentBgLight} hover:${theme.accentText} text-white/60 border border-white/10 hover:${theme.accentBorder} px-3 py-1 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
                 >
                   Copiar Classe
                 </button>

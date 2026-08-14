@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
 import { useTheme } from '../../providers/ThemeProvider';
 import type { Card } from '../../types';
@@ -30,6 +30,32 @@ export const ClueModal: React.FC<ClueModalProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (
+        e.key === 'ArrowLeft' &&
+        onPrevCard &&
+        document.activeElement?.tagName !== 'INPUT'
+      ) {
+        e.preventDefault();
+        onPrevCard();
+      } else if (
+        e.key === 'ArrowRight' &&
+        onNextCard &&
+        document.activeElement?.tagName !== 'INPUT'
+      ) {
+        e.preventDefault();
+        onNextCard();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, onPrevCard, onNextCard]);
+
   const handleSubmit = () => {
     if (mode === 'narrator') {
       if (clue.trim()) {
@@ -51,6 +77,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
       strokeLinecap="round"
       strokeLinejoin="round"
       className="opacity-90 ml-1"
+      aria-hidden="true"
     >
       <line x1="5" y1="12" x2="19" y2="12" />
       <polyline points="12 5 19 12 12 19" />
@@ -59,22 +86,28 @@ export const ClueModal: React.FC<ClueModalProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clue-modal-title"
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in"
-      onClick={onClose}
     >
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-[#0a0a0a]/85 backdrop-blur-2xl" />
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label={t.common.closeModal}
+        onClick={onClose}
+        className="absolute inset-0 bg-[#0a0a0a]/85 backdrop-blur-2xl cursor-default focus:outline-none w-full h-full border-none p-0"
+      />
 
       {/* Modal panel + controls wrapper */}
-      <div
-        className="relative flex items-center justify-center w-full max-w-md md:max-w-lg animate-zoom-in"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative z-10 flex items-center justify-center w-full max-w-md md:max-w-lg animate-zoom-in">
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          aria-label="Close"
-          className="absolute -top-14 right-0 text-white/50 hover:text-white w-10 h-10 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/15 hover:bg-white/10 transition-all z-[110] shadow-xl"
+          aria-label={t.common.closeModal}
+          className="absolute -top-14 right-0 text-white/50 hover:text-white w-10 h-10 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/15 hover:bg-white/10 transition-all z-[110] shadow-xl focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
         >
           <svg
             width="18"
@@ -85,6 +118,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden="true"
           >
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -111,11 +145,13 @@ export const ClueModal: React.FC<ClueModalProps> = ({
               <div className="w-10 sm:w-12">
                 {onPrevCard && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onPrevCard();
                     }}
-                    className={`shrink-0 text-white/30 hover:${theme.accentText} w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full transition-all border border-white/10 ${theme.innerCardBg} shadow-xl group`}
+                    aria-label={t.game.previousCard}
+                    className={`shrink-0 text-white/30 hover:${theme.accentText} w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full transition-all border border-white/10 ${theme.innerCardBg} shadow-xl group focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
                   >
                     <svg
                       className="group-hover:scale-110 transition-transform"
@@ -127,43 +163,36 @@ export const ClueModal: React.FC<ClueModalProps> = ({
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
-                      <polyline points="15 18 9 12 15 6"></polyline>
+                      <line x1="19" y1="12" x2="5" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
                   </button>
                 )}
               </div>
 
-              <div className="flex-1 flex justify-center">
-                {mode === 'narrator' ? (
-                  <label
-                    className={`text-[10px] uppercase tracking-[0.3em] font-sans font-bold ${theme.accentText}`}
-                  >
-                    {t.modals.clue.createClue}
-                  </label>
-                ) : clueText ? (
-                  <p
-                    className={`text-[9px] uppercase tracking-[0.4em] font-sans font-bold ${theme.accentText}`}
-                  >
-                    {t.modals.clue.theClueIs}
-                  </p>
-                ) : (
-                  <p
-                    className={`text-[9px] uppercase tracking-[0.4em] font-sans font-bold ${theme.accentText}`}
-                  >
-                    {t.modals.clue.cardSelection}
-                  </p>
-                )}
-              </div>
+              <span
+                id="clue-modal-title"
+                className={`font-cinzel text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-center flex-1 px-2 ${theme.accentText}`}
+              >
+                {mode === 'narrator'
+                  ? t.modals.clue.createClue
+                  : mode === 'player'
+                    ? `${t.modals.clue.theClueIs} "${clueText}"`
+                    : t.modals.clue.cardSelection}
+              </span>
 
               <div className="w-10 sm:w-12 flex justify-end">
                 {onNextCard && (
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onNextCard();
                     }}
-                    className={`shrink-0 text-white/30 hover:${theme.accentText} w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full transition-all border border-white/10 ${theme.innerCardBg} shadow-xl group`}
+                    aria-label={t.game.nextCard}
+                    className={`shrink-0 text-white/30 hover:${theme.accentText} w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full transition-all border border-white/10 ${theme.innerCardBg} shadow-xl group focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
                   >
                     <svg
                       className="group-hover:scale-110 transition-transform"
@@ -175,6 +204,7 @@ export const ClueModal: React.FC<ClueModalProps> = ({
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
@@ -187,12 +217,12 @@ export const ClueModal: React.FC<ClueModalProps> = ({
               <>
                 <div className="space-y-3">
                   <input
+                    id="clue-input"
                     type="text"
                     value={clue}
                     onChange={(e) => setClue(e.target.value)}
                     placeholder={t.modals.clue.cluePlaceholder}
-                    className={`w-full rounded-xl px-4 py-3 sm:py-3.5 text-center text-base sm:text-lg italic outline-none transition-all font-cinzel ${theme.inputBg}`}
-                    autoFocus
+                    className={`w-full rounded-xl px-4 py-3 sm:py-3.5 text-center text-base sm:text-lg italic outline-none transition-all font-cinzel focus-visible:ring-2 focus-visible:ring-amber-400 ${theme.inputBg}`}
                     maxLength={100}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                   />

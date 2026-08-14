@@ -303,11 +303,14 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({
               </span>
             </div>
 
-            <div
+            <button
+              type="button"
               onClick={() =>
                 setSelectedHandCard(selectedHandCard === 42 ? null : 42)
               }
-              className={`h-40 rounded-xl border bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-900 p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 ${
+              aria-label="Carta #42: O Guardião das Sombras"
+              aria-pressed={selectedHandCard === 42}
+              className={`w-full text-left h-40 rounded-xl border bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-900 p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 focus-visible:ring-4 focus-visible:ring-amber-400 focus-visible:outline-none ${
                 selectedHandCard === 42
                   ? `${theme.accentBorder} ring-2 ring-white/40 -translate-y-1 ${theme.glowShadow}`
                   : 'border-white/10 hover:border-white/30'
@@ -330,7 +333,7 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({
               >
                 O Guardião das Sombras
               </span>
-            </div>
+            </button>
 
             <Button variant="outline" size="sm" className="w-full">
               Confirmar Escolha
@@ -475,9 +478,21 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({
 
       {/* SAMPLE MODAL PREVIEW (OVERLAY) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="sample-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+        >
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label="Close"
+            onClick={() => setIsModalOpen(false)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-default focus:outline-none w-full h-full border-none p-0"
+          />
           <div
-            className={`w-full max-w-md border border-white/10 ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 relative space-y-5 animate-zoom-in ${theme.cardBg}`}
+            className={`w-full max-w-md border border-white/10 ring-1 ring-white/10 shadow-2xl rounded-2xl p-6 md:p-8 relative z-10 space-y-5 animate-zoom-in ${theme.cardBg}`}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -487,13 +502,18 @@ export const DataCardsSection: React.FC<DataCardsSectionProps> = ({
                 >
                   !
                 </div>
-                <h3 className="text-xl font-cinzel font-bold text-white">
+                <h3
+                  id="sample-modal-title"
+                  className="text-xl font-cinzel font-bold text-white"
+                >
                   Reiniciar Partida?
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-white/40 hover:text-white transition-colors"
+                className="text-white/40 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none p-1 rounded-lg"
+                aria-label="Close modal"
               >
                 ✕
               </button>

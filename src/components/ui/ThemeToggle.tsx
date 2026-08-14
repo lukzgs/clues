@@ -32,9 +32,18 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
 
   return (
     <button
+      type="button"
       onClick={cycleTheme}
-      title={`Tema: ${theme.name[lang]} (Clique para alternar)`}
-      aria-label={`Alternar tema visual (Atual: ${theme.name[lang]})`}
+      title={
+        lang === 'pt'
+          ? `Tema: ${theme.name.pt} (Clique para alternar)`
+          : `Theme: ${theme.name.en} (Click to switch)`
+      }
+      aria-label={
+        lang === 'pt'
+          ? `Alternar tema visual (Atual: ${theme.name.pt})`
+          : `Toggle visual theme (Current: ${theme.name.en})`
+      }
       className={`
         flex items-center justify-center
         bg-[#1A1A1A]/60 backdrop-blur-xl
@@ -43,6 +52,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
         transition-all duration-300
         hover:${theme.accentBorder} hover:scale-[1.05]
         cursor-pointer select-none group
+        focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none
         ${basePosition}
         ${className}
       `}
@@ -57,6 +67,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
         className={`transition-colors duration-300 ${theme.accentText}`}
       >
         <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />

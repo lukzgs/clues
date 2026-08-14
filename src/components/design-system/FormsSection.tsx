@@ -57,34 +57,43 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
 
           {/* Default / Focused Input */}
           <div className="space-y-1.5">
-            <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+            <label
+              htmlFor="forms-player-identity-input"
+              className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium"
+            >
               Identidade do Jogador (Padrão)
             </label>
             <input
+              id="forms-player-identity-input"
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Digite seu apelido..."
-              className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
+              className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
             />
           </div>
 
           {/* Password with Eye Toggle */}
           <div className="space-y-1.5">
-            <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+            <label
+              htmlFor="forms-room-password-input"
+              className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium"
+            >
               Senha Secreta da Sala (Com Alternância)
             </label>
             <div className="relative">
               <input
+                id="forms-room-password-input"
                 type={showPassword ? 'text' : 'password'}
                 defaultValue="Clues2026Secret"
-                className={`w-full rounded-xl pl-4 pr-11 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
+                className={`w-full rounded-xl pl-4 pr-11 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:${theme.accentText} transition-colors p-1`}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:${theme.accentText} transition-colors p-1 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
                 title={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
               >
                 {showPassword ? (
                   <svg
@@ -96,6 +105,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                     <line x1="1" y1="1" x2="23" y2="23" />
@@ -110,6 +120,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
@@ -122,7 +133,10 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
           {/* Textarea for Clue */}
           <div className="space-y-1.5">
             <div className="flex justify-between items-center pl-1">
-              <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
+              <label
+                htmlFor="forms-clue-textarea"
+                className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium"
+              >
                 Pista do Narrador (Textarea)
               </label>
               <span className="text-[10px] font-mono text-white/40">
@@ -130,20 +144,25 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
               </span>
             </div>
             <textarea
+              id="forms-clue-textarea"
               rows={3}
               value={textareaValue}
               onChange={(e) => setTextareaValue(e.target.value.slice(0, 100))}
-              className={`w-full rounded-xl p-3.5 text-sm font-sans outline-none ring-1 ring-white/5 resize-none transition-all ${theme.inputBg}`}
+              className={`w-full rounded-xl p-3.5 text-sm font-sans outline-none ring-1 ring-white/5 resize-none transition-all ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
             />
           </div>
 
           {/* Success Validation State */}
           <div className="space-y-1.5">
-            <label className="block text-emerald-400/80 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+            <label
+              htmlFor="forms-room-validation-input"
+              className="block text-emerald-400/80 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium"
+            >
               Código da Sala (Validação OK)
             </label>
             <div className="relative">
               <input
+                id="forms-room-validation-input"
                 type="text"
                 readOnly
                 value="ROOM99"
@@ -168,9 +187,9 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
 
           {/* Deck Selection Pills Switcher */}
           <div className="space-y-2">
-            <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+            <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
               Seleção de Baralho (Pill Switcher)
-            </label>
+            </span>
             <div
               className={`flex border rounded-xl p-1 relative z-0 transition-all duration-300 ${theme.innerCardBg}`}
             >
@@ -188,9 +207,10 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
               />
               {(['original', 'new', 'mixed'] as const).map((option) => (
                 <button
+                  type="button"
                   key={option}
                   onClick={() => setDeckOption(option)}
-                  className={`flex-1 py-2 text-[10px] md:text-xs font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg ${
+                  className={`flex-1 py-2 text-[10px] md:text-xs font-cinzel font-bold tracking-widest transition-colors duration-200 uppercase rounded-lg focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                     deckOption === option
                       ? theme.accentText
                       : 'text-white/40 hover:text-white/80'
@@ -208,9 +228,9 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
 
           {/* Condition Card with Switch & Range Slider */}
           <div className="space-y-2">
-            <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
+            <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans font-medium">
               Card de Regra com Switch & Range Slider
-            </label>
+            </span>
             <div
               className={`rounded-2xl border transition-all duration-300 ${
                 scoreEnabled
@@ -225,8 +245,9 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                   Por Pontuação Alvo
                 </span>
                 <button
+                  type="button"
                   onClick={() => setScoreEnabled(!scoreEnabled)}
-                  className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                     scoreEnabled ? theme.primaryGradient : 'bg-white/10'
                   }`}
                   aria-label="Toggle score condition"
@@ -242,18 +263,22 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
               {scoreEnabled && (
                 <div className="px-3 pb-3 pt-0.5 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-sans font-bold">
+                    <label
+                      htmlFor="forms-target-score-input"
+                      className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-sans font-bold"
+                    >
                       Primeiro a Atingir
-                    </span>
+                    </label>
                     <div className="flex items-center gap-1.5">
                       <input
+                        id="forms-target-score-input"
                         type="number"
                         min={10}
                         max={100}
                         step={5}
                         value={targetScore}
                         onChange={(e) => setTargetScore(Number(e.target.value))}
-                        className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none`}
+                        className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-amber-400`}
                       />
                       <span className="text-white/30 text-[9px] font-sans font-bold uppercase">
                         PTS
@@ -262,6 +287,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                   </div>
                   <input
                     type="range"
+                    aria-label="Adjust target score"
                     min={10}
                     max={100}
                     step={5}
@@ -278,14 +304,16 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
           {/* Phase Timeout Control Card */}
           <div className="space-y-2">
             <div className="flex items-center justify-between pl-1">
-              <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
+              <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-medium">
                 Temporizador de Fase (Card + Slider)
-              </label>
+              </span>
               <button
+                type="button"
                 onClick={() => setTimerEnabled(!timerEnabled)}
-                className={`relative w-9 h-4.5 rounded-full transition-colors duration-300 ${
+                className={`relative w-9 h-4.5 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                   timerEnabled ? theme.primaryGradient : 'bg-white/10'
                 }`}
+                aria-label="Toggle timer"
               >
                 <span
                   className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow transition-transform duration-300 ${
@@ -300,11 +328,15 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                 className={`border rounded-xl p-3 space-y-2 transition-all duration-300 ${theme.innerCardBg}`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-cinzel font-bold text-white/80">
+                  <label
+                    htmlFor="forms-phase-timeout-narrator"
+                    className="text-xs font-cinzel font-bold text-white/80"
+                  >
                     Fase 1: Escolha do Narrador
-                  </span>
+                  </label>
                   <div className="flex items-center gap-1.5">
                     <input
+                      id="forms-phase-timeout-narrator"
                       type="number"
                       min={0}
                       max={120}
@@ -313,7 +345,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                       onChange={(e) =>
                         setTimeoutNarrator(Number(e.target.value))
                       }
-                      className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none`}
+                      className={`w-14 rounded-lg px-1.5 py-1 ${theme.inputBg} font-cinzel font-bold text-sm text-center tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-amber-400`}
                     />
                     <span className="text-white/30 text-[9px] font-sans font-bold uppercase">
                       SEG
@@ -322,6 +354,7 @@ export const FormsSection: React.FC<FormsSectionProps> = () => {
                 </div>
                 <input
                   type="range"
+                  aria-label="Adjust time for Phase 1"
                   min={0}
                   max={120}
                   step={1}

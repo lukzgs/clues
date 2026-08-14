@@ -75,6 +75,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="text-emerald-400 shrink-0 mt-0.5"
+                  aria-hidden="true"
                 >
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                   <polyline points="22 4 12 14.01 9 11.01" />
@@ -90,8 +91,10 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => toggleDismiss('success')}
-                className="text-emerald-400/60 hover:text-emerald-200 text-sm"
+                aria-label="Dismiss success alert"
+                className="text-emerald-400/60 hover:text-emerald-200 text-sm focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
               >
                 ✕
               </button>
@@ -112,6 +115,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="text-amber-400 shrink-0 mt-0.5"
+                  aria-hidden="true"
                 >
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                   <line x1="12" y1="9" x2="12" y2="13" />
@@ -128,8 +132,10 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => toggleDismiss('warning')}
-                className="text-amber-400/60 hover:text-amber-200 text-sm"
+                aria-label="Dismiss warning alert"
+                className="text-amber-400/60 hover:text-amber-200 text-sm focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
               >
                 ✕
               </button>
@@ -150,6 +156,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="text-red-400 shrink-0 mt-0.5"
+                  aria-hidden="true"
                 >
                   <circle cx="12" cy="12" r="10" />
                   <line x1="15" y1="9" x2="9" y2="15" />
@@ -166,8 +173,10 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => toggleDismiss('error')}
-                className="text-red-400/60 hover:text-red-200 text-sm"
+                aria-label="Dismiss error alert"
+                className="text-red-400/60 hover:text-red-200 text-sm focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
               >
                 ✕
               </button>
@@ -188,6 +197,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="text-sky-400 shrink-0 mt-0.5"
+                  aria-hidden="true"
                 >
                   <circle cx="12" cy="12" r="10" />
                   <line x1="12" y1="16" x2="12" y2="12" />
@@ -204,8 +214,10 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => toggleDismiss('info')}
-                className="text-sky-400/60 hover:text-sky-200 text-sm"
+                aria-label="Dismiss info alert"
+                className="text-sky-400/60 hover:text-sky-200 text-sm focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
               >
                 ✕
               </button>
@@ -214,8 +226,9 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
 
           {Object.keys(dismissedAlerts).length > 0 && (
             <button
+              type="button"
               onClick={() => setDismissedAlerts({})}
-              className={`text-[10px] font-sans uppercase tracking-widest ${theme.accentText} pt-2 block`}
+              className={`text-[10px] font-sans uppercase tracking-widest ${theme.accentText} pt-2 block focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none`}
             >
               Restaurar Alertas Dispensados
             </button>
@@ -240,6 +253,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-auto">
             <button
+              type="button"
               onClick={() =>
                 handleTrigger(
                   'success',
@@ -247,12 +261,13 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   'Conexão',
                 )
               }
-              className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-emerald-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+              className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-emerald-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             >
               ✓ Toast Sucesso (Conexão)
             </button>
 
             <button
+              type="button"
               onClick={() =>
                 handleTrigger(
                   'warning',
@@ -260,12 +275,13 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   'Inatividade da Sala',
                 )
               }
-              className="bg-amber-950/40 border border-amber-500/40 text-amber-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-amber-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+              className="bg-amber-950/40 border border-amber-500/40 text-amber-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-amber-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             >
               ! Toast Alerta (Inatividade)
             </button>
 
             <button
+              type="button"
               onClick={() =>
                 handleTrigger(
                   'error',
@@ -273,12 +289,13 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   'Erro do Servidor',
                 )
               }
-              className="bg-red-950/40 border border-red-500/40 text-red-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-red-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+              className="bg-red-950/40 border border-red-500/40 text-red-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-red-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
             >
               ✕ Toast Erro (Servidor)
             </button>
 
             <button
+              type="button"
               onClick={() =>
                 handleTrigger(
                   'info',
@@ -286,7 +303,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                   'Informação',
                 )
               }
-              className="bg-sky-950/40 border border-sky-500/40 text-sky-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-sky-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+              className="bg-sky-950/40 border border-sky-500/40 text-sky-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-sky-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
             >
               ℹ Toast Informação
             </button>
@@ -323,6 +340,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="text-emerald-400 shrink-0 mt-0.5"
+                aria-hidden="true"
               >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
@@ -352,6 +370,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="text-amber-400 shrink-0 mt-0.5"
+                aria-hidden="true"
               >
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
@@ -382,6 +401,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="text-red-400 shrink-0 mt-0.5"
+                aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="15" y1="9" x2="9" y2="15" />
@@ -412,6 +432,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="text-sky-400 shrink-0 mt-0.5"
+                aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />

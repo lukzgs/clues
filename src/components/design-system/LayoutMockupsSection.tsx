@@ -62,8 +62,9 @@ export const LayoutMockupsSection: React.FC = () => {
         {/* Mockup Tab Selector */}
         <div className="flex bg-black/40 border border-white/10 rounded-xl p-1 shrink-0 overflow-x-auto">
           <button
+            type="button"
             onClick={() => setActiveMockupTab('join')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
               activeMockupTab === 'join'
                 ? `${theme.primaryGradient} shadow-md`
                 : 'text-white/60 hover:text-white'
@@ -72,8 +73,9 @@ export const LayoutMockupsSection: React.FC = () => {
             1. Entrada (Join)
           </button>
           <button
+            type="button"
             onClick={() => setActiveMockupTab('lobby')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
               activeMockupTab === 'lobby'
                 ? `${theme.primaryGradient} shadow-md`
                 : 'text-white/60 hover:text-white'
@@ -82,8 +84,9 @@ export const LayoutMockupsSection: React.FC = () => {
             2. Lobby da Sala
           </button>
           <button
+            type="button"
             onClick={() => setActiveMockupTab('gameplay')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-cinzel font-bold uppercase tracking-wider transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
               activeMockupTab === 'gameplay'
                 ? `${theme.primaryGradient} shadow-md`
                 : 'text-white/60 hover:text-white'
@@ -126,6 +129,7 @@ export const LayoutMockupsSection: React.FC = () => {
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                   className={theme.accentText}
                 >
                   <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -142,13 +146,17 @@ export const LayoutMockupsSection: React.FC = () => {
 
               {/* Name Input */}
               <div className="w-full mb-4">
-                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-1 pl-1 font-sans font-medium">
+                <label
+                  htmlFor="mockup-join-identity-input"
+                  className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-1 pl-1 font-sans font-medium"
+                >
                   Sua Identidade
                 </label>
                 <input
+                  id="mockup-join-identity-input"
                   type="text"
                   defaultValue="Narrador Místico"
-                  className={`w-full rounded-xl px-4 py-3 font-cinzel text-base outline-none ${theme.inputBg}`}
+                  className={`w-full rounded-xl px-4 py-3 font-cinzel text-base outline-none ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
                 />
               </div>
 
@@ -169,8 +177,9 @@ export const LayoutMockupsSection: React.FC = () => {
                 <input
                   type="text"
                   placeholder="CÓDIGO"
+                  aria-label="Room code"
                   maxLength={6}
-                  className={`flex-1 rounded-xl px-3 py-2.5 font-cinzel text-sm uppercase text-center outline-none ${theme.inputBg}`}
+                  className={`flex-1 rounded-xl px-3 py-2.5 font-cinzel text-sm uppercase text-center outline-none ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
                 />
                 <Button variant="glass" size="sm" className="shrink-0 px-4">
                   Entrar →
@@ -218,10 +227,12 @@ export const LayoutMockupsSection: React.FC = () => {
                     Por Pontuação Alvo
                   </span>
                   <button
+                    type="button"
                     onClick={() => setScoreEnabled(!scoreEnabled)}
-                    className={`relative w-10 h-5 rounded-full transition-colors duration-300 ${
+                    className={`relative w-10 h-5 rounded-full transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                       scoreEnabled ? theme.primaryGradient : 'bg-white/10'
                     }`}
+                    aria-label="Toggle score condition"
                   >
                     <span
                       className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-300 ${
@@ -242,6 +253,7 @@ export const LayoutMockupsSection: React.FC = () => {
                     </div>
                     <input
                       type="range"
+                      aria-label="Adjust target score"
                       min={10}
                       max={100}
                       defaultValue={30}
@@ -254,9 +266,9 @@ export const LayoutMockupsSection: React.FC = () => {
 
               {/* Deck Selection Pills */}
               <div className="space-y-2">
-                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">
+                <span className="block text-white/40 text-[10px] uppercase tracking-[0.2em] font-sans font-bold">
                   Seleção de Baralho (Deck Option)
-                </label>
+                </span>
                 <div
                   className={`flex border rounded-xl p-1 relative z-0 transition-all duration-300 ${theme.innerCardBg}`}
                 >
@@ -274,9 +286,10 @@ export const LayoutMockupsSection: React.FC = () => {
                   />
                   {(['original', 'new', 'mixed'] as const).map((option) => (
                     <button
+                      type="button"
                       key={option}
                       onClick={() => setDeckOption(option)}
-                      className={`flex-1 py-2 text-xs font-cinzel font-bold tracking-widest transition-colors uppercase rounded-lg ${
+                      className={`flex-1 py-2 text-xs font-cinzel font-bold tracking-widest transition-colors uppercase rounded-lg focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                         deckOption === option
                           ? theme.accentText
                           : 'text-white/40 hover:text-white/80'
@@ -384,6 +397,7 @@ export const LayoutMockupsSection: React.FC = () => {
                           height="12"
                           viewBox="0 0 24 24"
                           fill="currentColor"
+                          aria-hidden="true"
                         >
                           <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
                         </svg>
@@ -426,9 +440,10 @@ export const LayoutMockupsSection: React.FC = () => {
               {(['narrator', 'others', 'voting', 'results'] as const).map(
                 (step) => (
                   <button
+                    type="button"
                     key={step}
                     onClick={() => setGamePhaseStep(step)}
-                    className={`px-3 py-1.5 rounded-lg text-[11px] font-cinzel font-bold uppercase tracking-wider transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-cinzel font-bold uppercase tracking-wider transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
                       gamePhaseStep === step
                         ? `${theme.primaryGradient}`
                         : 'text-white/60 hover:text-white'
@@ -469,16 +484,20 @@ export const LayoutMockupsSection: React.FC = () => {
 
               {/* Clue Input */}
               <div className="space-y-1.5">
-                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans">
+                <label
+                  htmlFor="mockup-gameplay-clue-input"
+                  className="block text-white/40 text-[10px] uppercase tracking-[0.2em] pl-1 font-sans"
+                >
                   Sua Pista Enigmática
                 </label>
                 <div className="flex gap-2">
                   <input
+                    id="mockup-gameplay-clue-input"
                     type="text"
                     value={clueText}
                     onChange={(e) => setClueText(e.target.value)}
                     placeholder="Digite uma frase ou expressão mística..."
-                    className={`flex-1 rounded-xl px-4 py-3 text-white font-cinzel text-lg italic outline-none ${theme.inputBg}`}
+                    className={`flex-1 rounded-xl px-4 py-3 text-white font-cinzel text-lg italic outline-none ${theme.inputBg} focus-visible:ring-2 focus-visible:ring-amber-400`}
                   />
                   <Button variant="primary" size="md" className="shrink-0">
                     Enviar Pista
@@ -493,10 +512,13 @@ export const LayoutMockupsSection: React.FC = () => {
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {sampleHandCards.map((card) => (
-                    <div
+                    <button
+                      type="button"
                       key={card.id}
                       onClick={() => setSelectedCardId(card.id)}
-                      className={`h-48 rounded-2xl border bg-gradient-to-br ${card.color} p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 ${
+                      aria-label={`Carta: ${card.title}`}
+                      aria-pressed={selectedCardId === card.id}
+                      className={`w-full text-left h-48 rounded-2xl border bg-gradient-to-br ${card.color} p-4 flex flex-col justify-between cursor-pointer transition-all duration-300 focus-visible:ring-4 focus-visible:ring-amber-400 focus-visible:outline-none ${
                         selectedCardId === card.id
                           ? `${theme.accentBorder} ring-2 ring-white/30 -translate-y-2 ${theme.glowShadow}`
                           : 'border-white/10 hover:border-white/30 hover:-translate-y-1'
@@ -519,7 +541,7 @@ export const LayoutMockupsSection: React.FC = () => {
                       >
                         {card.title}
                       </span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -614,75 +636,148 @@ export const LayoutMockupsSection: React.FC = () => {
 
           {/* PHASE 4: RESULTS & SCORES */}
           {gamePhaseStep === 'results' && (
-            <div className="space-y-5 animate-fade-in">
-              <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-sans uppercase tracking-[0.2em] text-emerald-400 font-medium">
-                    Resultado da Rodada
-                  </span>
-                  <h4 className="text-lg font-cinzel font-bold text-white">
-                    2 Jogadores acertaram a carta do Narrador!
-                  </h4>
-                </div>
-                <Button variant="primary" size="sm">
-                  Próxima Rodada →
-                </Button>
+            <div className="space-y-6 animate-fade-in">
+              {/* Clue Banner */}
+              <div
+                className={`text-center backdrop-blur-2xl border px-6 py-4 rounded-2xl inline-flex flex-col items-center justify-center w-full transition-all ${theme.cardBg} ${theme.accentBorder}`}
+              >
+                <span className="text-white/40 text-[10px] uppercase tracking-[0.25em] font-sans font-bold">
+                  A Pista Foi:
+                </span>
+                <h4
+                  className={`text-xl font-cinzel font-bold tracking-wider mt-1 ${theme.accentText}`}
+                >
+                  "{clueText}"
+                </h4>
               </div>
 
-              {/* Leaderboard Table */}
-              <div
-                className={`border rounded-2xl p-5 space-y-3 ${theme.innerCardBg}`}
-              >
-                <h5
-                  className={`text-xs font-cinzel font-bold uppercase tracking-wider ${theme.accentText}`}
+              {/* Sidebar Layout Mockup */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                {/* Left Sidebar Mockup */}
+                <div
+                  className={`md:col-span-4 border rounded-2xl p-4 space-y-3 ${theme.innerCardBg} border-white/10`}
                 >
-                  Placar Geral da Sala
-                </h5>
-                <div className="space-y-2">
-                  {[
-                    {
-                      rank: '1º',
-                      name: 'Sofia Mística',
-                      pts: '18 pts',
-                      change: '+3 pts',
-                    },
-                    {
-                      rank: '2º',
-                      name: 'Você (Narrador)',
-                      pts: '15 pts',
-                      change: '+3 pts',
-                    },
-                    {
-                      rank: '3º',
-                      name: 'Lucas_GS',
-                      pts: '12 pts',
-                      change: '+0 pts',
-                    },
-                  ].map((row, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between border border-white/5 rounded-xl px-4 py-3 text-sm font-sans ${theme.innerCardBg}`}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span
+                      className={`text-[10px] font-cinzel font-bold uppercase tracking-wider ${theme.accentText}`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`font-cinzel font-bold text-base ${theme.accentText}`}
+                      Barra Lateral (Placar)
+                    </span>
+                    <span className="text-[10px] text-white/40 font-mono">
+                      3 jogadores
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        name: 'Sofia (Narrador)',
+                        score: 18,
+                        color: '#3B82F6',
+                        ready: true,
+                      },
+                      {
+                        name: 'Você (Lucas)',
+                        score: 15,
+                        color: '#10B981',
+                        ready: true,
+                      },
+                      {
+                        name: 'Nova_Bot',
+                        score: 12,
+                        color: '#F59E0B',
+                        ready: false,
+                      },
+                    ].map((p, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between p-2 rounded-xl bg-black/20 border border-white/5 text-xs font-sans"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: p.color }}
+                          />
+                          <span className="text-white font-medium">
+                            {p.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white font-mono">
+                            {p.score} pts
+                          </span>
+                          <span
+                            className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${p.ready ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-white/20'}`}
+                          >
+                            {p.ready ? '✓' : '•'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Cards Area */}
+                <div className="md:col-span-8 space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      {
+                        owner: 'Sofia (Narrador)',
+                        isNarrator: true,
+                        votes: ['Lucas', 'Nova'],
+                      },
+                      {
+                        owner: 'Você (Lucas)',
+                        isNarrator: false,
+                        votes: [],
+                      },
+                      {
+                        owner: 'Nova_Bot',
+                        isNarrator: false,
+                        votes: [],
+                      },
+                    ].map((c, i) => (
+                      <div key={i} className="flex flex-col items-center gap-2">
+                        <div
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold border truncate w-full text-center ${c.isNarrator ? `${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}` : 'bg-black/30 text-white/60 border-white/10'}`}
                         >
-                          {row.rank}
-                        </span>
-                        <span className="text-white font-medium">
-                          {row.name}
-                        </span>
+                          {c.owner}
+                        </div>
+                        <div
+                          className={`h-40 w-full rounded-xl border p-2 flex flex-col justify-end ${c.isNarrator ? `ring-2 ${theme.accentBorder} bg-amber-950/20` : 'border-white/10 bg-black/40'}`}
+                        >
+                          <span className="text-[10px] text-white/40 text-center">
+                            Carta {i + 1}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 min-h-[20px]">
+                          {c.votes.length > 0 ? (
+                            c.votes.map((v, vi) => (
+                              <span
+                                key={vi}
+                                className="text-[9px] bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded-full border border-blue-400/20 font-bold"
+                              >
+                                {v}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[9px] text-white/20">
+                              0 votos
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-emerald-400 font-mono font-semibold">
-                          {row.change}
-                        </span>
-                        <span className="font-cinzel font-bold text-white">
-                          {row.pts}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  <div className="pt-2 flex justify-center">
+                    <Button
+                      variant="primary"
+                      size="md"
+                      className="w-full max-w-sm"
+                    >
+                      Próxima Rodada →
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

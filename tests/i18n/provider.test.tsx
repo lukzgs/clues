@@ -29,10 +29,10 @@ function TestConsumer() {
       <span data-testid="title">{t.join.title}</span>
       <span data-testid="subtitle">{t.join.subtitle}</span>
       <span data-testid="newRoom">{t.join.newRoom}</span>
-      <button data-testid="set-pt" onClick={() => setLang('pt')}>
+      <button type="button" data-testid="set-pt" onClick={() => setLang('pt')}>
         set-pt-btn
       </button>
-      <button data-testid="set-en" onClick={() => setLang('en')}>
+      <button type="button" data-testid="set-en" onClick={() => setLang('en')}>
         set-en-btn
       </button>
     </div>

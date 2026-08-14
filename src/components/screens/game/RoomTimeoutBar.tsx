@@ -24,7 +24,10 @@ export const RoomTimeoutBar: React.FC<{ closeTime: number }> = ({
   const seconds = timeLeft % 60;
 
   return (
-    <div className="bg-red-900/50 border-b border-red-500/30 text-red-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2 z-50">
+    <div
+      role="alert"
+      className="bg-red-900/50 border-b border-red-500/30 text-red-200 text-center py-2.5 text-sm font-sans font-medium flex items-center justify-center gap-2 z-50"
+    >
       <svg
         width="16"
         height="16"
@@ -34,6 +37,7 @@ export const RoomTimeoutBar: React.FC<{ closeTime: number }> = ({
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
       >
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />

@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
+import { useTranslation } from '../../../i18n/index.tsx';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { LanguageToggle } from '../../ui/LanguageToggle';
 import { ThemeToggle } from '../../ui/ThemeToggle';
@@ -15,6 +16,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   onLeaveRoom,
   phaseLabel,
 }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
 
@@ -55,6 +57,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden="true"
             className={`${theme.accentText} md:w-5 md:h-5`}
           >
             <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -77,14 +80,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         </div>
 
         <button
+          type="button"
           onClick={handleCopyLink}
-          className={`w-10 h-10 rounded-xl transition-all duration-300 border shadow-sm shrink-0 flex items-center justify-center ${
+          className={`w-10 h-10 rounded-xl transition-all duration-300 border shadow-sm shrink-0 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${
             copied
               ? 'text-green-400 border-green-500/30 bg-green-500/10 scale-105'
               : `text-white/40 border-white/10 ${theme.innerCardBg} hover:${theme.accentText} hover:border-white/20 hover:scale-105`
           }`}
-          title="Copiar link da sala"
-          aria-label="Copiar link da sala"
+          title={t.lobby.copyLink}
+          aria-label={t.lobby.copyLink}
         >
           {copied ? (
             <svg
@@ -95,6 +99,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>
@@ -107,6 +112,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
               <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
@@ -121,10 +127,11 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         <LanguageToggle className="relative !static !top-auto !right-auto shadow-none flex-shrink-0" />
 
         <button
+          type="button"
           onClick={onLeaveRoom}
-          className="w-10 h-10 rounded-xl transition-all duration-300 border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-300 hover:text-red-200 hover:border-red-500/40 shadow-sm shrink-0 flex items-center justify-center"
-          title="Sair da sala"
-          aria-label="Sair da sala"
+          className="w-10 h-10 rounded-xl transition-all duration-300 border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-300 hover:text-red-200 hover:border-red-500/40 shadow-sm shrink-0 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+          title={t.game.leaveRoom}
+          aria-label={t.game.leaveRoom}
         >
           <svg
             className="w-3.5 h-3.5 md:w-4 md:h-4"
@@ -134,6 +141,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden="true"
           >
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>

@@ -2,9 +2,9 @@
 
 @theme {
   --color-canvas: #050505;
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-cinzel: 'Cinzel', serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-cinzel: "Cinzel", serif;
 }
 
 /* ===== BASE STYLES ===== */
@@ -99,8 +99,8 @@
 
 /* Esconder barra de rolagem (mobile) */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none;

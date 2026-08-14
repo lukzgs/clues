@@ -21,34 +21,36 @@ interface PlayerHandProps {
 }
 
 export const PlayerHand: React.FC<PlayerHandProps> = ({
-  gameState,
+  gameState: _gameState,
   currentPlayer,
   selectedCard,
   onCardSelect,
-  onConfirmCard,
+  onConfirmCard: _onConfirmCard,
   layout,
-  setLayout,
+  setLayout: _setLayout,
   isMobileScoreOpen,
   setIsMobileScoreOpen,
   hideHand,
   setHideHand,
   shouldShowHand,
-  isNarrator,
-  hasChosenCard,
+  isNarrator: _isNarrator,
+  hasChosenCard: _hasChosenCard,
 }) => {
   const { t } = useTranslation();
 
   if (!shouldShowHand || !currentPlayer) return null;
 
   return (
-    <div
+    <nav
+      aria-label={t.game.playerHand}
       className={`w-full bg-[#1A1A1A]/30 border border-white/10 rounded-2xl p-4 shrink-0 transition-all duration-300 ${isMobileScoreOpen ? 'invisible opacity-0' : 'visible opacity-100'} fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:border-0 md:p-0`}
     >
       {/* Mobile Handle */}
       <div className="md:hidden absolute -top-8 left-0 right-0 flex justify-center pointer-events-auto items-end gap-2 px-4 pb-1">
         <button
+          type="button"
           onClick={() => setIsMobileScoreOpen(true)}
-          className="bg-black/60 backdrop-blur-md text-amber-300 border border-white/10 px-3 py-1.5 rounded-t-xl text-[10px] uppercase font-sans font-bold flex items-center gap-1.5 shadow-[0_-5px_15px_rgba(0,0,0,0.5)]"
+          className="bg-black/60 backdrop-blur-md text-amber-300 border border-white/10 px-3 py-1.5 rounded-t-xl text-[10px] uppercase font-sans font-bold flex items-center gap-1.5 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
         >
           <svg
             width="12"
@@ -59,6 +61,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden="true"
           >
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -68,8 +71,12 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
           PONTUAÇÕES
         </button>
         <button
+          type="button"
+          aria-label={
+            hideHand ? 'Mostrar mão de cartas' : 'Esconder mão de cartas'
+          }
           onClick={() => setHideHand(!hideHand)}
-          className="w-16 h-6 bg-black/60 backdrop-blur-md border border-white/10 rounded-t-xl flex items-center justify-center flex-col gap-0.5 shadow-[0_-5px_15px_rgba(0,0,0,0.5)]"
+          className="w-16 h-6 bg-black/60 backdrop-blur-md border border-white/10 rounded-t-xl flex items-center justify-center flex-col gap-0.5 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
         >
           <div className="w-6 h-0.5 bg-white/30 rounded-full"></div>
           <div className="w-4 h-0.5 bg-white/30 rounded-full"></div>
@@ -106,7 +113,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                 <div
                   key={card.id}
                   className={`
-                    transition-all duration-500 cursor-pointer group origin-bottom flex-shrink-0 overflow-visible
+                    transition-all duration-500 group origin-bottom flex-shrink-0 overflow-visible
                     ${layout === 'row' ? 'snap-center' : ''}
                     ${isSelected ? 'z-30 scale-110 md:scale-[1.15]' : 'z-10 hover:z-20 hover:-translate-y-4 md:hover:-translate-y-12'}
                   `}
@@ -117,7 +124,6 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                         }
                       : undefined
                   }
-                  onClick={() => onCardSelect(card.id.toString())}
                 >
                   <GameCard
                     card={card}
@@ -129,18 +135,15 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                           : 'lg'
                     }
                     isSelected={isSelected}
+                    onClick={() => onCardSelect(card.id.toString())}
                     className={`shadow-[0_10px_20px_rgba(0,0,0,0.5)] transition-shadow duration-300 ${!isSelected && 'group-hover:shadow-[0_0_25px_rgba(245,158,11,0.25),0_20px_40px_rgba(0,0,0,0.6)]'}`}
                   />
-                  {/* Indicator for selected card in grid mode */}
-                  {isSelected && layout !== 'row' && (
-                    <div className="absolute inset-0 border-4 border-amber-400 rounded-2xl md:rounded-[1.75rem] pointer-events-none"></div>
-                  )}
                 </div>
               );
             })}
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };

@@ -271,20 +271,32 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
 
       {/* Mobile Options Modal */}
       {isMobileOptionsOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-options-title"
+          className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label={t.common.closeModal}
             onClick={() => setIsMobileOptionsOpen(false)}
-          ></div>
-          <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
+            className="absolute inset-0 bg-black/60 backdrop-blur-md cursor-default focus:outline-none w-full h-full border-none p-0"
+          />
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/20 ring-1 ring-white/10 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6 sticky top-0 bg-transparent backdrop-blur-xl z-20 pb-2 border-b border-white/10">
-              <h3 className="text-amber-300 font-cinzel font-bold text-lg tracking-widest">
+              <h3
+                id="mobile-options-title"
+                className="text-amber-300 font-cinzel font-bold text-lg tracking-widest"
+              >
                 {t.lobby.settings}
               </h3>
               <button
+                type="button"
                 onClick={() => setIsMobileOptionsOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Close"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                aria-label={t.common.close}
               >
                 <svg
                   width="18"
@@ -295,6 +307,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>

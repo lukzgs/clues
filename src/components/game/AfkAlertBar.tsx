@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import GAME_CONFIG from '../../../game.config.json';
+import { useTranslation } from '../../i18n/index.tsx';
 import { GamePhase, type GameState } from '../../types';
 
 interface AfkAlertBarProps {
@@ -7,6 +8,7 @@ interface AfkAlertBarProps {
 }
 
 export function AfkAlertBar({ gameState }: AfkAlertBarProps) {
+  const { t } = useTranslation();
   // As fases LOBBY e GAME_OVER não tem timeout
   const isActivePhase =
     gameState.phase !== GamePhase.LOBBY &&
@@ -56,7 +58,14 @@ export function AfkAlertBar({ gameState }: AfkAlertBarProps) {
 
   // Apenas um indicador sutil visual de tempo
   return (
-    <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
+    <div
+      role="progressbar"
+      aria-label={t.game.phaseTimeRemaining}
+      aria-valuemin={0}
+      aria-valuemax={currentPhaseTimeout}
+      aria-valuenow={timeLeft}
+      className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50"
+    >
       <div
         className="h-full bg-white/50 transition-all duration-100 ease-linear"
         style={{ width: `${(timeLeft / currentPhaseTimeout) * 100}%` }}

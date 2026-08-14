@@ -1,4 +1,4 @@
-import type React from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from '../../i18n/index.tsx';
 import { useTheme } from '../../providers/ThemeProvider';
 import { Button } from '../ui/Button';
@@ -15,21 +15,39 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCancel();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="leave-modal-title"
       className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in"
-      onClick={onCancel}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label={t.common.closeModal}
+        onClick={onCancel}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md cursor-default focus:outline-none w-full h-full border-none p-0"
+      />
 
       {/* Modal */}
       <div
-        className={`relative backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 max-w-[380px] w-full animate-zoom-in transition-all duration-300 ${theme.cardBg} ${theme.accentBorder}`}
-        onClick={(e) => e.stopPropagation()}
+        className={`relative z-10 backdrop-blur-2xl border ring-1 ring-white/10 shadow-2xl rounded-2xl md:rounded-[2rem] p-6 md:p-8 max-w-[380px] w-full animate-zoom-in transition-all duration-300 ${theme.cardBg} ${theme.accentBorder}`}
       >
         {/* Warning icon */}
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-5" aria-hidden="true">
           <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
             <svg
               width="28"
@@ -41,6 +59,7 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
               strokeLinecap="round"
               strokeLinejoin="round"
               className="text-red-400"
+              aria-hidden="true"
             >
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />
@@ -50,7 +69,10 @@ export const LeaveConfirmModal: React.FC<LeaveConfirmModalProps> = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-white font-cinzel font-bold text-lg md:text-xl text-center mb-2 tracking-wide uppercase">
+        <h3
+          id="leave-modal-title"
+          className="text-white font-cinzel font-bold text-lg md:text-xl text-center mb-2 tracking-wide uppercase"
+        >
           {t.modals.leave.title}
         </h3>
 

@@ -56,8 +56,9 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
         {/* Values and Copy Actions */}
         <div className="grid grid-cols-2 gap-2 mt-1">
           <button
+            type="button"
             onClick={() => handleCopy(hex, `${name} (HEX)`)}
-            className="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:bg-white/10 hover:border-amber-500/30 transition-colors text-left group/btn"
+            className="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:bg-white/10 hover:border-amber-500/30 transition-colors text-left group/btn focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             title="Clique para copiar HEX"
           >
             <span className="text-[11px] font-mono text-white/80 group-hover/btn:text-amber-300 font-medium">
@@ -69,8 +70,9 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
           </button>
 
           <button
+            type="button"
             onClick={() => handleCopy(twClass, `${name} (Classe)`)}
-            className="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:bg-white/10 hover:border-amber-500/30 transition-colors text-left group/btn"
+            className="flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 hover:bg-white/10 hover:border-amber-500/30 transition-colors text-left group/btn focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             title="Clique para copiar Classe Tailwind"
           >
             <span className="text-[10px] font-mono text-white/70 truncate mr-1 group-hover/btn:text-amber-300 font-medium">
@@ -84,8 +86,9 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
 
         {rgb && (
           <button
+            type="button"
             onClick={() => handleCopy(rgb, `${name} (RGB)`)}
-            className="w-full mt-0.5 text-left bg-black/20 hover:bg-black/50 border border-white/5 rounded-lg px-2.5 py-1 text-[10px] font-mono text-white/40 hover:text-white/80 transition-colors flex items-center justify-between"
+            className="w-full mt-0.5 text-left bg-black/20 hover:bg-black/50 border border-white/5 rounded-lg px-2.5 py-1 text-[10px] font-mono text-white/40 hover:text-white/80 transition-colors flex items-center justify-between focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             <span>{rgb}</span>
             <span className="text-[8px] uppercase tracking-wider">RGB</span>

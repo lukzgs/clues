@@ -59,6 +59,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <line x1="5" y1="12" x2="19" y2="12" />
       <polyline points="12 5 19 12 12 19" />
@@ -107,6 +108,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
               className={`w-5 h-5 md:w-6 md:h-6 transition-colors duration-500 ${theme.accentText}`}
             >
               <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -147,11 +149,16 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both',
                 }}
               >
-                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
+                <label
+                  htmlFor="invite-player-name"
+                  className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium"
+                >
                   {t.join.identity}
                 </label>
                 <input
+                  id="invite-player-name"
                   type="text"
+                  autoFocus
                   value={playerName}
                   onChange={(e) => {
                     setPlayerName(e.target.value);
@@ -161,9 +168,8 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     if (e.key === 'Enter') handleJoinRoom();
                   }}
                   placeholder={t.join.namePlaceholder}
-                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
+                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg focus-visible:ring-2 focus-visible:ring-amber-400 ${theme.inputBg}`}
                   maxLength={20}
-                  autoFocus
                 />
 
                 {/* Error floating below input */}
@@ -241,11 +247,16 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both',
                 }}
               >
-                <label className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium">
+                <label
+                  htmlFor="player-name"
+                  className="block text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2 pl-1 font-sans font-medium"
+                >
                   {t.join.identity}
                 </label>
                 <input
+                  id="player-name"
                   type="text"
+                  autoFocus
                   value={playerName}
                   onChange={(e) => {
                     setPlayerName(e.target.value);
@@ -255,9 +266,8 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     if (e.key === 'Enter') handleCreateRoom();
                   }}
                   placeholder={t.join.namePlaceholder}
-                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg ${theme.inputBg}`}
+                  className={`w-full rounded-xl px-4 py-3.5 outline-none ring-1 ring-white/5 transition-all font-cinzel text-lg focus-visible:ring-2 focus-visible:ring-amber-400 ${theme.inputBg}`}
                   maxLength={20}
-                  autoFocus
                 />
 
                 {/* Error floating below input */}
@@ -280,7 +290,10 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                   variant="primary"
                   size="md"
                   icon={
-                    <span className="text-lg leading-none font-sans font-light">
+                    <span
+                      className="text-lg leading-none font-sans font-light"
+                      aria-hidden="true"
+                    >
                       +
                     </span>
                   }
@@ -315,7 +328,11 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both',
                 }}
               >
+                <label htmlFor="room-code-input" className="sr-only">
+                  {t.join.roomIdPlaceholder}
+                </label>
                 <input
+                  id="room-code-input"
                   type="text"
                   value={roomCode}
                   onChange={(e) => {
@@ -326,7 +343,7 @@ export const JoinScreen: React.FC<JoinScreenProps> = ({
                     if (e.key === 'Enter') handleJoinRoom();
                   }}
                   placeholder={t.join.roomIdPlaceholder}
-                  className={`flex-1 rounded-xl px-4 py-3.5 text-lg font-cinzel uppercase outline-none ring-1 ring-white/5 transition-all min-w-0 ${theme.inputBg}`}
+                  className={`flex-1 rounded-xl px-4 py-3.5 text-lg font-cinzel uppercase outline-none ring-1 ring-white/5 transition-all min-w-0 focus-visible:ring-2 focus-visible:ring-amber-400 ${theme.inputBg}`}
                   maxLength={6}
                 />
                 <Button

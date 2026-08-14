@@ -201,9 +201,10 @@ export const VotingView: React.FC<VotingViewProps> = ({
           className={`flex rounded-xl border border-white/10 p-1 backdrop-blur-sm ${theme.innerCardBg}`}
         >
           <button
+            type="button"
             onClick={() => setTableMobileView('row')}
-            className={`p-2 rounded-lg transition-all ${tableMobileView === 'row' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
-            aria-label="Ver em carrossel"
+            className={`p-2 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${tableMobileView === 'row' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
+            aria-label={t.game.viewCarousel}
           >
             <svg
               width="18"
@@ -214,6 +215,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <rect x="9" y="3" width="6" height="18" rx="1" ry="1" />
               <rect x="18" y="5" width="3" height="14" rx="1" ry="1" />
@@ -221,9 +223,10 @@ export const VotingView: React.FC<VotingViewProps> = ({
             </svg>
           </button>
           <button
+            type="button"
             onClick={() => setTableMobileView('grid-2')}
-            className={`p-2 rounded-lg transition-all ${tableMobileView === 'grid-2' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
-            aria-label="Ver 2 por linha"
+            className={`p-2 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${tableMobileView === 'grid-2' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
+            aria-label={t.game.viewGrid2}
           >
             <svg
               width="18"
@@ -234,6 +237,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <rect x="3" y="3" width="7" height="7" rx="1" ry="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" ry="1" />
@@ -242,9 +246,10 @@ export const VotingView: React.FC<VotingViewProps> = ({
             </svg>
           </button>
           <button
+            type="button"
             onClick={() => setTableMobileView('grid-1')}
-            className={`p-2 rounded-lg transition-all ${tableMobileView === 'grid-1' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
-            aria-label="Ver 1 por linha"
+            className={`p-2 rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none ${tableMobileView === 'grid-1' ? theme.accentText : 'text-white/40 hover:text-white/80'}`}
+            aria-label={t.game.viewGrid1}
           >
             <svg
               width="18"
@@ -255,6 +260,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             </svg>
@@ -276,17 +282,13 @@ export const VotingView: React.FC<VotingViewProps> = ({
       >
         {gameState.tableCards.map((tc) => {
           const isSelected = selectedCard === tc.card.id.toString();
+          const canVoteThisCard = !isNarrator && !hasVoted && !tc.isMine;
           return (
             <div
               key={tc.orderId}
-              onClick={() => {
-                if (!isNarrator && !hasVoted && !tc.isMine)
-                  onCardSelect(tc.card.id.toString());
-              }}
               className={`
                 transition-all duration-300 relative group shrink-0
                 ${tableMobileView === 'row' ? 'snap-center snap-always pr-6 md:pr-0 last:pr-0' : ''}
-                ${isNarrator || hasVoted || tc.isMine ? 'cursor-default' : 'cursor-pointer hover:-translate-y-2'}
                 ${isSelected ? 'z-20 scale-[1.02]' : 'z-10'}
                 ${!isMobile || tableMobileView === 'row' ? 'w-[160px] md:w-[calc(20%-1.2rem)] max-w-[224px]' : 'w-full'}
               `}
@@ -303,21 +305,20 @@ export const VotingView: React.FC<VotingViewProps> = ({
                         : 'table'
                 }
                 isSelected={isSelected}
-                disabled={isNarrator || hasVoted || tc.isMine}
+                disabled={!canVoteThisCard}
                 dimWhenDisabled={!tc.isMine}
+                onClick={
+                  canVoteThisCard
+                    ? () => onCardSelect(tc.card.id.toString())
+                    : undefined
+                }
                 className={`
                   ${tc.isMine ? 'ring-2 ring-orange-500/70 shadow-[0_0_12px_rgba(249,115,22,0.25)]' : ''}
-                  ${!isSelected && !isNarrator && !hasVoted && !tc.isMine && 'group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}
+                  ${!isSelected && canVoteThisCard && 'group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]'}
                   ${isSelected ? 'shadow-2xl' : 'shadow-xl'}
                   ${!isMobile || tableMobileView === 'row' ? '!w-full !h-auto aspect-[2/3]' : ''}
                 `}
               />
-              {/* Overlay on selected card */}
-              {isSelected && (!isMobile || tableMobileView !== 'row') && (
-                <div
-                  className={`absolute inset-0 border-4 rounded-2xl md:rounded-[1.75rem] pointer-events-none ${theme.accentBorder}`}
-                ></div>
-              )}
             </div>
           );
         })}
@@ -340,6 +341,7 @@ export const VotingView: React.FC<VotingViewProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="text-green-400"
+                aria-hidden="true"
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>{' '}

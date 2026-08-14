@@ -11,20 +11,10 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
 }) => {
   const { lang, setLang } = useTranslation();
 
-  let accentText = 'text-amber-300';
-  let accentBg = 'bg-amber-500/15';
-  let accentBorder = 'border-amber-500/30';
-
-  try {
-    const { theme } = useTheme();
-    if (theme) {
-      accentText = theme.accentText;
-      accentBg = theme.accentBgLight;
-      accentBorder = theme.accentBorder;
-    }
-  } catch {
-    // Outside ThemeProvider fallback to amber
-  }
+  const { theme } = useTheme();
+  const accentText = theme.accentText;
+  const accentBg = theme.accentBgLight;
+  const accentBorder = theme.accentBorder;
 
   const toggle = () => setLang(lang === 'pt' ? 'en' : 'pt');
 
@@ -33,6 +23,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
 
   return (
     <button
+      type="button"
       onClick={toggle}
       aria-label={lang === 'pt' ? 'Switch to English' : 'Mudar para Português'}
       className={`
@@ -43,6 +34,7 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
         transition-all duration-300
         hover:${accentBorder}
         cursor-pointer select-none
+        focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none
         ${basePosition}
         ${className}
       `}

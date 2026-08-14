@@ -37,65 +37,95 @@ export const GameCard: React.FC<GameCardProps> = ({
     full: 'w-full aspect-[2/3]',
   };
 
-  const isClickable = onClick && !disabled;
+  const isClickable = Boolean(onClick && !disabled);
+
+  const content =
+    isHidden || card.id === -1 ? (
+      // Carta virada (verso)
+      <img
+        src="/cards/new/back_001.avif"
+        alt="Verso da carta"
+        className="w-full h-full object-cover"
+        loading={loading}
+      />
+    ) : (
+      // Carta visível (frente)
+      <>
+        <img
+          src={card.imageUrl}
+          alt={`Carta ${card.id}`}
+          className="w-full h-full object-cover"
+          loading={loading}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/cards/new/back_001.avif';
+          }}
+        />
+        {/* Overlay sutil no topo e base */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
+      </>
+    );
+
+  const sharedClasses = `
+    relative rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300
+    ${sizeClasses[size]}
+    ${
+      isClickable
+        ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] focus-visible:ring-4 focus-visible:ring-amber-400 focus-visible:outline-none focus-visible:scale-105'
+        : ''
+    }
+    ${
+      isSelected
+        ? 'ring-4 ring-amber-400 scale-105 -translate-y-2 shadow-xl shadow-amber-500/30'
+        : ''
+    }
+    ${isHighlighted ? 'ring-4 scale-105 shadow-xl' : ''}
+    ${
+      disabled && dimWhenDisabled
+        ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
+        : disabled && !dimWhenDisabled
+          ? 'cursor-not-allowed'
+          : ''
+    }
+    ${className}
+    shadow-lg
+  `;
+
+  const dynamicStyle =
+    isHighlighted && highlightColor
+      ? ({ '--tw-ring-color': highlightColor } as React.CSSProperties)
+      : undefined;
+
+  if (isClickable) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={
+          isHidden || card.id === -1
+            ? 'Carta virada'
+            : isSelected
+              ? `Carta ${card.id}, selecionada`
+              : `Selecionar carta ${card.id}`
+        }
+        aria-pressed={isSelected}
+        className={`${sharedClasses} text-left p-0 border-0 bg-transparent block`}
+        style={dynamicStyle}
+      >
+        {content}
+      </button>
+    );
+  }
 
   return (
     <div
-      onClick={isClickable ? onClick : undefined}
-      className={`
-        relative rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300
-        ${sizeClasses[size]}
-        ${
-          isClickable
-            ? 'cursor-pointer hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(99,102,241,0.4)]'
-            : ''
-        }
-        ${
-          isSelected
-            ? 'ring-4 ring-amber-400 scale-105 -translate-y-2 shadow-xl shadow-amber-500/30'
-            : ''
-        }
-        ${isHighlighted ? 'ring-4 scale-105 shadow-xl' : ''}
-        ${
-          disabled && dimWhenDisabled
-            ? 'opacity-50 cursor-not-allowed grayscale-[30%]'
-            : disabled && !dimWhenDisabled
-              ? 'cursor-not-allowed'
-              : ''
-        }
-        ${className}
-        shadow-lg
-      `}
-      style={
-        isHighlighted && highlightColor
-          ? ({ '--tw-ring-color': highlightColor } as React.CSSProperties)
-          : undefined
+      role="img"
+      aria-label={
+        isHidden || card.id === -1 ? 'Carta virada' : `Carta ${card.id}`
       }
+      className={sharedClasses}
+      style={dynamicStyle}
     >
-      {isHidden || card.id === -1 ? (
-        // Carta virada (verso)
-        <img
-          src="/cards/new/back_001.avif"
-          alt="Card back"
-          className="w-full h-full object-cover"
-          loading={loading}
-        />
-      ) : (
-        // Carta visível (frente)
-        <>
-          <img
-            src={card.imageUrl}
-            alt={`Card ${card.id}`}
-            className="w-full h-full object-cover"
-            loading={loading}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/cards/new/back_001.avif';
-            }}
-          />
-          {/* Overlay sutil no topo e base */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
-        </>
-      )}
+      {content}
     </div>
   );
 };
