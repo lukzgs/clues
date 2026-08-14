@@ -122,13 +122,8 @@ describe('ResultsView', () => {
     );
 
     // p2 (Player2) and p3 (Player3) voted for the first card.
-    // They are rendered as circles with their first initial 'P'.
-    const voterInitials = screen.getAllByText('P');
-    expect(voterInitials.length).toBeGreaterThanOrEqual(2);
-
-    // Specifically verify titles
-    expect(screen.getByTitle('Player2 votou aqui')).toBeInTheDocument();
-    expect(screen.getByTitle('Player3 votou aqui')).toBeInTheDocument();
+    expect(screen.getByTitle('Player2 votou nesta carta')).toBeInTheDocument();
+    expect(screen.getByTitle('Player3 votou nesta carta')).toBeInTheDocument();
   });
 
   it('calls onNextRound when clicking the next round button', async () => {
@@ -146,5 +141,25 @@ describe('ResultsView', () => {
     const nextBtn = screen.getByRole('button', { name: /Next Round/i });
     await userEvent.click(nextBtn);
     expect(onNextRound).toHaveBeenCalled();
+  });
+
+  it('triggers mobile score modal opener when provided', async () => {
+    const gameState = createMockGameState();
+    const setIsMobileScoreOpen = vi.fn();
+    renderWithProviders(
+      <ResultsView
+        gameState={gameState}
+        playerId="p1"
+        onNextRound={vi.fn()}
+        onLeaveRoom={vi.fn()}
+        setIsMobileScoreOpen={setIsMobileScoreOpen}
+      />,
+    );
+
+    const scoreBtn = screen.getByRole('button', {
+      name: /Current Score|Pontuação Atual/i,
+    });
+    await userEvent.click(scoreBtn);
+    expect(setIsMobileScoreOpen).toHaveBeenCalledWith(true);
   });
 });

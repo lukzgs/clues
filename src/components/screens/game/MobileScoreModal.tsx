@@ -1,4 +1,4 @@
-import type React from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from '../../../i18n/index.tsx';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { GamePhase, type GameState, type Player } from '../../../types';
@@ -26,6 +26,19 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (!isMobileScoreOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsMobileScoreOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileScoreOpen, setIsMobileScoreOpen]);
+
   if (!isMobileScoreOpen) return null;
 
   const activePlayers = gameState.players
@@ -34,16 +47,25 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
   const spectators = gameState.players.filter((p) => p.isSpectator);
 
   return (
-    <div className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-auto">
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mobile-score-title"
+      className="lg:hidden fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-auto"
+    >
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label={t.common.closeModal}
         onClick={() => setIsMobileScoreOpen(false)}
-      ></div>
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-default focus:outline-none w-full h-full border-none p-0"
+      />
       <div
-        className={`backdrop-blur-2xl border ring-1 ring-white/10 rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col relative shadow-2xl animate-in fade-in zoom-in-95 duration-200 transition-all ${theme.cardBg} ${theme.accentBorder}`}
+        className={`backdrop-blur-2xl border ring-1 ring-white/10 rounded-3xl w-full max-w-md max-h-[85vh] flex flex-col relative z-10 shadow-2xl animate-in fade-in zoom-in-95 duration-200 transition-all ${theme.cardBg} ${theme.accentBorder}`}
       >
         <div className="flex items-center justify-between p-5 border-b border-white/10 shrink-0">
           <h2
+            id="mobile-score-title"
             className={`font-cinzel font-bold text-lg tracking-widest uppercase flex items-center gap-2 ${theme.accentText}`}
           >
             <svg
@@ -55,6 +77,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -64,8 +87,10 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
             {t.lobby.players}
           </h2>
           <button
+            type="button"
             onClick={() => setIsMobileScoreOpen(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label={t.common.close}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             <svg
               width="18"
@@ -76,6 +101,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -127,6 +153,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
+                          aria-hidden="true"
                         >
                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                         </svg>
@@ -173,15 +200,25 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                         {voted ? 'VOTOU' : 'VOTANDO'}
                       </div>
                     )}
+                    {gameState.phase === GamePhase.RESULTS && (
+                      <div
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${(gameState.playersWhoReadied ?? []).includes(player.id) ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-white/30 border border-white/10'}`}
+                      >
+                        {(gameState.playersWhoReadied ?? []).includes(player.id)
+                          ? 'PRONTO'
+                          : 'AGUARDANDO'}
+                      </div>
+                    )}
                   </div>
                   {/* Host kick action */}
                   {isHost &&
                     player.id !== currentPlayer?.id &&
                     onKickPlayer && (
                       <button
+                        type="button"
                         onClick={() => onKickPlayer(player.id)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-white/20 hover:text-red-400 hover:bg-red-500/20 transition-colors ml-1"
-                        title="Remove player"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-white/20 hover:text-red-400 hover:bg-red-500/20 transition-colors ml-1 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+                        aria-label={`Remover ${player.name}`}
                       >
                         <svg
                           width="16"
@@ -192,6 +229,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
+                          aria-hidden="true"
                         >
                           <line x1="18" y1="6" x2="6" y2="18"></line>
                           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -215,6 +253,7 @@ export const MobileScoreModal: React.FC<MobileScoreModalProps> = ({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>

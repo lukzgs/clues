@@ -26,32 +26,6 @@ const GameRouter: React.FC = () => {
   const { theme } = useTheme();
   const { addToast } = useToast();
 
-  // Verifica se o usuario acessou /design-system ou /sysd
-  const [isDesignSystem, setIsDesignSystem] = useState(() => {
-    const path = window.location.pathname.toLowerCase();
-    return path === '/design-system' || path === '/sysd';
-  });
-
-  useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname.toLowerCase();
-      setIsDesignSystem(path === '/design-system' || path === '/sysd');
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  if (isDesignSystem) {
-    return (
-      <DesignSystemScreen
-        onBackToApp={() => {
-          window.history.pushState({}, '', '/');
-          setIsDesignSystem(false);
-        }}
-      />
-    );
-  }
-
   const {
     gameState,
     playerId,
@@ -210,6 +184,7 @@ const GameRouter: React.FC = () => {
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
                 className={`md:w-5 md:h-5 transition-colors duration-300 ${theme.accentText}`}
               >
                 <path d="M2 4l3 11h14l3-11-5 4-5-5-5 5z" />
@@ -237,8 +212,9 @@ const GameRouter: React.FC = () => {
               className={`mt-5 md:mt-6 w-full text-center transition-all duration-300 ${error ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
             >
               <button
+                type="button"
                 onClick={() => clearSession()}
-                className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors"
+                className="text-white/30 hover:text-white/60 text-[10px] uppercase tracking-widest font-sans font-bold transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
               >
                 {t.connecting.back}
               </button>
@@ -283,13 +259,44 @@ const GameRouter: React.FC = () => {
   );
 };
 
+const MainApp: React.FC = () => {
+  const [isDesignSystem, setIsDesignSystem] = useState(() => {
+    const path = window.location.pathname.toLowerCase();
+    return path === '/design-system' || path === '/sysd';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      setIsDesignSystem(path === '/design-system' || path === '/sysd');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  if (isDesignSystem) {
+    return (
+      <DesignSystemScreen
+        onBackToApp={() => {
+          window.history.pushState({}, '', '/');
+          setIsDesignSystem(false);
+        }}
+      />
+    );
+  }
+
+  return (
+    <GameSessionProvider>
+      <GameRouter />
+    </GameSessionProvider>
+  );
+};
+
 const App: React.FC = () => {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <GameSessionProvider>
-          <GameRouter />
-        </GameSessionProvider>
+        <MainApp />
       </ToastProvider>
     </ThemeProvider>
   );

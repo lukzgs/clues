@@ -47,6 +47,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden="true"
           >
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -101,6 +102,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                         height="12"
                         viewBox="0 0 24 24"
                         fill="currentColor"
+                        aria-hidden="true"
                       >
                         <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
                       </svg>
@@ -121,6 +123,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                         strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        aria-hidden="true"
                       >
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
@@ -149,9 +152,10 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 {/* Host kick action */}
                 {isHost && !isCurrent && onKickPlayer && (
                   <button
+                    type="button"
                     onClick={() => onKickPlayer(player.id)}
-                    className="w-6 h-6 flex items-center justify-center rounded-lg text-white/10 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
-                    title="Remover jogador"
+                    className="w-6 h-6 flex items-center justify-center rounded-lg text-white/10 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+                    aria-label={`Remover ${player.name}`}
                   >
                     <svg
                       width="12"
@@ -162,6 +166,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      aria-hidden="true"
                     >
                       <line x1="18" y1="6" x2="6" y2="18"></line>
                       <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -174,21 +179,32 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                   !isNarrator) ||
                   (gameState.phase === GamePhase.VOTING && !isNarrator) ||
                   (gameState.phase === GamePhase.NARRATOR_CHOOSING &&
-                    isNarrator)) && (
+                    isNarrator) ||
+                  gameState.phase === GamePhase.RESULTS) && (
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-all duration-300 ${
                       (
-                        gameState.phase === GamePhase.OTHERS_CHOOSING ||
-                          gameState.phase === GamePhase.NARRATOR_CHOOSING
-                      ) && chosen
+                        gameState.phase === GamePhase.RESULTS &&
+                          (gameState.playersWhoReadied ?? []).includes(
+                            player.id,
+                          )
+                      ) ||
+                      (
+                        (gameState.phase === GamePhase.OTHERS_CHOOSING ||
+                          gameState.phase === GamePhase.NARRATOR_CHOOSING) &&
+                          chosen
+                      )
                         ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                        : (gameState.phase === GamePhase.VOTING && voted)
+                        : gameState.phase === GamePhase.VOTING && voted
                           ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
                           : 'bg-black/40 text-white/15 border-white/5'
                     }`}
                   >
-                    {(gameState.phase === GamePhase.OTHERS_CHOOSING &&
-                      chosen) ||
+                    {(gameState.phase === GamePhase.RESULTS &&
+                      (gameState.playersWhoReadied ?? []).includes(
+                        player.id,
+                      )) ||
+                    (gameState.phase === GamePhase.OTHERS_CHOOSING && chosen) ||
                     (gameState.phase === GamePhase.VOTING && voted) ||
                     (gameState.phase === GamePhase.NARRATOR_CHOOSING &&
                       chosen) ? (
@@ -201,6 +217,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                         strokeWidth="4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        aria-hidden="true"
                       >
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
@@ -226,6 +243,7 @@ export const PlayerSidebar: React.FC<PlayerSidebarProps> = ({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>

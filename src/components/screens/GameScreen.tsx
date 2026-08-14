@@ -201,49 +201,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     onLeaveRoom();
   };
 
-  if (gameState.phase === GamePhase.RESULTS) {
-    return (
-      <div
-        style={{ backgroundColor: theme.bgCanvas }}
-        className="flex flex-col h-[100dvh] w-full overflow-hidden relative text-white z-0 transition-colors duration-500"
-      >
-        <div
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 50% 0%, #1a1a1a, transparent 70%)',
-          }}
-        />
-        <div
-          className={`fixed top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none z-0 transition-all duration-700 ${theme.ambientOrb}`}
-        />
-
-        <GameHeader
-          roomCode={gameState.roomCode}
-          onLeaveRoom={() => setShowLeaveConfirm(true)}
-          phaseLabel={t.game.phaseLabelResults}
-        />
-        <div className="flex-1 flex flex-col min-h-0 w-full p-3 md:p-4 overflow-hidden">
-          <ResultsView
-            gameState={gameState}
-            playerId={playerId}
-            onNextRound={onNextRound}
-            onLeaveRoom={() => setShowLeaveConfirm(true)}
-            onKickPlayer={onKickPlayer}
-            isHost={isHost}
-          />
-        </div>
-
-        {showLeaveConfirm && (
-          <LeaveConfirmModal
-            onConfirm={handleLeaveConfirm}
-            onCancel={() => setShowLeaveConfirm(false)}
-          />
-        )}
-      </div>
-    );
-  }
-
   if (gameState.phase === GamePhase.GAME_OVER) {
     return (
       <div
@@ -330,6 +287,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
@@ -389,6 +347,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
                     tableMobileView={tableMobileView}
                     setTableMobileView={setTableMobileView}
                     isHost={isHost}
+                  />
+                )}
+
+                {gameState.phase === GamePhase.RESULTS && (
+                  <ResultsView
+                    gameState={gameState}
+                    playerId={playerId}
+                    onNextRound={onNextRound}
+                    onLeaveRoom={() => setShowLeaveConfirm(true)}
+                    onKickPlayer={onKickPlayer}
+                    isHost={isHost}
+                    setIsMobileScoreOpen={setShowScoreModal}
                   />
                 )}
               </div>
