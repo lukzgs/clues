@@ -355,6 +355,8 @@ export function handleRestartGame(server: GameServer, playerId: string) {
   const player = server.state.players.find((p) => p.id === playerId);
   if (!player?.isHost) return;
 
+  server.cancelPhaseTimer();
+
   // [SPECTATOR] Mantém jogadores e preserva status de spectator
   const players = server.state.players.map((p) => ({
     ...p,

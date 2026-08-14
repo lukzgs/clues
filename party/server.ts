@@ -2,18 +2,14 @@ import type * as Party from 'partykit/server';
 import GAME_CONFIG from '../game.config.json';
 import { ClientMessageSchema } from '../src/schemas';
 import {
-  Card,
-  ClientMessageType,
   type DeckOption,
   GamePhase,
   type GameState,
-  Player,
   type ServerGameState,
   ServerMessageType,
-  TableCard,
 } from '../src/types';
 import { calculateMaxPlayers } from '../src/utils/gameMath';
-import { BotManager } from './bots';
+import { BotManager, generateClue } from './bots';
 import { getPublicState } from './game-logic';
 import { handleVoteKickAfk } from './handlers/afk';
 import { handleAddBot, handleRemoveBot } from './handlers/bot';
@@ -64,6 +60,9 @@ export default class GameServer implements Party.Server {
   // Rate limiting: connectionId -> { count, windowStart }
   private rateLimitData: Map<string, { count: number; windowStart: number }> =
     new Map();
+
+  // Temporizador de avanço de fase por timeout
+  private phaseTimer: NodeJS.Timeout | null = null;
 
   constructor(readonly room: Party.Room) {
     this.state = this.createInitialState();
@@ -485,12 +484,125 @@ export default class GameServer implements Party.Server {
   }
 
   public changePhase(newPhase: GamePhase) {
+    this.cancelPhaseTimer();
     this.botManager?.cancelAllTimeouts();
     this.state.phase = newPhase;
     this.state.phaseStartTime = Date.now();
     this.state.afkKickVotes = [];
     this.state.playersWhoReadied = [];
     this.notifyRegistry();
+    this.startPhaseTimer(newPhase);
+  }
+
+  public startPhaseTimer(phase: GamePhase) {
+    this.cancelPhaseTimer();
+    if (!this.state.timerEnabled) return;
+    if (phase === GamePhase.LOBBY || phase === GamePhase.GAME_OVER) return;
+
+    let timeoutSeconds = 0;
+    if (phase === GamePhase.NARRATOR_CHOOSING) {
+      timeoutSeconds = this.state.phaseTimeouts?.narrator ?? 60;
+    } else if (phase === GamePhase.OTHERS_CHOOSING) {
+      timeoutSeconds = this.state.phaseTimeouts?.othersChoosing ?? 45;
+    } else if (phase === GamePhase.VOTING) {
+      timeoutSeconds = this.state.phaseTimeouts?.voting ?? 30;
+    } else if (phase === GamePhase.RESULTS) {
+      timeoutSeconds = this.state.phaseTimeouts?.results ?? 15;
+    }
+
+    if (timeoutSeconds > 0) {
+      this.phaseTimer = setTimeout(() => {
+        this.handlePhaseTimeout(phase);
+      }, timeoutSeconds * 1000);
+    }
+  }
+
+  public cancelPhaseTimer() {
+    if (this.phaseTimer) {
+      clearTimeout(this.phaseTimer);
+      this.phaseTimer = null;
+    }
+  }
+
+  public handlePhaseTimeout(phase: GamePhase) {
+    if (this.state.phase !== phase || !this.state.timerEnabled) return;
+
+    switch (phase) {
+      case GamePhase.NARRATOR_CHOOSING: {
+        const narrator = this.state.players[this.state.narratorIndex];
+        if (narrator && narrator.hand && narrator.hand.length > 0) {
+          const randomCard =
+            narrator.hand[Math.floor(Math.random() * narrator.hand.length)];
+          const clue = generateClue();
+          handleSubmitClue(this, narrator.id, randomCard.id, clue);
+        }
+        break;
+      }
+
+      case GamePhase.OTHERS_CHOOSING: {
+        const narrator = this.state.players[this.state.narratorIndex];
+        const afkPlayers = this.state.players.filter(
+          (p) =>
+            !p.isSpectator &&
+            p.id !== narrator?.id &&
+            !this.state.tableCards.some((tc) => tc.playerId === p.id),
+        );
+
+        for (const p of afkPlayers) {
+          if (p.hand && p.hand.length > 0) {
+            const randomCard =
+              p.hand[Math.floor(Math.random() * p.hand.length)];
+            handlePlayCard(this, p.id, randomCard.id);
+          }
+        }
+        break;
+      }
+
+      case GamePhase.VOTING: {
+        const narrator = this.state.players[this.state.narratorIndex];
+        const afkVoters = this.state.players.filter(
+          (p) =>
+            !p.isSpectator &&
+            p.id !== narrator?.id &&
+            this.state.votes[p.id] === undefined,
+        );
+
+        for (const p of afkVoters) {
+          const validCards = this.state.tableCards.filter(
+            (tc) => tc.playerId !== p.id,
+          );
+          if (validCards.length > 0) {
+            const chosenCard =
+              validCards[Math.floor(Math.random() * validCards.length)];
+            handleVote(this, p.id, chosenCard.orderId);
+          }
+        }
+        break;
+      }
+
+      case GamePhase.RESULTS: {
+        const hostOrFirst =
+          this.state.players.find((p) => p.isHost && !p.isSpectator) ||
+          this.state.players.find((p) => !p.isSpectator) ||
+          this.state.players[0];
+
+        if (hostOrFirst) {
+          this.state.players.forEach((p) => {
+            if (
+              !p.isSpectator &&
+              !this.state.playersWhoReadied.includes(p.id)
+            ) {
+              this.state.playersWhoReadied.push(p.id);
+            }
+          });
+          handleNextRound(this, hostOrFirst.id);
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
   }
 
   // ============================================

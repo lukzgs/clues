@@ -369,7 +369,9 @@ Exemplos:
   // Graceful shutdown
   process.on('SIGINT', () => {
     console.log('\n\nEncerrando bots...');
-    bots.forEach((bot) => bot.disconnect());
+    bots.forEach((bot) => {
+      bot.disconnect();
+    });
     process.exit(0);
   });
 }
