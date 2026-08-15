@@ -77,7 +77,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           </p>
           {narrator && (
             <span
-              className={`text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}
+              className={`text-[9px] px-2.5 py-0.5 rounded-full uppercase tracking-wider font-cinzel font-bold border ${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}`}
             >
               {narrator.name}
             </span>
@@ -204,7 +204,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
               >
                 {/* Card Owner Pill */}
                 <div
-                  className={`px-3 py-1.5 z-10 w-full text-center truncate rounded-full text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg border transition-all ${
+                  className={`px-3 py-1.5 z-10 w-full text-center truncate rounded-full text-xs uppercase tracking-widest font-cinzel font-bold flex items-center justify-center gap-2 shadow-lg border transition-all ${
                     isNarratorCard
                       ? `${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder} ring-1 ring-current/20`
                       : `${theme.innerCardBg} text-white/75 border-white/10`
@@ -214,7 +214,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                     className="w-2.5 h-2.5 rounded-full shadow-inner shrink-0"
                     style={{ backgroundColor: owner?.color }}
                   />
-                  <span className="truncate">{owner?.name}</span>
+                  <span className="truncate tracking-wider">{owner?.name}</span>
                   {isNarratorCard && (
                     <svg
                       width="12"
@@ -254,17 +254,17 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
                         voter && (
                           <div
                             key={voter.id}
-                            className="px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[11px] font-bold text-white shadow-md border border-white/20 transition-transform hover:scale-105"
+                            className="px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[11px] font-cinzel font-bold text-white shadow-md border border-white/20 transition-transform hover:scale-105"
                             style={{ backgroundColor: voter.color }}
                             title={`${voter.name} votou nesta carta`}
                           >
-                            <span>{voter.name}</span>
+                            <span className="tracking-wide">{voter.name}</span>
                           </div>
                         ),
                     )
                   ) : (
-                    <span className="text-[10px] text-white/20 uppercase tracking-widest font-sans font-medium">
-                      0 votos
+                    <span className="text-[10px] text-white/30 uppercase tracking-widest font-cinzel font-semibold">
+                      0 {t.results.votes || 'votos'}
                     </span>
                   )}
                 </div>

@@ -738,14 +738,14 @@ export const LayoutMockupsSection: React.FC = () => {
                     ].map((c, i) => (
                       <div key={i} className="flex flex-col items-center gap-2">
                         <div
-                          className={`px-2 py-1 rounded-full text-[10px] font-bold border truncate w-full text-center ${c.isNarrator ? `${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}` : 'bg-black/30 text-white/60 border-white/10'}`}
+                          className={`px-2 py-1 rounded-full text-[10px] font-cinzel font-bold border truncate w-full text-center ${c.isNarrator ? `${theme.accentBgLight} ${theme.accentText} ${theme.accentBorder}` : 'bg-black/30 text-white/60 border-white/10'}`}
                         >
                           {c.owner}
                         </div>
                         <div
                           className={`h-40 w-full rounded-xl border p-2 flex flex-col justify-end ${c.isNarrator ? `ring-2 ${theme.accentBorder} bg-amber-950/20` : 'border-white/10 bg-black/40'}`}
                         >
-                          <span className="text-[10px] text-white/40 text-center">
+                          <span className="text-[10px] text-white/40 text-center font-sans">
                             Carta {i + 1}
                           </span>
                         </div>
@@ -754,13 +754,13 @@ export const LayoutMockupsSection: React.FC = () => {
                             c.votes.map((v, vi) => (
                               <span
                                 key={vi}
-                                className="text-[9px] bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded-full border border-blue-400/20 font-bold"
+                                className="text-[9px] bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded-full border border-blue-400/20 font-cinzel font-bold"
                               >
                                 {v}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[9px] text-white/20">
+                            <span className="text-[9px] text-white/20 font-cinzel font-semibold">
                               0 votos
                             </span>
                           )}

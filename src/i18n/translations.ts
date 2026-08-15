@@ -128,6 +128,7 @@ export const translations = {
       layoutOptionB: 'Option B: Integrated',
       layoutSwitch: 'Results Layout',
       narratorCard: 'Narrator Card',
+      votes: 'votes',
     },
     gameOver: {
       title: 'Game Over!',
@@ -333,6 +334,7 @@ export const translations = {
       layoutOptionB: 'Opção B: Integrada',
       layoutSwitch: 'Layout de Resultados',
       narratorCard: 'Carta do Narrador',
+      votes: 'votos',
     },
     gameOver: {
       title: 'Fim de Jogo!',
