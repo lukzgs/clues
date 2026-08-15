@@ -58,6 +58,15 @@ Single source of truth for all buttons in the application, directly mirroring th
 
 ---
 
+## Branding & Visual Assets
+
+### `public/favicon.svg`
+The browser tab icon uses a dedicated, scalable SVG logo:
+- Circular dark obsidian base with a polished gold rim and subtle ambient luminescence.
+- Replicates the crown emblem from the home screen with balanced optical centering and rounded vector stroke joins.
+
+---
+
 ## Design System & Showcase Page
 
 ### `DesignSystemScreen` (`src/components/design-system/DesignSystemScreen.tsx`)

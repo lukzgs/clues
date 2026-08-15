@@ -58,6 +58,15 @@ Fonte única da verdade para todos os botões da aplicação, espelhando diretam
 
 ---
 
+## Identidade Visual & Assets
+
+### `public/favicon.svg`
+O ícone da aba do navegador utiliza um logo vetorial SVG escalável:
+- Base circular escura (obsidiana) com aro dourado polido e iluminação ambiente sutil.
+- Replica a coroa da tela inicial com centralização óptica equilibrada e extremidades arredondadas.
+
+---
+
 ## Design System & Showcase Page
 
 ### `DesignSystemScreen` (`src/components/design-system/DesignSystemScreen.tsx`)
