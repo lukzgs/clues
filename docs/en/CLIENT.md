@@ -177,6 +177,11 @@ The client stores connection state inside `localStorage` (key: `story-weaver:act
 When the app reloads, it automatically bypasses the `JoinScreen`, injects the `reconnectId`, and immediately resumes the player's active state.
 If a user accesses the page with an invite query parameter (`?room=XXXX`) that differs from the stored session, the stored session is ignored and cleared to avoid conflicts.
 
+### Toast Notification & Connection Lifecycle
+- **Direct Messaging**: Toasts omit redundant category titles and state the event or error directly.
+- **Connection Guard**: Reconnection alerts only trigger after a player has successfully connected to an active room session (`hasConnectedOnceRef`), preventing false alarms on initial app launch.
+- **Typography & Alignment**: Standardized with `font-sans` (`Inter`) for crisp body text and vertically centered status icons.
+
 | Prop | Type | Description |
 |------|------|-------------|
 | `gameState` | `GameState` | Current game state |

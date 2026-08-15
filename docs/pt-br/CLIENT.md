@@ -188,6 +188,11 @@ O frontend salva os dados essenciais providos pelo backend no `localStorage` (so
 Em caso de recarregamento ou reabertura, se este dado for encontrado na inicialização via AppState, a tela de entrada é contornada e o usuário se reconecta imediatamente enviando este UUID ao invés de buscar por uma nova inscrição via "Nome".
 Se um jogador acessar a página com o parâmetro de convite (`?room=XXXX`) diferente da sessão salva no `localStorage`, a sessão antiga é ignorada e limpa para evitar conflitos.
 
+### Notificações Toast & Ciclo de Conexão
+- **Mensagens Diretas**: Os toasts omitem títulos de categorias redundantes e informam diretamente o evento ou erro.
+- **Proteção de Reconexão**: Alertas de queda de rede só são ativados após uma conexão bem-sucedida em sala ativa (`hasConnectedOnceRef`), evitando falsos positivos ao abrir o jogo ou na tela inicial.
+- **Tipografia e Alinhamento**: Padronizado com `font-sans` (`Inter`) para legibilidade e ícones de status centralizados verticalmente.
+
 | Prop | Tipo | Descrição |
 |------|------|-----------|
 | `gameState` | `GameState` | Estado atual do jogo |
