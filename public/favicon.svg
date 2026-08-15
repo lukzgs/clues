@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Circular Background Gradients -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#2A1C0A" />
+      <stop offset="60%" stop-color="#0E0A05" />
+      <stop offset="100%" stop-color="#050403" />
+    </radialGradient>
+
+    <radialGradient id="ambientGlow" cx="50%" cy="52%" r="50%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.45" />
+      <stop offset="60%" stop-color="#D97706" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Golden Border Gradient -->
+    <linearGradient id="goldRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5D6" />
+      <stop offset="30%" stop-color="#FCD34D" />
+      <stop offset="70%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+
+    <!-- Golden Stroke Gradient -->
+    <linearGradient id="goldCrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="25%" stop-color="#FDE68A" />
+      <stop offset="65%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <!-- Symmetrical Glow and Shadow -->
+    <filter id="crownGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="10" flood-color="#000000" flood-opacity="0.75" />
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#F59E0B" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Circular Base (Perfect Round Container centered at 256, 256) -->
+  <circle
+    cx="256"
+    cy="256"
+    r="230"
+    fill="url(#bgGrad)"
+    stroke="url(#goldRim)"
+    stroke-width="14"
+  />
+
+  <!-- Subtle Inner Dotted Ring centered at 256, 256 -->
+  <circle
+    cx="256"
+    cy="256"
+    r="208"
+    fill="none"
+    stroke="#F59E0B"
+    stroke-width="2"
+    stroke-opacity="0.25"
+    stroke-dasharray="8 6"
+  />
+
+  <!-- Ambient Glow -->
+  <circle cx="256" cy="265" r="160" fill="url(#ambientGlow)" />
+
+  <!-- Crown Icon (Optically Centered with Downward Weight Balance) -->
+  <g filter="url(#crownGlow)">
+    <!-- Crown Body -->
+    <path
+      d="M 126 183
+         L 165 326
+         H 347
+         L 386 183
+         L 321 235
+         L 256 170
+         L 191 235
+         Z"
+      fill="url(#goldCrown)"
+      fill-opacity="0.18"
+      stroke="url(#goldCrown)"
+      stroke-width="22"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <!-- Base Line -->
+    <line
+      x1="126"
+      y1="378"
+      x2="386"
+      y2="378"
+      stroke="url(#goldCrown)"
+      stroke-width="22"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>
