@@ -255,11 +255,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
             <button
               type="button"
               onClick={() =>
-                handleTrigger(
-                  'success',
-                  'Conexão estabelecida com sucesso!',
-                  'Conexão',
-                )
+                handleTrigger('success', 'Conexão restabelecida com sucesso!')
               }
               className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-emerald-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             >
@@ -272,7 +268,6 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 handleTrigger(
                   'warning',
                   'A sala fechará por inatividade em 2:00 minutos.',
-                  'Inatividade da Sala',
                 )
               }
               className="bg-amber-950/40 border border-amber-500/40 text-amber-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-amber-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
@@ -286,7 +281,6 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 handleTrigger(
                   'error',
                   'Código de sala inválido ou inexistente.',
-                  'Erro do Servidor',
                 )
               }
               className="bg-red-950/40 border border-red-500/40 text-red-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-red-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
@@ -297,11 +291,7 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
             <button
               type="button"
               onClick={() =>
-                handleTrigger(
-                  'info',
-                  'Você é o narrador desta rodada!',
-                  'Informação',
-                )
+                handleTrigger('info', 'Você é o narrador desta rodada!')
               }
               className="bg-sky-950/40 border border-sky-500/40 text-sky-300 font-cinzel font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-sky-900/60 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
             >
@@ -328,8 +318,8 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Success Toast */}
-          <div className="bg-emerald-950/90 border border-emerald-500/40 text-emerald-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
+          <div className="bg-emerald-950/90 border border-emerald-500/40 text-emerald-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <svg
                 width="18"
                 height="18"
@@ -339,27 +329,22 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-emerald-400 shrink-0 mt-0.5"
+                className="text-emerald-400 shrink-0"
                 aria-hidden="true"
               >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
-              <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-emerald-300">
-                  Conexão
-                </h4>
-                <p className="text-xs font-sans font-medium mt-0.5">
-                  Conectado ao servidor!
-                </p>
-              </div>
+              <p className="text-xs sm:text-sm font-sans font-medium text-white/95 leading-snug">
+                Conexão restabelecida!
+              </p>
             </div>
-            <span className="opacity-40 text-xs">✕</span>
+            <span className="text-white/40 text-xs shrink-0">✕</span>
           </div>
 
           {/* Warning Toast */}
-          <div className="bg-amber-950/90 border border-amber-500/40 text-amber-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
+          <div className="bg-amber-950/90 border border-amber-500/40 text-amber-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <svg
                 width="18"
                 height="18"
@@ -369,28 +354,23 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-amber-400 shrink-0 mt-0.5"
+                className="text-amber-400 shrink-0"
                 aria-hidden="true"
               >
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
-              <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-amber-300">
-                  Inatividade
-                </h4>
-                <p className="text-xs font-sans font-medium mt-0.5">
-                  A sala fechará em breve.
-                </p>
-              </div>
+              <p className="text-xs sm:text-sm font-sans font-medium text-white/95 leading-snug">
+                Conexão perdida. Reconectando...
+              </p>
             </div>
-            <span className="opacity-40 text-xs">✕</span>
+            <span className="text-white/40 text-xs shrink-0">✕</span>
           </div>
 
           {/* Error Toast */}
-          <div className="bg-red-950/90 border border-red-500/40 text-red-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
+          <div className="bg-red-950/90 border border-red-500/40 text-red-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <svg
                 width="18"
                 height="18"
@@ -400,28 +380,23 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-red-400 shrink-0 mt-0.5"
+                className="text-red-400 shrink-0"
                 aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="15" y1="9" x2="9" y2="15" />
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
-              <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-red-300">
-                  Servidor
-                </h4>
-                <p className="text-xs font-sans font-medium mt-0.5">
-                  Erro na ação da sala.
-                </p>
-              </div>
+              <p className="text-xs sm:text-sm font-sans font-medium text-white/95 leading-snug">
+                Código de sala inválido.
+              </p>
             </div>
-            <span className="opacity-40 text-xs">✕</span>
+            <span className="text-white/40 text-xs shrink-0">✕</span>
           </div>
 
           {/* Info Toast */}
-          <div className="bg-sky-950/90 border border-sky-500/40 text-sky-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
+          <div className="bg-sky-950/90 border border-sky-500/40 text-sky-100 p-4 rounded-xl backdrop-blur-xl shadow-lg flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <svg
                 width="18"
                 height="18"
@@ -431,23 +406,18 @@ export const FeedbackSection: React.FC<FeedbackSectionProps> = () => {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-sky-400 shrink-0 mt-0.5"
+                className="text-sky-400 shrink-0"
                 aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
-              <div>
-                <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider text-sky-300">
-                  Informação
-                </h4>
-                <p className="text-xs font-sans font-medium mt-0.5">
-                  Sua vez como narrador!
-                </p>
-              </div>
+              <p className="text-xs sm:text-sm font-sans font-medium text-white/95 leading-snug">
+                Você é o narrador desta rodada!
+              </p>
             </div>
-            <span className="opacity-40 text-xs">✕</span>
+            <span className="text-white/40 text-xs shrink-0">✕</span>
           </div>
         </div>
       </div>

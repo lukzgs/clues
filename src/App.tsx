@@ -52,22 +52,32 @@ const GameRouter: React.FC = () => {
     playerName: session?.playerName || null,
   });
 
-  // Connection & Reconnection Toasts (apenas se houve queda prévia)
+  // Connection & Reconnection Toasts (apenas se houve queda após conexão prévia)
+  const hasConnectedOnceRef = React.useRef(false);
   const wasDisconnectedRef = React.useRef(false);
 
   useEffect(() => {
+    if (!session?.roomCode || !session?.playerName) {
+      hasConnectedOnceRef.current = false;
+      wasDisconnectedRef.current = false;
+      return;
+    }
+
     let timer: NodeJS.Timeout;
 
     if (isConnected) {
+      hasConnectedOnceRef.current = true;
       if (wasDisconnectedRef.current) {
-        addToast('success', t.connecting.reconnected, 'Conexão', 3500);
+        addToast('success', t.connecting.reconnected, undefined, 3500);
         wasDisconnectedRef.current = false;
       }
-    } else {
+    } else if (hasConnectedOnceRef.current) {
       timer = setTimeout(() => {
-        wasDisconnectedRef.current = true;
-        addToast('warning', t.connecting.lostConnection, 'Conexão', 0);
-      }, 1200);
+        if (!isConnected && hasConnectedOnceRef.current) {
+          wasDisconnectedRef.current = true;
+          addToast('warning', t.connecting.lostConnection, undefined, 0);
+        }
+      }, 1500);
     }
 
     return () => {
@@ -75,6 +85,8 @@ const GameRouter: React.FC = () => {
     };
   }, [
     isConnected,
+    session?.roomCode,
+    session?.playerName,
     addToast,
     t.connecting.lostConnection,
     t.connecting.reconnected,
@@ -83,7 +95,7 @@ const GameRouter: React.FC = () => {
   // Toast for server errors
   useEffect(() => {
     if (error) {
-      addToast('error', error, 'Erro do Servidor');
+      addToast('error', error);
       clearError();
     }
   }, [error, addToast, clearError]);
@@ -101,7 +113,7 @@ const GameRouter: React.FC = () => {
         addToast(
           'warning',
           `A sala fechará por inatividade em ${minutes}:${secs.toString().padStart(2, '0')}`,
-          'Inatividade da Sala',
+          undefined,
           8000,
         );
       }

@@ -90,9 +90,9 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
               animation: 'fade-in-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both',
             }}
           >
-            <div className="flex items-start gap-3 min-w-0">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               {/* Toast Icon */}
-              <div className="mt-0.5 shrink-0">
+              <div className="shrink-0 flex items-center justify-center">
                 {toast.type === 'success' && (
                   <svg
                     width="18"
@@ -166,13 +166,13 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
                 )}
               </div>
 
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 {toast.title && (
-                  <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider mb-0.5 truncate">
+                  <h4 className="font-cinzel font-bold text-xs uppercase tracking-wider mb-0.5 truncate text-white/80">
                     {toast.title}
                   </h4>
                 )}
-                <p className="text-xs font-sans font-medium leading-relaxed break-words opacity-90">
+                <p className="text-xs sm:text-sm font-sans font-medium leading-snug break-words text-white/95">
                   {toast.message}
                 </p>
               </div>
@@ -181,7 +181,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="opacity-50 hover:opacity-100 transition-opacity p-0.5 text-xs shrink-0 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+              className="text-white/40 hover:text-white transition-colors p-1 text-xs shrink-0 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none rounded-lg"
               title="Close"
               aria-label="Close notification"
             >
